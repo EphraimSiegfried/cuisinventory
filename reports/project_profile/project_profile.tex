@@ -1,0 +1,42 @@
+
+% --------------------
+% General Definitions
+% --------------------
+\documentclass{article} % Determines the general format.
+\usepackage{a4wide}     % Sets paper size to A4.
+\usepackage[utf8]{inputenc} % File encoding.
+\usepackage[T1]{fontenc}    % Font encoding in the PDF.
+\usepackage{fancyhdr}       % Custom header and footer.
+\usepackage{lastpage}       % For "Page X of Y" in the header.
+\usepackage{enumerate}      % Custom enumeration styles.
+\usepackage[ngerman,english]{babel} % German and english language support.
+\usepackage{setspace}       % Line spacing package.
+\usepackage{parskip}        % Package to tweak paragraph spacing.
+
+% ----------------
+% Header Setup
+% ----------------
+\lhead{\course\\\semester\\\projectname} % Left side of header
+\rhead{\authorname\\Page \thepage\ of \pageref{LastPage}} % Right side of header
+\usepackage[headheight=36pt]{geometry} % Height of Header
+\pagestyle{fancy} % Page style that uses the header
+
+% -----------------
+% Custom Commands
+% -----------------
+
+\newcommand{\authorname}{Alexander Lutsch\\Ephraim Siegfried\\Felix ?}
+\newcommand{\semester}{Fall Semester 2023}
+\newcommand{\course}{Computer Architecture }
+\newcommand{\course}{Cuisinventory}
+
+% -----------------
+% Document Content
+% -----------------
+
+\begin{document}
+
+\section*{Project profile: Cuisinventory}
+
+
+\end{document}
