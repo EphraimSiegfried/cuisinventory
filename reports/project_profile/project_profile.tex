@@ -16,7 +16,7 @@
 % ----------------
 % Header Setup
 % ----------------
-\lhead{\course\\\semester\\\projectname} % Left side of header
+\lhead{\course\\\semester\\Project name: \projectname} % Left side of header
 \rhead{\authorname} % Right side of header
 \usepackage[headheight=36pt]{geometry} % Height of Header
 \pagestyle{fancy} % Page style that uses the header
@@ -25,7 +25,7 @@
 % Custom Commands
 % -----------------
 
-\newcommand{\authorname}{Alexander Lutsch\\Ephraim Siegfried\\Felix ?}
+\newcommand{\authorname}{Alexander Lutsch\\Ephraim Siegfried\\Felix Andrist}
 \newcommand{\semester}{Fall Semester 2023}
 \newcommand{\course}{Computer Architecture }
 \newcommand{\projectname}{Cuisinventory}
@@ -36,7 +36,35 @@
 
 \begin{document}
 
-\section*{Project profile: Cuisinventory}
+\section*{Project Description: Cuisinventory}
+We're developing a kitchen hardware system to manage food inventory by monitoring products and their amounts.
+Users can scan a product's barcode for identification and place it on a scale for weighing.
+After consumption, the product can be re-weighed to update remaining quantities.
+The user should be able to see the inventory in a web interface.
+(We might add the feature that the user can also track expiry dates.)
 
 
+\section*{Hardware Requirements}
+We will need the following hardware components for our project.
+(A component that costs 0 CHF means that we already have the component.)
+
+\begin{tabular}{l l l}
+	\hline
+	Component              & Model                                           & Cost    \\
+	\hline
+	Main Controller        & Adafruit Feather nRF52840                       & 0 CHF   \\
+	Barcode-Code Scanner   & SparkFun 2D Barcode Scanner Breakout            & 52 CHF  \\
+	Strain Gauge Load Cell & Strain Gauge Load Cell - 4 Wires - 5Kg          & 6 CHF   \\
+	ADC-Chip               & Adafruit NAU7802 24-Bit ADC - STEMMA QT / Qwiic & 16 CHF  \\
+	Display                & SparkFun LCD-16398                              & 0 CHF   \\
+	WLAN Co-Processor      & Adafruit AirLift FeatherWing ESP32              & 16 CHF  \\
+	I2C Interface          & SparkFun Qwiic / Stemma QT FeatherWing          & 0 CHF   \\
+	3 * Buttons            & SparkFun Zubehör Qwiic Button - Green LED       & 15 CHF  \\
+	Cable                  & SparkFun Qwiic Cable Kit                        & 0 CHF   \\
+	Adalogger              & Adalogger FeatherWing - RTC + SD Add-on         & 0 CHF   \\
+	Stacking Headers       & Adafruit 12-pin and 16-pin female headers       & 2 CHF   \\
+	\hline
+	Total                  &                                                 & 107 CHF \\
+	\hline
+\end{tabular}
 \end{document}
