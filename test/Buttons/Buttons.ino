@@ -2,7 +2,9 @@
 #include <Wire.h>
 
 #include <SerLCD.h> 
-QwiicButton button;
+QwiicButton greenButton1;
+QwiicButton greenButton2;
+QwiicButton redButton;
 SerLCD lcd; 
 
 void setup() {
@@ -12,23 +14,37 @@ void setup() {
   lcd.setContrast(5); //Set contrast. Lower to 0 for higher contrast.
   lcd.clear(); 
 
-  if (button.begin() == false) {
-    Serial.println("Device did not acknowledge! Freezing.");
+  if (greenButton1.begin(0x70) == false) {
+    Serial.println("Green Device did not acknowledge! Freezing.");
     while (1);
   }
-  Serial.println("Button acknowledged.");
+  if (greenButton2.begin(0x6f) == false) {
+    Serial.println("Green Device did not acknowledge! Freezing.");
+    while (1);
+  }
+  if (redButton.begin(0x71) == false) {
+    Serial.println("Red Device did not acknowledge! Freezing.");
+    while (1);
+  }
+  Serial.println("Buttons acknowledged.");
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if (button.isPressed() == true) {
-    Serial.println("The button is pressed!");
-    lcd.setCursor(0, 1);
-    lcd.print("The button is pressed");
-    while (button.isPressed() == true)
-      delay(10);  //wait for user to stop pressing
-    lcd.clear();
-  }
+  String buttonAd = "Nothing";
 
+  if (greenButton1.isPressed()) {
+    buttonAd = "Green 0x70";
+    lcd.setBacklight(0, 255, 0); // Green
+  } else if (greenButton2.isPressed()) {
+    buttonAd = "Green 0x71";
+    lcd.setBacklight(0, 0, 255); // bright blue
+  } else if (redButton.isPressed()) {
+    buttonAd = "Red 0x70";
+    lcd.setBacklight(255, 0, 0); // Red
+  }
+  lcd.print(buttonAd + " pressed");
+  while (buttonAd.isPressed())
+    delay(30);  //wait for user to stop pressing
+  lcd.clear();
 }
