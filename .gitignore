@@ -2,6 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,latex,c,linux,windows
 
 ### C ###
+
+# Secrets header files
+*secrets.h
+
 # Prerequisites
 *.d
 
