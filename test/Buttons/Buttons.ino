@@ -1,50 +1,85 @@
-#include <SparkFun_Qwiic_Button.h>
 #include <Wire.h>
-
 #include <SerLCD.h> 
+#include <SparkFun_Qwiic_Button.h>
+
+enum buttons {
+    GREEN_BUTTON1 = 0x6f,
+    GREEN_BUTTON2 = 0x70,
+    RED_BUTTON = 0x71
+};
+
+SerLCD lcd; 
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
-SerLCD lcd; 
+
+uint8_t brightness_idle = 10; // brightness of buttons while idle, between 0 and 255
+uint8_t brightness_active = 50; // brightness of buttons during click, between 0 and 255
+
 
 void setup() {
-  Wire.begin();
-  lcd.begin(Wire);
-  lcd.setBacklight(255, 255, 255); //Set backlight to bright white
-  lcd.setContrast(5); //Set contrast. Lower to 0 for higher contrast.
-  lcd.clear(); 
+    Wire.begin();
+    lcd.begin(Wire);
+    Wire.setClock(400000); // set I2C SCL to High Speed Mode of 400kHz
 
-  if (greenButton1.begin(0x70) == false) {
-    Serial.println("Green Device did not acknowledge! Freezing.");
-    while (1);
-  }
-  if (greenButton2.begin(0x6f) == false) {
-    Serial.println("Green Device did not acknowledge! Freezing.");
-    while (1);
-  }
-  if (redButton.begin(0x71) == false) {
-    Serial.println("Red Device did not acknowledge! Freezing.");
-    while (1);
-  }
-  Serial.println("Buttons acknowledged.");
+    lcd.setFastBacklight(0xFFFFFF); // set backlight to bright white
+    lcd.setContrast(5); // Set contrast. Lower to 0 for higher contrast.
+    lcd.clear(); 
 
+    while (!greenButton1.begin(GREEN_BUTTON1)) {
+        lcd.clear();
+        lcd.print("Green button 1 not found...");
+        delay(200);
+    }
+    while (!greenButton2.begin(GREEN_BUTTON2)) {
+        lcd.clear();
+        lcd.print("Green button 2 not found...");
+        delay(200);
+    }
+    while (!redButton.begin(RED_BUTTON)) {
+        lcd.clear();
+        lcd.print("Red button not found...");
+        delay(200);
+    }
+
+    greenButton1.LEDon(brightness_idle);
+    greenButton2.LEDon(brightness_idle);
+    redButton.LEDon(brightness_idle);
+
+    lcd.clear();
+    lcd.print("Try pushing some buttons...");
+}
+
+void handleInput(enum buttons btn) {
+    lcd.clear();
+    switch (btn) {
+        case GREEN_BUTTON1:
+            lcd.setFastBacklight(0x00FF00); // green
+            lcd.print("Green button 1 was pressed.");
+            greenButton1.LEDon(brightness_active);
+            while (greenButton1.isPressed()); // wait
+            greenButton1.LEDon(brightness_idle);
+            break;
+        case GREEN_BUTTON2:
+            lcd.setFastBacklight(0x0000FF); // blue
+            lcd.print("Green button 2 was pressed.");
+            greenButton2.LEDon(brightness_active);
+            while (greenButton2.isPressed()); // wait
+            greenButton2.LEDon(brightness_idle);
+            break;
+        case RED_BUTTON:
+            lcd.setFastBacklight(0xFF0000); // red
+            lcd.print("Red button was pressed.");
+            redButton.LEDon(brightness_active);
+            while (redButton.isPressed()); // wait
+            redButton.LEDon(brightness_idle);
+            break;
+    }
 }
 
 void loop() {
-  String buttonAd = "Nothing";
-
-  if (greenButton1.isPressed()) {
-    buttonAd = "Green 0x70";
-    lcd.setBacklight(0, 255, 0); // Green
-  } else if (greenButton2.isPressed()) {
-    buttonAd = "Green 0x71";
-    lcd.setBacklight(0, 0, 255); // bright blue
-  } else if (redButton.isPressed()) {
-    buttonAd = "Red 0x70";
-    lcd.setBacklight(255, 0, 0); // Red
-  }
-  lcd.print(buttonAd + " pressed");
-  while (buttonAd.isPressed())
-    delay(30);  //wait for user to stop pressing
-  lcd.clear();
+    if (greenButton1.isPressed()) handleInput(GREEN_BUTTON1);
+    else if (greenButton2.isPressed()) handleInput(GREEN_BUTTON2);
+    else if (redButton.isPressed()) handleInput(RED_BUTTON);
+    delay(10);
 }
