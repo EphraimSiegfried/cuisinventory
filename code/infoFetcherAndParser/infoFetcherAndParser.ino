@@ -2,6 +2,8 @@
 #include <SPI.h>
 #include <ArduinoJson.h>
 #include <SD.h>
+#include "DB.h"
+
   //Initialize serial and wait for port to open:
 
   void setup() {
@@ -10,6 +12,9 @@
       ; // wait for serial port to connect. Needed for native USB port only
     }
     SD.begin(10);
+    if(!initializeSD()){
+      Serial.println("SD Card initialization failed");
+    }
     if(!connectWlan("S10","Internet5")){
       Serial.println("wlan connection failed");
     }
