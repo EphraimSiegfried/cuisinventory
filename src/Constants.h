@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 // Barcode API
 const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
@@ -9,8 +10,10 @@ const String BARCODE_FIELDS =
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
 
 // SD
+const int JSONSIZE = 1024;
 const int SD_PIN = 10;
-const String MAPPINGFILE = "/.state/mapping";
+const String KEY_BAR_MAPPINGFILE = "/.intern/keybarmapping";
+const String BAR_KEYS_MAPPINGFILE = "/.intern/barkeymapping";
 const String STATEFILE = "/.state/state";
 
 // Buttons

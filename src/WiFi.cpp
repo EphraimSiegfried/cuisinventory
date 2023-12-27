@@ -1,7 +1,5 @@
-#include "Constants.h"
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <WiFiNINA.h>
+
+#include "WIFI.h"
 
 #define SPIWIFI SPI     // The SPI port
 #define SPIWIFI_SS 13   // Chip select pin
@@ -9,21 +7,17 @@
 #define SPIWIFI_ACK 11  // a.k.a BUSY or READY pin
 #define ESP32_GPIO0 -1
 
-class WIFI {
 
-public:
-  WIFI(String ssid, String pw) {
-    WIFI::ssid = ssid.c_str();
-    WIFI::pw = pw.c_str();
-    WIFI::wifiStatus = WL_IDLE_STATUS;
-    WiFiSSLClient client;
+  WIFI::WIFI(String ssid, String pw) {
+    ssid = ssid.c_str();
+    pw = pw.c_str();
+    wifiStatus = WL_IDLE_STATUS;
     connect();
   }
-  bool put(StaticJsonDocument *doc);
 
-  bool get(String barcode, StaticJsonDocument *doc) {
+  bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE>& doc) {
     // if you get a connection, report back via serial:
-    if (!client.connect(BARCODE_ENDPOINT, 443)) {
+    if (!client.connect(BARCODE_ENDPOINT.c_str(), 443)) {
       Serial.println(F("Connection to server failed"));
       return false;
     }
@@ -73,7 +67,7 @@ public:
     return true;
   }
 
-  int getStatus() {
+  int WIFI::getStatus() {
     // print the SSID of the network you're attached to:
     Serial.print("SSID: ");
     Serial.println(WiFi.SSID());
@@ -90,12 +84,7 @@ public:
     Serial.println(" dBm");
   }
 
-private:
-  const char *ssid;
-  const char *pw;
-  int wifiStatus;
-
-  bool connect() {
+  bool WIFI::connect() {
     WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
     // check for the WiFi module:
     if (WiFi.status() == WL_NO_MODULE) {
@@ -106,7 +95,7 @@ private:
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network:
-    wifiStatus = WiFi.begin(ssid, pass);
+    wifiStatus = WiFi.begin(ssid, pw);
     // wait 10 seconds for connection:
     delay(3000);
     if (wifiStatus != WL_CONNECTED) {
@@ -114,4 +103,4 @@ private:
     }
     return true;
   }
-};
+
