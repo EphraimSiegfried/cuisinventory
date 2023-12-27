@@ -20,7 +20,7 @@ enum buttons {
     RED_BUTTON = 0x71
 };
 
-SerLCD lcd; 
+SerLCD lcd;
 Sd2Card card;
 SdVolume volume;
 RTC_PCF8523 rtc;
@@ -30,6 +30,8 @@ QwiicButton redButton;
 Adafruit_USBD_MSC usb_msc;
 
 bool usb = false; // whether to act as usb mass storage
+
+Task tInput(T_INPUT_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, &inputCB, &ts, true);
 
 void setup() {
 #ifdef DEBUG
@@ -109,6 +111,10 @@ void setup() {
 
 void loop() {
     if (usb) return; // do nothing if in usb mode
+}
+
+void inputCB() {
+
 }
 
 void setupUSB() {

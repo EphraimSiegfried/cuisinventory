@@ -1,5 +1,8 @@
 #pragma once
 
+// Tasks
+const uint64_t T_INPUT_INTERVAL = 100; // interval between calls to checkInput in ms
+
 // SD
 const int SD_PIN = 10;
 const String MAPPINGFILE = "/.state/mapping";
