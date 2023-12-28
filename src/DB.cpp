@@ -55,15 +55,15 @@ bool DB::add(StaticJsonDocument<1024>& doc) {
     doc["uniqueID"] = currentID;
     String filename = String(currentID);
 
-  doc.remove("errors");
-  doc.remove("result");
-  doc.remove("status");
-  doc.remove("warnings");
-  doc["weight"] = 0;
-  File file = SD.open("test.json", FILE_WRITE);
-  serializeJsonPretty(doc,file);
-  Serial.write(file.read());
-  file.close();
+    doc.remove("errors");
+    doc.remove("result");
+    doc.remove("status");
+    doc.remove("warnings");
+    doc["weight"] = 0;
+    File file = SD.open("test.json", FILE_WRITE);
+    serializeJsonPretty(doc, file);
+    Serial.write(file.read());
+    file.close();
 }
 
 bool DB::set(uint32_t id, String key, String value) { return true; }
@@ -90,29 +90,28 @@ bool DB::getCurrentID() {
     return true;
 }
 
-bool DB::addMappings(u_int32_t currentID, String barcode){
-  //update statefile
-  File stateFile;
-  stateFile = SD.open(STATEFILE, FILE_WRITE);
-  if(!stateFile){
-    Serial.println("Failed to open state file");
-    return false;
-  }
-  StaticJsonDocument<STATEFILESIZE> stateJson;
-  auto error = deserializeJson(stateJson, stateFile);
-  if (error) {
-    Serial.print(F("deserializeJson() failed with code "));
-    Serial.println(error.c_str());
-    return false;
-  }
-  stateFile.close();
-  stateJson["currentID"] = currentID;
-  //Save statefile
-  const char* filename = String(currentID).c_str();
-  File file = SD.open(filename, FILE_WRITE);
-  serializeJson(stateJson,file);
-  file.close();
-  
+bool DB::addMappings(u_int32_t currentID, String barcode) {
+    // update statefile
+    File stateFile;
+    stateFile = SD.open(STATEFILE, FILE_WRITE);
+    if (!stateFile) {
+        Serial.println("Failed to open state file");
+        return false;
+    }
+    StaticJsonDocument<STATEFILESIZE> stateJson;
+    auto error = deserializeJson(stateJson, stateFile);
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return false;
+    }
+    stateFile.close();
+    stateJson["currentID"] = currentID;
+    // Save statefile
+    const char* filename = String(currentID).c_str();
+    File file = SD.open(filename, FILE_WRITE);
+    serializeJson(stateJson, file);
+    file.close();
 }
 
 /*DynamicJsonDocument* DB::loadKeyMapping(){
@@ -129,5 +128,3 @@ bool DB::addMappings(u_int32_t currentID, String barcode){
     keyBarMap.close();
     return keyBarMapJson;
 }*/
-
-

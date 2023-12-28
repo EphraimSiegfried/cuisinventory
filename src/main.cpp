@@ -8,11 +8,14 @@
 #include "Constants.h"
 #include "DB.h"
 
-#define _TASK_STATUS_REQUEST     // Compile with support for StatusRequest functionality - triggering tasks on status change events in addition to time only
-// #define _TASK_LTS_POINTER        // Compile with support for local task storage pointer
+#define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
+                              // functionality - triggering tasks on status
+                              // change events in addition to time only
+// #define _TASK_LTS_POINTER        // Compile with support for local task
+// storage pointer
 //#include <TaskScheduler.h>
 
-//Scheduler ts;
+// Scheduler ts;
 
 enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
 
@@ -23,11 +26,12 @@ RTC_PCF8523 rtc;
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
-//Adafruit_USBD_MSC usb_msc;
+// Adafruit_USBD_MSC usb_msc;
 
 bool usb = false;  // whether to act as usb mass storage
 
-//Task tInput(T_INPUT_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, &inputCB, &ts, true);
+// Task tInput(T_INPUT_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, &inputCB, &ts,
+// true);
 
 void setup() {
 #ifdef DEBUG
@@ -72,7 +76,7 @@ void setup() {
     if (redButton.isPressed()) {
         lcd.print("** USB MSC activated **");
         usb = true;
-//        setupUSB();
+        //        setupUSB();
         return;
     }
 
@@ -113,8 +117,8 @@ void loop() {
 void inputCB() {}
 
 /*void setupUSB() {
-    // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-    usb_msc.setID("Vendor", "Cuisinventory", "1.0");
+    // Set disk vendor id, product id and revision with string up to 8, 16, 4
+characters respectively usb_msc.setID("Vendor", "Cuisinventory", "1.0");
 
     // Set read write callback
     usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
@@ -160,7 +164,8 @@ int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
     return card.writeBlock(lba, buffer) ? 512 : -1;
 }
 
-// Callback invoked when WRITE10 command is completed (status received and accepted by host).
+// Callback invoked when WRITE10 command is completed (status received and
+accepted by host).
 // used to flush any pending cache.
 void msc_flush_cb (void)
 {

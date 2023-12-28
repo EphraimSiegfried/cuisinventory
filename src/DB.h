@@ -17,8 +17,8 @@ class DB {
     bool set(uint32_t id, String key, String value);
     bool removeJson(uint32_t id);
 
-private:
-  uint32_t currentID;
-  bool getCurrentID();
-  bool addMappings(u_int32_t currentID, String barcode);
+   private:
+    uint32_t currentID;
+    bool getCurrentID();
+    bool addMappings(u_int32_t currentID, String barcode);
 };
