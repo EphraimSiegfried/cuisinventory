@@ -14,6 +14,7 @@ const uint64_t T_INPUT_INTERVAL = 100; // interval between calls to checkInput i
 
 // SD
 const int JSONSIZE = 1024;
+const int STATEFILESIZE = 1024;
 const int SD_PIN = 10;
 const String KEY_BAR_MAPPINGFILE = "/.intern/keybarmapping";
 const String BAR_KEYS_MAPPINGFILE = "/.intern/barkeymapping";
