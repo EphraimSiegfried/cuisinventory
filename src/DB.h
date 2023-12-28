@@ -18,6 +18,5 @@ public:
 private:
   uint32_t currentID;
   bool getCurrentID();
-  DynamicJsonDocument* loadKeyMapping();
-  DynamicJsonDocument* loadBarMapping();
+  bool addMappings(u_int32_t currentID, String barcode);
 };

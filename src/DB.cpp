@@ -55,9 +55,6 @@ bool DB::add(StaticJsonDocument<1024>& doc){
   doc["uniqueID"] = currentID;
   String filename = String(currentID);
 
-  if(SD.exists(filename)){
-    return true;
-  }
   doc.remove("errors");
   doc.remove("result");
   doc.remove("status");
@@ -97,7 +94,7 @@ bool DB::getCurrentID(){
   return true;
 }
 
-bool addMappings(u_int32_t currentID, String barcode){
+bool DB::addMappings(u_int32_t currentID, String barcode){
   //update statefile
   File stateFile;
   stateFile = SD.open(STATEFILE, FILE_WRITE);
@@ -113,7 +110,7 @@ bool addMappings(u_int32_t currentID, String barcode){
     return false;
   }
   stateFile.close();
-  stateJson['currentID'] = currentID;
+  stateJson["currentID"] = currentID;
   //Save statefile
   const char* filename = String(currentID).c_str();
   File file = SD.open(filename, FILE_WRITE);
@@ -137,12 +134,4 @@ bool addMappings(u_int32_t currentID, String barcode){
     return keyBarMapJson;
 }*/
 
-
-bool storeJson(Json doc){
-  const char* filename = doc["uniqueID"].as<const char*>();
-  File file = SD.open(filename, FILE_WRITE);
-  serializeJson(doc,file);
-  file.close();
-  return true;
-}
 
