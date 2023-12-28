@@ -24,5 +24,5 @@ class DB {
     bool loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     DynamicJsonDocument* loadBarKeyMapping();
-    bool saveMapping(DynamicJsonDocument* doc,String mappingName);
+    bool saveMapping(DynamicJsonDocument* doc, String mappingName);
 };
