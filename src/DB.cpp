@@ -1,38 +1,81 @@
 #include "DB.h"
 
-DBCuisinventory::DBCuisinventory() {
+DB::DB() {
     currentID = 0;
     getCurrentID();
 }
 
-bool DBCuisinventory::getJsonFromID(uint32_t id,StaticJsonDocument<1024>& doc){
+bool DB::getJsonFromID(uint32_t id,StaticJsonDocument<JSONSIZE>& doc){
   //DynamicJsonDocument* keyBarMap = loadKeyMapping();
   String filename = String(id);
-  File file = SD.open(filename.c_str(), FILE_WRITE);
-  if(!file){
+  File jsonFile = SD.open(filename.c_str(), FILE_WRITE);
+  if(!jsonFile){
     Serial.println("Failed to open keyBar file");
     return false;
   }
+  auto error = deserializeJson(doc,jsonFile);
+  if (error) {
+    Serial.print(F("failed to get json from id: "));
+    Serial.println(error.c_str());
+    return false;
+  }
+  jsonFile.close();
   return true;
 }
 
-uint32_t DBCuisinventory::getID(String barcode){
-  return 0;
-}
-
-bool DBCuisinventory::add(StaticJsonDocument<1024>& doc){
+bool DB::getIDs(String barcode,std::vector<uint32_t>& ids){
+  //Open BarKey Mappingfile
+  File barKeyMap = SD.open(BAR_KEYS_MAPPINGFILE.c_str(), FILE_WRITE);
+  if(!barKeyMap){
+    Serial.println("Failed to open barKeyMap file");
+    return false;
+  }
+  //estimate required filesize
+  long keyBarMapSize = barKeyMap.size();
+  int estimateMembers = (int) keyBarMapSize/12;
+  DynamicJsonDocument barKeyMapJson(JSON_OBJECT_SIZE(estimateMembers));
+  auto error = deserializeJson(barKeyMapJson,barKeyMap);
+  if (error) {
+      Serial.print(F("failed to deserialize barKeyMapping: "));
+      Serial.println(error.c_str());
+      return false;
+  }
+  barKeyMap.close();
+  //read out field and add to vector
+  JsonArray keys = barKeyMapJson[barcode.c_str()];
+  for (JsonVariant key : keys) {
+    ids.push_back(key.as<uint32_t>());
+  }
+  barKeyMapJson.clear();
   return true;
 }
 
-bool DBCuisinventory::set(uint32_t id, String key, String value){
+bool DB::add(StaticJsonDocument<1024>& doc){
+  this->currentID++;
+  const char* filename = doc["code"].as<const char*>();
+  if(SD.exists(filename)){
+    return true;
+  }
+  doc.remove("errors");
+  doc.remove("result");
+  doc.remove("status");
+  doc.remove("warnings");
+  doc["weight"] = 0;
+  File file = SD.open("test.json", FILE_WRITE);
+  serializeJsonPretty(doc,file);
+  Serial.write(file.read());
+  file.close();
+}
+
+bool DB::set(uint32_t id, String key, String value){
   return true;
 }
 
-bool DBCuisinventory::removeJson(uint32_t id){
+bool DB::removeJson(uint32_t id){
   return true;
 }
 
-bool DBCuisinventory::getCurrentID(){
+bool DB::getCurrentID(){
   File stateFile;
   //open state
   stateFile = SD.open(STATEFILE, FILE_WRITE);
@@ -51,15 +94,22 @@ bool DBCuisinventory::getCurrentID(){
   stateFile.close();  
   return true;
 }
-DynamicJsonDocument* DBCuisinventory::loadKeyMapping(){
-    File keyBarMap;
-    keyBarMap = SD.open(KEY_BAR_MAPPINGFILE, FILE_WRITE);
+
+/*DynamicJsonDocument* DB::loadKeyMapping(){
+    File keyBarMap = SD.open(KEY_BAR_MAPPINGFILE.c_str(), FILE_WRITE);
     long keyBarMapSize = keyBarMap.size();
-    keyBarMap.close();
     int estimateMembers = (int) keyBarMapSize/12;
-    DynamicJsonDocument* keyBarMapJson = new DynamicJsonDocument(JSON_OBJECT_SIZE(estimateMembers));
+    DynamicJsonDocument keyBarMapJson(JSON_OBJECT_SIZE(estimateMembers));
+    auto error = deserializeJson(keyBarMapJson,keyBarMap);
+    if (error) {
+      Serial.print(F("failed to deserialize keyBarMapping: "));
+      Serial.println(error.c_str());
+      return keyBarMapJson;
+    }
+    keyBarMap.close();
     return keyBarMapJson;
-}
+}*/
+
 
 /*bool storeJson(DynamicJsonDocument& doc){
   const char* filename = doc["code"].as<const char*>();
