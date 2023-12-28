@@ -24,29 +24,14 @@ bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
 }
 
 bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
-    // Open BarKey Mappingfile
-    File barKeyMap = SD.open(BAR_KEYS_MAPPINGFILE.c_str(), FILE_WRITE);
-    if (!barKeyMap) {
-        Serial.println("Failed to open barKeyMap file");
-        return false;
-    }
-    // estimate required filesize
-    long keyBarMapSize = barKeyMap.size();
-    int estimateMembers = (int)keyBarMapSize / 12;
-    DynamicJsonDocument barKeyMapJson(JSON_OBJECT_SIZE(estimateMembers));
-    auto error = deserializeJson(barKeyMapJson, barKeyMap);
-    if (error) {
-        Serial.print(F("failed to deserialize barKeyMapping: "));
-        Serial.println(error.c_str());
-        return false;
-    }
-    barKeyMap.close();
+    DynamicJsonDocument* barKeyMapJson = loadBarKeyMapping();
     // read out field and add to vector
-    JsonArray keys = barKeyMapJson[barcode.c_str()];
+    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
     for (JsonVariant key : keys) {
         ids.push_back(key.as<uint32_t>());
     }
-    barKeyMapJson.clear();
+    (*barKeyMapJson).clear();
+    delete barKeyMapJson;
     return true;
 }
 
@@ -92,13 +77,28 @@ bool DB::getCurrentID() {
 
 bool DB::addMappings(u_int32_t currentID, String barcode) {
     // update statefile
+    StaticJsonDocument<STATEFILESIZE> stateJson;
+    loadStateMapping(stateJson);
+    stateJson["currentID"] = currentID;
+    saveStateMapping(stateJson);
+    // update bar key mapping
+    DynamicJsonDocument* barKeyMapJson = loadBarKeyMapping();
+    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
+    //Add barcode
+    keys.add(barcode);
+    saveMapping(barKeyMapJson,BAR_KEYS_MAPPINGFILE);
+    (*barKeyMapJson).clear();
+    delete barKeyMapJson;
+    // update key bar mapping
+}
+
+bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson){
     File stateFile;
     stateFile = SD.open(STATEFILE, FILE_WRITE);
     if (!stateFile) {
         Serial.println("Failed to open state file");
         return false;
     }
-    StaticJsonDocument<STATEFILESIZE> stateJson;
     auto error = deserializeJson(stateJson, stateFile);
     if (error) {
         Serial.print(F("deserializeJson() failed with code "));
@@ -106,25 +106,51 @@ bool DB::addMappings(u_int32_t currentID, String barcode) {
         return false;
     }
     stateFile.close();
-    stateJson["currentID"] = currentID;
-    // Save statefile
-    const char* filename = String(currentID).c_str();
-    File file = SD.open(filename, FILE_WRITE);
-    serializeJson(stateJson, file);
-    file.close();
+    return true;
 }
 
-/*DynamicJsonDocument* DB::loadKeyMapping(){
-    File keyBarMap = SD.open(KEY_BAR_MAPPINGFILE.c_str(), FILE_WRITE);
-    long keyBarMapSize = keyBarMap.size();
-    int estimateMembers = (int) keyBarMapSize/12;
-    DynamicJsonDocument keyBarMapJson(JSON_OBJECT_SIZE(estimateMembers));
-    auto error = deserializeJson(keyBarMapJson,keyBarMap);
-    if (error) {
-      Serial.print(F("failed to deserialize keyBarMapping: "));
-      Serial.println(error.c_str());
-      return keyBarMapJson;
+bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson){
+    File stateFile;
+    stateFile = SD.open(STATEFILE, FILE_WRITE);
+    if (!stateFile) {
+        Serial.println("Failed to open state file");
+        return false;
     }
-    keyBarMap.close();
-    return keyBarMapJson;
-}*/
+    serializeJson(stateJson,stateFile);
+    stateFile.close();
+    return true;
+}
+
+DynamicJsonDocument* DB::loadBarKeyMapping(){
+    File barKeyMap = SD.open(BAR_KEYS_MAPPINGFILE.c_str(), FILE_WRITE);
+    if (!barKeyMap) {
+        Serial.println("Failed to open barKeyMap file");
+        return NULL;
+    }
+    // estimate required filesize
+    long barKeyMapSize = barKeyMap.size();
+    int estimateMembers = (int)barKeyMapSize / 12;
+    DynamicJsonDocument* barKeyMapJson = new DynamicJsonDocument(JSON_OBJECT_SIZE(estimateMembers));
+    auto error = deserializeJson(*barKeyMapJson, barKeyMap);
+    if (error) {
+        Serial.print(F("failed to deserialize barKeyMapping: "));
+        Serial.println(error.c_str());
+        return NULL;
+    }
+    barKeyMap.close();
+    return barKeyMapJson;
+}
+
+bool DB::saveMapping(DynamicJsonDocument* doc,String mappingName){
+    File mappingFile;
+    mappingFile = SD.open(mappingName.c_str(), FILE_WRITE);
+    if (!mappingFile) {
+        Serial.println("Failed to open mapping file for saving");
+        return false;
+    }
+    serializeJson(*doc,mappingFile);
+    mappingFile.close();
+    return true;
+}
+
+

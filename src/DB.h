@@ -21,4 +21,8 @@ class DB {
     uint32_t currentID;
     bool getCurrentID();
     bool addMappings(u_int32_t currentID, String barcode);
+    bool loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
+    bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
+    DynamicJsonDocument* loadBarKeyMapping();
+    bool saveMapping(DynamicJsonDocument* doc,String mappingName);
 };
