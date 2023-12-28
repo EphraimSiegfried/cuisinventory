@@ -1,11 +1,12 @@
-#include <SD.h>
-#include <Wire.h>
-#include <SerLCD.h>
+#include <Adafruit_TinyUSB.h>
 #include <RTClib.h>
+#include <SD.h>
+#include <SerLCD.h>
+#include <SparkFun_Qwiic_Button.h>
+#include <Wire.h>
+
 #include "Constants.h"
 #include "DB.h"
-#include <Adafruit_TinyUSB.h>
-#include <SparkFun_Qwiic_Button.h>
 
 #define _TASK_STATUS_REQUEST     // Compile with support for StatusRequest functionality - triggering tasks on status change events in addition to time only
 // #define _TASK_LTS_POINTER        // Compile with support for local task storage pointer
@@ -13,11 +14,7 @@
 
 //Scheduler ts;
 
-enum buttons {
-    GREEN_BUTTON1 = 0x6f,
-    GREEN_BUTTON2 = 0x70,
-    RED_BUTTON = 0x71
-};
+enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
 
 SerLCD lcd;
 Sd2Card card;
@@ -28,7 +25,7 @@ QwiicButton greenButton2;
 QwiicButton redButton;
 //Adafruit_USBD_MSC usb_msc;
 
-bool usb = false; // whether to act as usb mass storage
+bool usb = false;  // whether to act as usb mass storage
 
 //Task tInput(T_INPUT_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, &inputCB, &ts, true);
 
@@ -38,11 +35,12 @@ void setup() {
 #endif
     Wire.begin();
     lcd.begin(Wire);
-    Wire.setClock(400000); // set I2C SCL to High Speed Mode of 400kHz
+    Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
-    lcd.setFastBacklight(0xFFFFFF); // set backlight to bright white
-    lcd.setContrast(LCD_CONTRAST); // Set contrast. Lower to 0 for higher contrast.
-    lcd.clear(); 
+    lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
+    lcd.setContrast(
+        LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
+    lcd.clear();
 
     // *** Buttons ***
 
@@ -80,7 +78,7 @@ void setup() {
 
     // *** SD ***
 
-    pinMode(SD_PIN, OUTPUT); // set SD pin mode
+    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
 
     while (!SD.begin(SD_PIN)) {
         lcd.clear();
@@ -109,12 +107,10 @@ void setup() {
 }
 
 void loop() {
-    if (usb) return; // do nothing if in usb mode
+    if (usb) return;  // do nothing if in usb mode
 }
 
-void inputCB() {
-
-}
+void inputCB() {}
 
 /*void setupUSB() {
     // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
@@ -123,8 +119,8 @@ void inputCB() {
     // Set read write callback
     usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
 
-    // Still initialize MSC but tell usb stack that MSC is not ready to read/write
-    // If we don't initialize, board will be enumerated as CDC only
+    // Still initialize MSC but tell usb stack that MSC is not ready to
+    // read/write If we don't initialize, board will be enumerated as CDC only
     usb_msc.setUnitReady(false);
     usb_msc.begin();
 
@@ -134,34 +130,34 @@ void inputCB() {
         while (1) delay(10);
     }
 
-    // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
+    // Now we will try to open the 'volume'/'partition' - it should be FAT16 or
+    // FAT32
     if (!volume.init(card)) {
         lcd.clear();
         lcd.print("Couldn't find FAT16/FAT32 partition!");
         while (1) delay(10);
     }
 
-    uint32_t block_count = volume.blocksPerCluster()*volume.clusterCount();
-    usb_msc.setCapacity(block_count, 512); // Set disk size, SD block size is always 512
-    usb_msc.setUnitReady(true); // msc is ready for read/write
+    uint32_t block_count = volume.blocksPerCluster() * volume.clusterCount();
+    usb_msc.setCapacity(block_count,
+                        512);    // Set disk size, SD block size is always 512
+    usb_msc.setUnitReady(true);  // msc is ready for read/write
 }
 
 // Callback invoked when received READ10 command.
 // Copy disk's data to buffer (up to bufsize) and
 // return number of copied bytes (must be multiple of block size)
-int32_t msc_read_cb (uint32_t lba, void* buffer, uint32_t bufsize)
-{
-  (void) bufsize;
-  return card.readBlock(lba, (uint8_t*) buffer) ? 512 : -1;
+int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
+    (void)bufsize;
+    return card.readBlock(lba, (uint8_t*)buffer) ? 512 : -1;
 }
 
 // Callback invoked when received WRITE10 command.
-// Process data in buffer to disk's storage and 
+// Process data in buffer to disk's storage and
 // return number of written bytes (must be multiple of block size)
-int32_t msc_write_cb (uint32_t lba, uint8_t* buffer, uint32_t bufsize)
-{
-  (void) bufsize;
-  return card.writeBlock(lba, buffer) ? 512 : -1;
+int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
+    (void)bufsize;
+    return card.writeBlock(lba, buffer) ? 512 : -1;
 }
 
 // Callback invoked when WRITE10 command is completed (status received and accepted by host).
