@@ -1,25 +1,24 @@
 
 #include "WIFI.h"
 
-#define SPIWIFI SPI     // The SPI port
-#define SPIWIFI_SS 13   // Chip select pin
-#define ESP32_RESETN 12 // Reset pin
-#define SPIWIFI_ACK 11  // a.k.a BUSY or READY pin
-#define ESP32_GPIO0 -1
+#define SPIWIFI      SPI  // The SPI port
+#define SPIWIFI_SS   13   // Chip select pin
+#define ESP32_RESETN 12   // Reset pin
+#define SPIWIFI_ACK  11   // a.k.a BUSY or READY pin
+#define ESP32_GPIO0  -1
 
-
-  WIFI::WIFI(String ssid, String pw) {
+WIFI::WIFI(String ssid, String pw) {
     ssid = ssid.c_str();
     pw = pw.c_str();
     wifiStatus = WL_IDLE_STATUS;
     connect();
-  }
+}
 
-  bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE>& doc) {
+bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
     // if you get a connection, report back via serial:
     if (!client.connect(BARCODE_ENDPOINT.c_str(), 443)) {
-      Serial.println(F("Connection to server failed"));
-      return false;
+        Serial.println(F("Connection to server failed"));
+        return false;
     }
     Serial.println(F("Connected to server"));
     // Make a HTTP request:
@@ -34,9 +33,9 @@
     char status[32] = {0};
     client.readBytesUntil('\r', status, sizeof(status));
     if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
-      Serial.print(F("Unexpected response: "));
-      Serial.println(status);
-      return false;
+        Serial.print(F("Unexpected response: "));
+        Serial.println(status);
+        return false;
     }
 
     char singelLine[] = "\n";
@@ -46,50 +45,30 @@
     // skip first line
     client.find(singelLine, 1);
 
-    DynamicJsonDocument doc(1024);
-    auto error = deserializeJson(doc, client);
+    [[maybe_unused]] auto error = deserializeJson(jsonDoc, client);
+#ifdef DEBUG
     if (error) {
-      Serial.print(F("deserializeJson() failed with code "));
-      Serial.println(error.c_str());
-      return false;
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return false;
     }
-    if (strcmp(doc["status"].as<const char *>(), "success") != 0) {
-      Serial.println(F("Couldn't find product"));
-      return false;
+    if (strcmp(jsonDoc["status"].as<const char *>(), "success") != 0) {
+        Serial.println(F("Couldn't find product"));
+        return false;
     }
-    Serial.println(doc["product"]["product_name"].as<const char *>());
-    if (!storeJson(doc)) {
-      Serial.println(F("Storing failed"));
-      return false;
-    }
+    Serial.println(jsonDoc["product"]["product_name"].as<const char *>());
+#endif
+
     client.flush();
-    doc.clear();
     return true;
-  }
+}
 
-  int WIFI::getStatus() {
-    // print the SSID of the network you're attached to:
-    Serial.print("SSID: ");
-    Serial.println(WiFi.SSID());
-
-    // print your board's IP address:
-    IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
-    Serial.println(ip);
-
-    // print the received signal strength:
-    long rssi = WiFi.RSSI();
-    Serial.print("signal strength (RSSI):");
-    Serial.print(rssi);
-    Serial.println(" dBm");
-  }
-
-  bool WIFI::connect() {
+bool WIFI::connect() {
     WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
     // check for the WiFi module:
     if (WiFi.status() == WL_NO_MODULE) {
-      Serial.println("Communication with WiFi module failed!");
-      return false;
+        Serial.println("Communication with WiFi module failed!");
+        return false;
     }
     // attempt to connect to Wifi network:
     Serial.print("Attempting to connect to WPA SSID: ");
@@ -99,8 +78,7 @@
     // wait 10 seconds for connection:
     delay(3000);
     if (wifiStatus != WL_CONNECTED) {
-      return false;
+        return false;
     }
     return true;
-  }
-
+}
