@@ -6,6 +6,7 @@
 #include <SPI.h>
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
+#include <USB.h>
 #include <Wire.h>
 
 #define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
@@ -20,13 +21,10 @@
 enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
 
 SerLCD lcd;
-Sd2Card card;
-SdVolume volume;
 RTC_PCF8523 rtc;
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
-// Adafruit_USBD_MSC usb_msc;
 
 bool usb = false;  // whether to act as usb mass storage
 
@@ -76,7 +74,7 @@ void setup() {
     if (redButton.isPressed()) {
         lcd.print("** USB MSC activated **");
         usb = true;
-        //        setupUSB();
+        setupUSB();
         return;
     }
 
