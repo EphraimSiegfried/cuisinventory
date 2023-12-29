@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Constants.h>
+#include <Debug.h>
 #include <SPI.h>
 #include <WiFiNINA.h>
 

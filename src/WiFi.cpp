@@ -16,24 +16,21 @@ WIFI::WIFI(String ssid, String pw) {
 bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
     // if you get a connection, report back via serial:
     if (!client.connect(BARCODE_ENDPOINT.c_str(), 443)) {
-        Serial.println(F("Connection to server failed"));
+        LOG("Connection to server failed");
         return false;
     }
-    Serial.println(F("Connected to server"));
-    // Make a HTTP request:
-    client.println("GET " + BARCODE_PATH + barcode +
-                   "?fields=" + BARCODE_FIELDS + " HTTP/1.1");
-    client.println("Host: " + BARCODE_ENDPOINT);
-    client.println("User-Agent:" + USER_AGENT);
-    client.println("Connection: close");
-    client.println();
+    LOG("Connected to server");
+    client.println(
+        "GET " + BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS +
+        " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
+        "User-Agent: " + USER_AGENT + "\r\n" + "Connection: close\r\n\r\n");
 
     // Check HTTP status
     char status[32] = {0};
     client.readBytesUntil('\r', status, sizeof(status));
     if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
-        Serial.print(F("Unexpected response: "));
-        Serial.println(status);
+        LOG("Unexpected response:");
+        LOG(status);
         return false;
     }
 
@@ -44,19 +41,17 @@ bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
     // skip first line
     client.find(singelLine, 1);
 
-    [[maybe_unused]] auto error = deserializeJson(jsonDoc, client);
-#ifdef DEBUG
+    auto error = deserializeJson(jsonDoc, client);
     if (error) {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
+        LOG("deserializeJson() failed with code:");
+        LOG(error.c_str());
         return false;
     }
     if (strcmp(jsonDoc["status"].as<const char *>(), "success") != 0) {
-        Serial.println(F("Couldn't find product"));
+        LOG("Couldn't find product");
         return false;
     }
-    Serial.println(jsonDoc["product"]["product_name"].as<const char *>());
-#endif
+    LOG(jsonDoc["product"]["product_name"].as<const char *>());
 
     client.flush();
     return true;
@@ -69,9 +64,8 @@ bool WIFI::connect() {
         Serial.println("Communication with WiFi module failed!");
         return false;
     }
-    // attempt to connect to Wifi network:
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
+    LOG("Attempting to connect to WPA SSID: \r\n");
+    LOG(ssid);
     // Connect to WPA/WPA2 network:
     wifiStatus = WiFi.begin(ssid, pw);
     // wait 10 seconds for connection:
