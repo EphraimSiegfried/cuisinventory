@@ -5,7 +5,9 @@
 #include <RTClib.h>
 #include <SD.h>
 
-class Error {
+class ErrorClass {
    public:
     void logError(String error);
 };
+
+extern ErrorClass Error;

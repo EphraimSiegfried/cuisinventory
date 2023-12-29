@@ -3,7 +3,7 @@
 RTC_PCF8523 rtc;
 File logFile;
 
-void Error::logError(String error) {
+void ErrorClass::logError(String error) {
 #ifdef DEBUG
     Serial.println("Error: " + error);
 #endif
@@ -14,3 +14,5 @@ void Error::logError(String error) {
         logFile.close();
     }
 }
+
+ErrorClass Error;

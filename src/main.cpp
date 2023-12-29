@@ -26,7 +26,6 @@ extern RTC_PCF8523 rtc;
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
-Error ErrorLogger;
 // Adafruit_USBD_MSC usb_msc;
 
 bool usb = false;  // whether to act as usb mass storage
@@ -110,7 +109,7 @@ void setup() {
     rtc.start();
     lcd.clear();
 
-    ErrorLogger.logError("Testing logError()");
+    Error.logError("Testing logError()");
 }
 
 void loop() {
