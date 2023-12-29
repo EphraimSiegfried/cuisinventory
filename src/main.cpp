@@ -1,12 +1,11 @@
 #include <Adafruit_TinyUSB.h>
+#include <Constants.h>
+#include <DB.h>
 #include <RTClib.h>
 #include <SPI.h>
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
 #include <Wire.h>
-
-#include <Constants.h>
-#include <DB.h>
 
 #define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
                               // functionality - triggering tasks on status
