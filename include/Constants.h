@@ -22,6 +22,9 @@ const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
 const String STATEFILE = "/.state/state";
 const String LOGFILE = "/.state/logs";
 
+//JSON
+const String UNIQUE_ID = "unique_ID";
+
 // Clock
 const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
 

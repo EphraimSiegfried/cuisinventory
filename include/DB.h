@@ -27,4 +27,9 @@ class DB {
     bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     DynamicJsonDocument* loadMapping(String mappingfile);
     bool saveMapping(DynamicJsonDocument* doc, String mappingName);
+    bool initDatabase();
+    bool checkInitialized(String filename);
+    bool initializeStateFile();
+    bool initializeKeyBarMapping();
+    bool initializeBarKeyMapping();
 };
