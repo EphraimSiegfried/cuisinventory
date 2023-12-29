@@ -1,12 +1,12 @@
 #include <Adafruit_TinyUSB.h>
 #include <Constants.h>
 #include <DB.h>
-#include <Error.h>
 #include <RTClib.h>
 #include <SPI.h>
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
 #include <Wire.h>
+#include <Debug.h>
 
 #define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
                               // functionality - triggering tasks on status
@@ -22,7 +22,7 @@ enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
 SerLCD lcd;
 Sd2Card card;
 SdVolume volume;
-extern RTC_PCF8523 rtc;
+RTC_PCF8523 rtc;
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
@@ -108,8 +108,6 @@ void setup() {
 
     rtc.start();
     lcd.clear();
-
-    Error.logError("Testing logError()");
 }
 
 void loop() {
