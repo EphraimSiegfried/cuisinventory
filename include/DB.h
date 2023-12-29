@@ -22,6 +22,8 @@ class DB {
     bool getCurrentID();
     bool addMappings(u_int32_t currentID, String barcode);
     bool removeMappings(u_int32_t currentID, String barcode);
+    bool loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name);
+    bool saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name);
     bool loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     DynamicJsonDocument* loadMapping(String mappingfile);

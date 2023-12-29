@@ -6,7 +6,6 @@ DB::DB() {
 }
 
 bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
-    // DynamicJsonDocument* keyBarMap = loadKeyMapping();
     String filename = String(id);
     File jsonFile = SD.open(filename.c_str(), FILE_WRITE);
     if (!jsonFile) {
@@ -53,7 +52,17 @@ bool DB::add(StaticJsonDocument<1024>& doc, float weight) {
     return true;
 }
 
-bool DB::set(uint32_t id, String key, String value) { return true; }
+bool DB::set(uint32_t id, String key, String value) {
+    StaticJsonDocument<JSONSIZE> jsonDoc;
+    if(!loadJson(jsonDoc,String(id))){
+        return false;
+    }
+    jsonDoc[key] = value;
+    if(!saveJson(jsonDoc,String(id))){
+        return false;
+    }
+    return true;
+}
 
 bool DB::remove(uint32_t id, String barcode) { 
     if(!SD.remove(String(id).c_str())){
@@ -161,9 +170,38 @@ bool DB::removeMappings(u_int32_t currentID, String barcode){
     return true;
 }
 
+bool DB::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
+    File jsonFile;
+    jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    if (!jsonFile) {
+        Serial.println("Failed to open json file");
+        return false;
+    }
+    auto error = deserializeJson(jsonDoc, jsonFile);
+    if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return false;
+    }
+    jsonFile.close();
+    return true;
+}
+
+bool DB::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
+    File jsonFile;
+    jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    if (!jsonFile) {
+        Serial.println("Failed to open json file");
+        return false;
+    }
+    serializeJson(jsonDoc, jsonFile);
+    jsonFile.close();
+    return true;
+}
+
 bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
-    stateFile = SD.open(STATEFILE, FILE_WRITE);
+    stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
         Serial.println("Failed to open state file");
         return false;
@@ -180,7 +218,7 @@ bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 
 bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
-    stateFile = SD.open(STATEFILE, FILE_WRITE);
+    stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
         Serial.println("Failed to open state file");
         return false;
