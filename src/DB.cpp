@@ -2,7 +2,7 @@
 
 DB::DB() {
     currentID = 0;
-    if(!initDatabase()){
+    if (!initDatabase()) {
         Serial.println("Initialize Database failed");
     }
     getCurrentID();
@@ -46,7 +46,7 @@ bool DB::add(StaticJsonDocument<JSONSIZE>& doc, float weight) {
     doc.remove("status");
     doc.remove("warnings");
     doc["weight"] = weight;
-    if(saveJson(doc,String(currentID))){
+    if (saveJson(doc, String(currentID))) {
         return false;
     }
     if (!addMappings(currentID, barcode)) {
@@ -263,26 +263,26 @@ bool DB::saveMapping(DynamicJsonDocument* doc, String mappingName) {
     mappingFile.close();
     return true;
 }
-bool DB::initDatabase(){
-    if(!checkInitialized(STATEFILE)){
-        if(!initializeStateFile()){
+bool DB::initDatabase() {
+    if (!checkInitialized(STATEFILE)) {
+        if (!initializeStateFile()) {
             return false;
         }
     }
-    if(!checkInitialized(KEY_BAR_MAPPINGFILE)){
-        if(!initializeKeyBarMapping()){
+    if (!checkInitialized(KEY_BAR_MAPPINGFILE)) {
+        if (!initializeKeyBarMapping()) {
             return false;
         }
     }
-    if(!checkInitialized(BAR_KEYS_MAPPINGFILE)){
-        if(!initializeBarKeyMapping()){
+    if (!checkInitialized(BAR_KEYS_MAPPINGFILE)) {
+        if (!initializeBarKeyMapping()) {
             return false;
         }
     }
     return true;
 }
 
-bool DB::checkInitialized(String filename){
+bool DB::checkInitialized(String filename) {
     File file;
     file = SD.open(filename, FILE_WRITE);
     if (!file) {
@@ -290,38 +290,38 @@ bool DB::checkInitialized(String filename){
         return false;
     }
     long size = file.size();
-    if(size<=1){
+    if (size <= 1) {
         return false;
     }
     return true;
 }
 
-bool DB::initializeStateFile(){
+bool DB::initializeStateFile() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
     stateJson[UNIQUE_ID] = currentID;
-    if(!saveStateMapping(stateJson)){
+    if (!saveStateMapping(stateJson)) {
         Serial.println("Initialize sate mapping failed");
         return false;
     }
     return true;
 }
 
-bool DB::initializeKeyBarMapping(){
+bool DB::initializeKeyBarMapping() {
     StaticJsonDocument<JSONSIZE> keyBarJson;
-    //create empty json
+    // create empty json
     keyBarJson.to<JsonObject>();
-    if(!saveJson(keyBarJson,KEY_BAR_MAPPINGFILE)){
+    if (!saveJson(keyBarJson, KEY_BAR_MAPPINGFILE)) {
         Serial.println("Initialize key bar mapping failed");
         return false;
     }
     return true;
 }
 
-bool DB::initializeBarKeyMapping(){
+bool DB::initializeBarKeyMapping() {
     StaticJsonDocument<JSONSIZE> barKeyJson;
-    //create empty json
+    // create empty json
     barKeyJson.to<JsonObject>();
-    if(!saveJson(barKeyJson,BAR_KEYS_MAPPINGFILE)){
+    if (!saveJson(barKeyJson, BAR_KEYS_MAPPINGFILE)) {
         Serial.println("Initialize bar key mapping failed");
         return false;
     }

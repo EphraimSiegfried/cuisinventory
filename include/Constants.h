@@ -22,7 +22,7 @@ const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
 const String STATEFILE = "/.state/state";
 const String LOGFILE = "/.state/logs";
 
-//JSON
+// JSON
 const String UNIQUE_ID = "unique_ID";
 
 // Clock
