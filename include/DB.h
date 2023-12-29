@@ -2,11 +2,10 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <Constants.h>
 #include <SD.h>
 
 #include <vector>
-
-#include <Constants.h>
 
 class DB {
    public:

@@ -2,10 +2,9 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <Constants.h>
 #include <SPI.h>
 #include <WiFiNINA.h>
-
-#include <Constants.h>
 
 class WIFI {
    public:
