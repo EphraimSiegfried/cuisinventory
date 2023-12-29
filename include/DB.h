@@ -16,7 +16,6 @@ class DB {
     bool set(uint32_t id, String key, String value);
     bool remove(uint32_t id, String barcode);
 
-
    private:
     uint32_t currentID;
     bool getCurrentID();
