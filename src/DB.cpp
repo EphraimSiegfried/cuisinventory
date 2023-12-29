@@ -54,11 +54,11 @@ bool DB::add(StaticJsonDocument<1024>& doc, float weight) {
 
 bool DB::set(uint32_t id, String key, String value) {
     StaticJsonDocument<JSONSIZE> jsonDoc;
-    if(!loadJson(jsonDoc,String(id))){
+    if (!loadJson(jsonDoc, String(id))) {
         return false;
     }
     jsonDoc[key] = value;
-    if(!saveJson(jsonDoc,String(id))){
+    if (!saveJson(jsonDoc, String(id))) {
         return false;
     }
     return true;
