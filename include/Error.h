@@ -2,11 +2,10 @@
 
 #include <Arduino.h>
 #include <Constants.h>
-#include <SD.h>
 #include <RTClib.h>
-
+#include <SD.h>
 
 class Error {
-    public:
-     void logError(String error);
+   public:
+    void logError(String error);
 };

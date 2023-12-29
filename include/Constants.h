@@ -23,7 +23,7 @@ const String STATEFILE = "/.state/state";
 const String LOGFILE = "/.state/logs";
 
 // Clock
-const uint32_t CLOCK_OFFSET = -17; // offset of RTC in seconds
+const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
 
 // Buttons
 const uint8_t BTN_LIGHT_IDLE =
