@@ -24,7 +24,7 @@ bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
 }
 
 bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
-    DynamicJsonDocument* barKeyMapJson = loadBarKeyMapping();
+    DynamicJsonDocument* barKeyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
     // read out field and add to vector
     JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
     for (JsonVariant key : keys) {
@@ -35,25 +35,36 @@ bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
-bool DB::add(StaticJsonDocument<1024>& doc) {
+bool DB::add(StaticJsonDocument<1024>& doc, float weight) {
     this->currentID++;
+    String barcode = doc["code"];
     doc["uniqueID"] = currentID;
-    String filename = String(currentID);
-
     doc.remove("errors");
     doc.remove("result");
     doc.remove("status");
     doc.remove("warnings");
-    doc["weight"] = 0;
-    File file = SD.open("test.json", FILE_WRITE);
-    serializeJsonPretty(doc, file);
-    Serial.write(file.read());
+    doc["weight"] = weight;
+    File file = SD.open(String(currentID).c_str(), FILE_WRITE);
+    serializeJson(doc, file);
     file.close();
+    if(!addMappings(currentID,barcode)){
+        return false;
+    }
+    return true;
 }
 
 bool DB::set(uint32_t id, String key, String value) { return true; }
 
-bool DB::removeJson(uint32_t id) { return true; }
+bool DB::remove(uint32_t id, String barcode) { 
+    if(!SD.remove(String(id).c_str())){
+        Serial.println(F("Failed to remove file from SD card"));
+        return false;
+    }
+    if(!removeMappings(id,barcode)){
+        return false;
+    }
+    return false;
+}
 
 bool DB::getCurrentID() {
     File stateFile;
@@ -78,18 +89,76 @@ bool DB::getCurrentID() {
 bool DB::addMappings(u_int32_t currentID, String barcode) {
     // update statefile
     StaticJsonDocument<STATEFILESIZE> stateJson;
-    loadStateMapping(stateJson);
-    stateJson["currentID"] = currentID;
-    saveStateMapping(stateJson);
+    if(!loadStateMapping(stateJson)){
+        return false;
+    }
+    stateJson["currentID"] = String(currentID);
+    if(!saveStateMapping(stateJson)){
+        return false;
+    }
     // update bar key mapping
-    DynamicJsonDocument* barKeyMapJson = loadBarKeyMapping();
+    DynamicJsonDocument* barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
+    if(barKeyMapJson == nullptr){
+        return false;
+    }
     JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
-    // Add barcode
-    keys.add(barcode);
-    saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE);
+    keys.add(currentID);
+    if(!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)){
+        (*barKeyMapJson).clear();
+        delete barKeyMapJson;
+        return false;
+    }
     (*barKeyMapJson).clear();
     delete barKeyMapJson;
     // update key bar mapping
+    DynamicJsonDocument* keyBarMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
+    if(keyBarMapJson == nullptr){
+        return false;
+    }
+    (*keyBarMapJson)[String(currentID)] = barcode;
+    if(!saveMapping(keyBarMapJson,KEY_BAR_MAPPINGFILE)){
+        (*keyBarMapJson).clear();
+        delete keyBarMapJson;
+        return false;
+    }
+    (*keyBarMapJson).clear();
+    delete keyBarMapJson;
+    return true;
+}
+
+bool DB::removeMappings(u_int32_t currentID, String barcode){
+    // update bar key mapping
+    DynamicJsonDocument* barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
+    if(barKeyMapJson == nullptr){
+        return false;
+    }
+    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
+    for (JsonArray::iterator it=keys.begin(); it!=keys.end(); ++it) {
+        if ((*it).as<u_int32_t>() == currentID) {
+            keys.remove(it);
+        }
+    }
+    if(!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)){
+        (*barKeyMapJson).clear();
+        delete barKeyMapJson;
+        return false;
+    }
+    (*barKeyMapJson).clear();
+    delete barKeyMapJson;
+    // update key bar mapping
+    DynamicJsonDocument* keyBarMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
+    if(keyBarMapJson == nullptr){
+        return false;
+    }
+    (*keyBarMapJson).remove(String(currentID));
+    if(!saveMapping(keyBarMapJson,KEY_BAR_MAPPINGFILE)){
+        (*keyBarMapJson).clear();
+        delete keyBarMapJson;
+        return false;
+    }
+    (*keyBarMapJson).clear();
+    delete keyBarMapJson;
+    return true;
 }
 
 bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
@@ -121,25 +190,25 @@ bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     return true;
 }
 
-DynamicJsonDocument* DB::loadBarKeyMapping() {
-    File barKeyMap = SD.open(BAR_KEYS_MAPPINGFILE.c_str(), FILE_WRITE);
-    if (!barKeyMap) {
-        Serial.println("Failed to open barKeyMap file");
-        return NULL;
+DynamicJsonDocument* DB::loadMapping(String mappingfile) {
+    File mappingFile = SD.open(mappingfile.c_str(), FILE_WRITE);
+    if (!mappingFile) {
+        Serial.println("Failed to open mapping file");
+        return nullptr;
     }
     // estimate required filesize
-    long barKeyMapSize = barKeyMap.size();
-    int estimateMembers = (int)barKeyMapSize / 12;
-    DynamicJsonDocument* barKeyMapJson =
-        new DynamicJsonDocument(JSON_OBJECT_SIZE(estimateMembers));
-    auto error = deserializeJson(*barKeyMapJson, barKeyMap);
+    long mapSize = mappingFile.size();
+    int estimateMembers = (int)mapSize / 12;
+    DynamicJsonDocument* mapJson =
+        new DynamicJsonDocument(JSON_OBJECT_SIZE(1+estimateMembers));
+    auto error = deserializeJson(*mapJson, mappingFile);
     if (error) {
-        Serial.print(F("failed to deserialize barKeyMapping: "));
+        Serial.print(F("failed to deserialize mapping File: "));
         Serial.println(error.c_str());
-        return NULL;
+        return nullptr;
     }
-    barKeyMap.close();
-    return barKeyMapJson;
+    mappingFile.close();
+    return mapJson;
 }
 
 bool DB::saveMapping(DynamicJsonDocument* doc, String mappingName) {
