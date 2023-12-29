@@ -53,7 +53,6 @@ int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
 // Callback invoked when WRITE10 command is completed (status received and
 // accepted by host).
 // used to flush any pending cache.
-void msc_flush_cb (void)
-{
-  // nothing to do
+void msc_flush_cb(void) {
+    // nothing to do
 }
