@@ -1,5 +1,4 @@
-
-#include "WIFI.h"
+#include <WiFi.h>
 
 #define SPIWIFI      SPI  // The SPI port
 #define SPIWIFI_SS   13   // Chip select pin

@@ -5,7 +5,7 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 
-#include "Constants.h"
+#include <Constants.h>
 
 class WIFI {
    public:
