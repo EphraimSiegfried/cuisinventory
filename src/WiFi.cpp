@@ -20,12 +20,10 @@ bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
         return false;
     }
     LOG("Connected to server");
-    client.println("GET " + BARCODE_PATH + barcode +
-                  "?fields=" + BARCODE_FIELDS + " HTTP/1.1\r\n" +
-                  "Host: " + BARCODE_ENDPOINT + "\r\n" +
-                  "User-Agent: " + USER_AGENT + "\r\n" +
-                  "Connection: close\r\n\r\n"
-      );
+    client.println(
+        "GET " + BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS +
+        " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
+        "User-Agent: " + USER_AGENT + "\r\n" + "Connection: close\r\n\r\n");
 
     // Check HTTP status
     char status[32] = {0};
