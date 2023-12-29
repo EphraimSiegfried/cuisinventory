@@ -17,9 +17,13 @@ const uint64_t T_INPUT_INTERVAL =
 const int JSONSIZE = 1024;
 const int STATEFILESIZE = 1024;
 const int SD_PIN = 10;
-const String KEY_BAR_MAPPINGFILE = "/.intern/keybarmapping";
-const String BAR_KEYS_MAPPINGFILE = "/.intern/barkeymapping";
+const String KEY_BAR_MAPPINGFILE = "/.intern/keybar";
+const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
 const String STATEFILE = "/.state/state";
+const String LOGFILE = "/.state/logs";
+
+// Clock
+const uint32_t CLOCK_OFFSET = -17; // offset of RTC in seconds
 
 // Buttons
 const uint8_t BTN_LIGHT_IDLE =

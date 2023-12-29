@@ -7,6 +7,7 @@
 
 #include <Constants.h>
 #include <DB.h>
+#include <Error.h>
 
 #define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
                               // functionality - triggering tasks on status
@@ -22,10 +23,11 @@ enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
 SerLCD lcd;
 Sd2Card card;
 SdVolume volume;
-RTC_PCF8523 rtc;
+extern RTC_PCF8523 rtc;
 QwiicButton greenButton1;
 QwiicButton greenButton2;
 QwiicButton redButton;
+Error ErrorLogger;
 // Adafruit_USBD_MSC usb_msc;
 
 bool usb = false;  // whether to act as usb mass storage
@@ -108,6 +110,8 @@ void setup() {
 
     rtc.start();
     lcd.clear();
+
+    ErrorLogger.logError("Testing logError()");
 }
 
 void loop() {
