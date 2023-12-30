@@ -8,9 +8,9 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 
-class WiFiClass2 {
+class WiFiServiceClass {
    public:
-    WiFiClass2();
+    WiFiServiceClass();
     bool connect(String ssid, String pw);
     bool put(StaticJsonDocument<JSONSIZE> &doc);
     bool get(String barcode, StaticJsonDocument<JSONSIZE> &doc);
@@ -20,4 +20,4 @@ class WiFiClass2 {
     WiFiSSLClient wifiClient;
 };
 
-extern WiFiClass2 WiFi2;
+extern WiFiServiceClass WiFiService;

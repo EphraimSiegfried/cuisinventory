@@ -8,6 +8,7 @@
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
 #include <USB.h>
+#include <WiFiService.h>
 #include <Wire.h>
 
 SerLCD lcd;
@@ -118,7 +119,7 @@ void addProduct() {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
     }
     StaticJsonDocument<JSONSIZE> doc;
-    /*if (!WiFi2.get(barcode, doc) {
+    /*if (!WiFiService.get(barcode, doc) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("Product was not found in our database!\n");
