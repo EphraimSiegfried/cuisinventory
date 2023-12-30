@@ -8,9 +8,9 @@
 
 #include <vector>
 
-class DB {
+class DBClass {
    public:
-    DB();  // Constructor
+    DBClass();  // Constructor
     bool getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc);
     bool getIDs(String barcode, std::vector<uint32_t>& ids);
     bool add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight);
@@ -35,3 +35,5 @@ class DB {
     bool initializeKeyBarMapping();
     bool initializeBarKeyMapping();
 };
+
+extern DBClass DB;

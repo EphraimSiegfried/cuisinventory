@@ -8,16 +8,16 @@
 #include <SPI.h>
 #include <WiFiNINA.h>
 
-class WIFI {
+class WiFiClass2 {
    public:
-    WIFI(String ssid, String pw);
+    WiFiClass2();
+    bool connect(String ssid, String pw);
     bool put(StaticJsonDocument<JSONSIZE> &doc);
     bool get(String barcode, StaticJsonDocument<JSONSIZE> &doc);
 
    private:
-    bool connect();
-    const char *ssid;
-    const char *pw;
     int wifiStatus;
     WiFiSSLClient wifiClient;
 };
+
+extern WiFiClass2 WiFi2;

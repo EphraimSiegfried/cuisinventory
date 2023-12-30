@@ -118,7 +118,7 @@ void addProduct() {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
     }
     StaticJsonDocument<JSONSIZE> doc;
-    /*if (!WiFi.get(barcode, doc) {
+    /*if (!WiFi2.get(barcode, doc) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("Product was not found in our database!\n");

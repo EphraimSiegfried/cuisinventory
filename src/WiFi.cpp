@@ -6,26 +6,23 @@
 #define SPIWIFI_ACK  11   // a.k.a BUSY or READY pin
 #define ESP32_GPIO0  -1
 
-WIFI::WIFI(String ssid, String pw) {
-    this->ssid = ssid.c_str();
-    this->pw = pw.c_str();
+WiFiClass2::WiFiClass2() {
     this->wifiStatus = WL_IDLE_STATUS;
     WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
-    connect();
 }
 
-bool WIFI::connect() {
+bool WiFiClass2::connect(String ssid, String pw) {
     // check for the WiFi module:
     if (WiFi.status() == WL_NO_MODULE) {
         LOG("Communication with WiFi module failed!");
         return false;
     }
     LOG("Attempting to connect to WPA SSID: \r\n");
-    LOG(this->ssid);
+    LOG(ssid);
     // Connect to WPA/WPA2 network:
     int amountOfTries = 0;
     do {
-        this->wifiStatus = WiFi.begin(this->ssid, this->pw);
+        this->wifiStatus = WiFi.begin(ssid.c_str(), pw.c_str());
         delay(100);
         amountOfTries++;
     } while (this->wifiStatus != WL_CONNECTED && amountOfTries != 30);
@@ -35,7 +32,7 @@ bool WIFI::connect() {
     return true;
 }
 
-bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
+bool WiFiClass2::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, BARCODE_ENDPOINT.c_str(), port);
@@ -72,7 +69,7 @@ bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
     return true;
 }
 
-bool WIFI::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
+bool WiFiClass2::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     int port = 80;
     HttpClient httpClient =
         HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT.c_str(), port);
@@ -97,3 +94,5 @@ bool WIFI::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     }
     return true;
 }
+
+WiFiClass2 WiFi2;

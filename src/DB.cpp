@@ -1,6 +1,6 @@
 #include <DB.h>
 
-DB::DB() {
+DBClass::DBClass() {
     currentID = 0;  // reserved for product not found in get
     if (!initDatabase()) {
         LOG("Initialize Database failed");
@@ -8,7 +8,7 @@ DB::DB() {
     getCurrentID();
 }
 
-bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
+bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     String filename = String(id);
     File jsonFile = SD.open(filename.c_str(), FILE_WRITE);
     if (!jsonFile) {
@@ -25,7 +25,7 @@ bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     return true;
 }
 
-bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
+bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     DynamicJsonDocument* barKeyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
     // read out field and add to vector
     JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
@@ -37,7 +37,7 @@ bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
-bool DB::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight) {
+bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight) {
     this->currentID++;
     String barcode = doc["code"];
     doc[UNIQUE_ID] = currentID;
@@ -55,7 +55,7 @@ bool DB::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight) {
     return true;
 }
 
-bool DB::set(uint32_t id, String key, String value) {
+bool DBClass::set(uint32_t id, String key, String value) {
     StaticJsonDocument<JSONSIZE> jsonDoc;
     if (!loadJson(jsonDoc, String(id))) {
         return false;
@@ -67,7 +67,7 @@ bool DB::set(uint32_t id, String key, String value) {
     return true;
 }
 
-bool DB::remove(uint32_t id, String barcode) {
+bool DBClass::remove(uint32_t id, String barcode) {
     if (!SD.remove(String(id).c_str())) {
         LOG(F("Failed to remove file from SD card"));
         return false;
@@ -78,7 +78,7 @@ bool DB::remove(uint32_t id, String barcode) {
     return false;
 }
 
-bool DB::getCurrentID() {
+bool DBClass::getCurrentID() {
     File stateFile;
     // open state
     stateFile = SD.open(STATEFILE, FILE_WRITE);
@@ -98,7 +98,7 @@ bool DB::getCurrentID() {
     return true;
 }
 
-bool DB::addMappings(u_int32_t currentID, String barcode) {
+bool DBClass::addMappings(u_int32_t currentID, String barcode) {
     // update statefile
     StaticJsonDocument<STATEFILESIZE> stateJson;
     if (!loadStateMapping(stateJson)) {
@@ -138,7 +138,7 @@ bool DB::addMappings(u_int32_t currentID, String barcode) {
     return true;
 }
 
-bool DB::removeMappings(u_int32_t currentID, String barcode) {
+bool DBClass::removeMappings(u_int32_t currentID, String barcode) {
     // update bar key mapping
     DynamicJsonDocument* barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
     if (barKeyMapJson == nullptr) {
@@ -173,7 +173,7 @@ bool DB::removeMappings(u_int32_t currentID, String barcode) {
     return true;
 }
 
-bool DB::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
+bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     File jsonFile = SD.open(name.c_str(), FILE_WRITE);
     if (!jsonFile) {
         LOG("Failed to open json file");
@@ -189,7 +189,7 @@ bool DB::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     return true;
 }
 
-bool DB::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
+bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     File jsonFile = SD.open(name.c_str(), FILE_WRITE);
     if (!jsonFile) {
         LOG("Failed to open json file");
@@ -200,7 +200,7 @@ bool DB::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     return true;
 }
 
-bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
+bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
     stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
@@ -217,7 +217,7 @@ bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     return true;
 }
 
-bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
+bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
     stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
@@ -229,7 +229,7 @@ bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     return true;
 }
 
-DynamicJsonDocument* DB::loadMapping(String mappingfile) {
+DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
     File mappingFile = SD.open(mappingfile.c_str(), FILE_WRITE);
     if (!mappingFile) {
         LOG("Failed to open mapping file");
@@ -250,7 +250,7 @@ DynamicJsonDocument* DB::loadMapping(String mappingfile) {
     return mapJson;
 }
 
-bool DB::saveMapping(DynamicJsonDocument* doc, String mappingName) {
+bool DBClass::saveMapping(DynamicJsonDocument* doc, String mappingName) {
     File mappingFile;
     mappingFile = SD.open(mappingName.c_str(), FILE_WRITE);
     if (!mappingFile) {
@@ -261,7 +261,7 @@ bool DB::saveMapping(DynamicJsonDocument* doc, String mappingName) {
     mappingFile.close();
     return true;
 }
-bool DB::initDatabase() {
+bool DBClass::initDatabase() {
     if (!checkInitialized(STATEFILE)) {
         if (!initializeStateFile()) {
             return false;
@@ -280,7 +280,7 @@ bool DB::initDatabase() {
     return true;
 }
 
-bool DB::checkInitialized(String filename) {
+bool DBClass::checkInitialized(String filename) {
     File file;
     file = SD.open(filename, FILE_WRITE);
     if (!file) {
@@ -294,7 +294,7 @@ bool DB::checkInitialized(String filename) {
     return true;
 }
 
-bool DB::initializeStateFile() {
+bool DBClass::initializeStateFile() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
     stateJson[UNIQUE_ID] = currentID;
     if (!saveStateMapping(stateJson)) {
@@ -304,7 +304,7 @@ bool DB::initializeStateFile() {
     return true;
 }
 
-bool DB::initializeKeyBarMapping() {
+bool DBClass::initializeKeyBarMapping() {
     StaticJsonDocument<JSONSIZE> keyBarJson;
     // create empty json
     keyBarJson.to<JsonObject>();
@@ -315,7 +315,7 @@ bool DB::initializeKeyBarMapping() {
     return true;
 }
 
-bool DB::initializeBarKeyMapping() {
+bool DBClass::initializeBarKeyMapping() {
     StaticJsonDocument<JSONSIZE> barKeyJson;
     // create empty json
     barKeyJson.to<JsonObject>();
@@ -325,3 +325,5 @@ bool DB::initializeBarKeyMapping() {
     }
     return true;
 }
+
+DBClass DB;
