@@ -2,6 +2,7 @@
 #include <Constants.h>
 #include <DB.h>
 #include <Debug.h>
+#include <Input.h>
 #include <RTClib.h>
 #include <SPI.h>
 #include <SerLCD.h>
@@ -18,13 +19,11 @@
 
 // Scheduler ts;
 
-enum buttons { GREEN_BUTTON1 = 0x6f, GREEN_BUTTON2 = 0x70, RED_BUTTON = 0x71 };
-
 SerLCD lcd;
 RTC_PCF8523 rtc;
-QwiicButton greenButton1;
-QwiicButton greenButton2;
-QwiicButton redButton;
+extern QwiicButton greenButton1;
+extern QwiicButton greenButton2;
+extern QwiicButton redButton;
 
 bool usb = false;  // whether to act as usb mass storage
 
@@ -46,17 +45,17 @@ void setup() {
 
     // *** Buttons ***
 
-    while (!greenButton1.begin(GREEN_BUTTON1)) {
+    while (!greenButton1.begin(GREEN_BUTTON1_ADDRESS)) {
         lcd.clear();
         lcd.print("Green button 1 not found...");
         delay(200);
     }
-    while (!greenButton2.begin(GREEN_BUTTON2)) {
+    while (!greenButton2.begin(GREEN_BUTTON2_ADDRESS)) {
         lcd.clear();
         lcd.print("Green button 2 not found...");
         delay(200);
     }
-    while (!redButton.begin(RED_BUTTON)) {
+    while (!redButton.begin(RED_BUTTON_ADDRESS)) {
         lcd.clear();
         lcd.print("Red button not found...");
         delay(200);
