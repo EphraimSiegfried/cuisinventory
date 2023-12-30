@@ -23,7 +23,6 @@ const String DEVICE_KEY = "th1s1sak3y";
 const String DEVICE_KEY = "th1s1satestk3y";
 #endif
 
-
 // SD
 const int JSONSIZE = 1024;
 const int STATEFILESIZE = 1024;
