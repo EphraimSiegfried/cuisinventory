@@ -9,6 +9,12 @@ const String BARCODE_FIELDS =
     "grade,ingredients_text,customer_service";
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
 
+// Pythonanywhere server
+const String PYTHONANYWHERE_ENDPOINT = "https://kev1n27.pythonanywhere.com";
+const String PYTHONANYWHERE_PATH = "/cuisinventory";
+
+// Device constants
+const String DEVICE_KEY = "th1s1sak3y";
 // Tasks
 const uint64_t T_INPUT_INTERVAL =
     100;  // interval between calls to checkInput in ms
