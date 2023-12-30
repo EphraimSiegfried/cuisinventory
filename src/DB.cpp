@@ -1,7 +1,7 @@
 #include <DB.h>
 
 DB::DB() {
-    currentID = 0; // reserved for product not found in get
+    currentID = 0;  // reserved for product not found in get
     if (!initDatabase()) {
         LOG("Initialize Database failed");
     }

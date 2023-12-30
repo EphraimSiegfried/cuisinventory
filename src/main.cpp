@@ -16,9 +16,9 @@ extern QwiicButton greenButton1;
 extern QwiicButton greenButton2;
 extern QwiicButton redButton;
 
-bool usb = false;  // whether to act as usb mass storage
-bool pendingSync = false; // whether we need to send data to server
-uint64_t lastActiveTime = 0; // millis() of last action
+bool usb = false;             // whether to act as usb mass storage
+bool pendingSync = false;     // whether we need to send data to server
+uint64_t lastActiveTime = 0;  // millis() of last action
 
 void setup() {
 #ifdef DEBUG
@@ -102,20 +102,20 @@ void addProduct() {
     lcd.setFastBacklight(0x00FF00);
     lcd.print("Please scan product barcode...");
     while (0 /*check for barcode*/) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
     lcd.clear();
     lcd.print("Please weigh product,\npress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
     lcd.clear();
     lcd.print("Weighing, please stand by...");
     uint32_t weight = 0;
     while (0 /*while value not settled*/) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
     }
     StaticJsonDocument<JSONSIZE> doc;
     /*if (!WiFi.get(barcode, doc) {
@@ -148,7 +148,7 @@ void updateProduct() {
     lcd.setFastBacklight(0x0000FF);
     lcd.print("Please scan product barcode...");
     while (0 /*check for barcode*/) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
     /* uint32_t id = DB.getLeastRemainingID(barcode);
@@ -162,14 +162,14 @@ void updateProduct() {
     lcd.clear();
     lcd.print("Please weigh product,\npress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
     lcd.clear();
     lcd.print("Weighing, please stand by...");
     uint32_t weight = 0;
     while (0 /*while value not settled*/) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
     }
     /* if (!DB.updateWeight(id, weight)) {
         lcd.clear();
@@ -193,7 +193,7 @@ void removeProduct() {
     lcd.setFastBacklight(0xFF0000);
     lcd.print("Please scan product barcode...");
     while (0 /*check for barcode*/) {
-        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
     /* uint32_t id = DB.getLeastRemainingID(barcode);
@@ -230,7 +230,7 @@ void reset() {
 
 void loop() {
     if (usb) return;  // do nothing if in usb mode
-    if (input(GREEN_BUTTON1, SHORT_PRESS)) { 
+    if (input(GREEN_BUTTON1, SHORT_PRESS)) {
         addProduct();
         reset();
     }
@@ -251,4 +251,3 @@ void loop() {
     }
     delay(100);
 }
-

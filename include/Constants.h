@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 // Main
-const uint64_t IDLE_WAIT_BEFORE_SYNC = 300'000; // ms
+const uint64_t IDLE_WAIT_BEFORE_SYNC = 300'000;  // ms
 
 // Barcode API
 const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
