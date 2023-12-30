@@ -12,6 +12,13 @@ const String BARCODE_FIELDS =
     "grade,ingredients_text,customer_service";
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
 
+// Pythonanywhere server
+const String PYTHONANYWHERE_ENDPOINT = "https://kev1n27.pythonanywhere.com";
+const String PYTHONANYWHERE_PATH = "/cuisinventory";
+
+// Device constants
+const String DEVICE_KEY = "th1s1sak3y";
+
 // SD
 const int JSONSIZE = 1024;
 const int STATEFILESIZE = 1024;

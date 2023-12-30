@@ -7,41 +7,58 @@
 #define ESP32_GPIO0  -1
 
 WIFI::WIFI(String ssid, String pw) {
-    ssid = ssid.c_str();
-    pw = pw.c_str();
-    wifiStatus = WL_IDLE_STATUS;
+    this->ssid = ssid.c_str();
+    this->pw = pw.c_str();
+    this->wifiStatus = WL_IDLE_STATUS;
+    WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
     connect();
 }
 
+bool WIFI::connect() {
+    // check for the WiFi module:
+    if (WiFi.status() == WL_NO_MODULE) {
+        LOG("Communication with WiFi module failed!");
+        return false;
+    }
+    LOG("Attempting to connect to WPA SSID: \r\n");
+    LOG(this->ssid);
+    // Connect to WPA/WPA2 network:
+    int amountOfTries = 0;
+    do {
+        this->wifiStatus = WiFi.begin(this->ssid, this->pw);
+        delay(100);
+        amountOfTries++;
+    } while (this->wifiStatus != WL_CONNECTED && amountOfTries != 30);
+    if (this->wifiStatus != WL_CONNECTED) {
+        return false;
+    }
+    return true;
+}
+
 bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
+    int port = 443;
+    HttpClient httpClient =
+        HttpClient(this->wifiClient, BARCODE_ENDPOINT.c_str(), port);
     // if you get a connection, report back via serial:
-    if (!client.connect(BARCODE_ENDPOINT.c_str(), 443)) {
+    if (!this->wifiClient.connect(BARCODE_ENDPOINT.c_str(), port)) {
         LOG("Connection to server failed");
         return false;
     }
     LOG("Connected to server");
-    client.println(
-        "GET " + BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS +
-        " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
-        "User-Agent: " + USER_AGENT + "\r\n" + "Connection: close\r\n\r\n");
-
+    // send request
+    httpClient.get(BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS +
+                   " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
+                   "User-Agent: " + USER_AGENT);
     // Check HTTP status
-    char status[32] = {0};
-    client.readBytesUntil('\r', status, sizeof(status));
-    if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
+    int statusCode = httpClient.responseStatusCode();
+    if (statusCode != 0) {
         LOG("Unexpected response:");
-        LOG(status);
+        LOG(statusCode);
         return false;
     }
-
-    char singelLine[] = "\n";
-    char doubleLine[] = "\r\n\r\n";
-    // Skip headers
-    client.find(doubleLine, 4);
-    // skip first line
-    client.find(singelLine, 1);
-
-    auto error = deserializeJson(jsonDoc, client);
+    // Get response
+    String response = httpClient.responseBody();
+    auto error = deserializeJson(jsonDoc, response);
     if (error) {
         LOG("deserializeJson() failed with code:");
         LOG(error.c_str());
@@ -52,25 +69,30 @@ bool WIFI::get(String barcode, StaticJsonDocument<JSONSIZE> &jsonDoc) {
         return false;
     }
     LOG(jsonDoc["product"]["product_name"].as<const char *>());
-
-    client.flush();
     return true;
 }
 
-bool WIFI::connect() {
-    WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
-    // check for the WiFi module:
-    if (WiFi.status() == WL_NO_MODULE) {
-        Serial.println("Communication with WiFi module failed!");
+bool WIFI::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
+    int port = 80;
+    HttpClient httpClient =
+        HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT.c_str(), port);
+    // if you get a connection, report back via serial:
+    if (!this->wifiClient.connect(PYTHONANYWHERE_ENDPOINT.c_str(), port)) {
+        LOG("Connection to server failed");
         return false;
     }
-    LOG("Attempting to connect to WPA SSID: \r\n");
-    LOG(ssid);
-    // Connect to WPA/WPA2 network:
-    wifiStatus = WiFi.begin(ssid, pw);
-    // wait 10 seconds for connection:
-    delay(3000);
-    if (wifiStatus != WL_CONNECTED) {
+    LOG("Connected to server");
+    // send request
+    char serializedJson[JSONSIZE];
+    serializeJson(jsonDoc, serializedJson);
+    String contentType = "application/json";
+    httpClient.put(PYTHONANYWHERE_ENDPOINT + PYTHONANYWHERE_PATH, contentType,
+                   "key=" + DEVICE_KEY + +"&" + "data=" + serializedJson);
+    // Check HTTP status
+    int statusCode = httpClient.responseStatusCode();
+    if (statusCode != 0) {
+        LOG("Unexpected response:");
+        LOG(statusCode);
         return false;
     }
     return true;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ArduinoHttpClient.h>
 #include <ArduinoJson.h>
 #include <Constants.h>
 #include <Debug.h>
@@ -10,7 +11,7 @@
 class WIFI {
    public:
     WIFI(String ssid, String pw);
-    // bool put( StaticJsonDocument<JSONSIZE>& doc);
+    bool put(StaticJsonDocument<JSONSIZE> &doc);
     bool get(String barcode, StaticJsonDocument<JSONSIZE> &doc);
 
    private:
@@ -18,5 +19,5 @@ class WIFI {
     const char *ssid;
     const char *pw;
     int wifiStatus;
-    WiFiSSLClient client;
+    WiFiSSLClient wifiClient;
 };
