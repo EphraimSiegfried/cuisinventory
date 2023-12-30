@@ -10,15 +10,6 @@
 #include <USB.h>
 #include <Wire.h>
 
-#define _TASK_STATUS_REQUEST  // Compile with support for StatusRequest
-                              // functionality - triggering tasks on status
-                              // change events in addition to time only
-// #define _TASK_LTS_POINTER        // Compile with support for local task
-// storage pointer
-//#include <TaskScheduler.h>
-
-// Scheduler ts;
-
 SerLCD lcd;
 RTC_PCF8523 rtc;
 extern QwiicButton greenButton1;
@@ -26,9 +17,8 @@ extern QwiicButton greenButton2;
 extern QwiicButton redButton;
 
 bool usb = false;  // whether to act as usb mass storage
-
-// Task tInput(T_INPUT_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, &inputCB, &ts,
-// true);
+bool pendingSync = false; // whether we need to send data to server
+uint64_t lastActiveTime = 0; // millis() of last action
 
 void setup() {
 #ifdef DEBUG
@@ -107,64 +97,158 @@ void setup() {
     lcd.clear();
 }
 
+void addProduct() {
+    lcd.clear();
+    lcd.setFastBacklight(0x00FF00);
+    lcd.print("Please scan product barcode...");
+    while (0 /*check for barcode*/) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        delay(100);
+    }
+    lcd.clear();
+    lcd.print("Please weigh product,\npress button 1 to confirm");
+    while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        delay(100);
+    }
+    lcd.clear();
+    lcd.print("Weighing, please stand by...");
+    uint32_t weight = 0;
+    while (0 /*while value not settled*/) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+    }
+    StaticJsonDocument<JSONSIZE> doc;
+    /*if (!WiFi.get(barcode, doc) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("Product was not found in our database!\n");
+        lcd.print("You may add it using the openfoodfacts app");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }
+    if (!DB.add(doc, weight) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("FATAL ERROR:\n");
+        lcd.print("Failed to save product");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }
+    */
+    pendingSync = true;
+    lcd.clear();
+    lcd.print("Product added successfully!");
+    lcd.setFastBacklight(0x00FF00);
+    delay(1000);
+    return;
+}
+
+void updateProduct() {
+    lcd.clear();
+    lcd.setFastBacklight(0x0000FF);
+    lcd.print("Please scan product barcode...");
+    while (0 /*check for barcode*/) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        delay(100);
+    }
+    /* uint32_t id = DB.getLeastRemainingID(barcode);
+    if (!id) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("Please add product first!");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    */
+    lcd.clear();
+    lcd.print("Please weigh product,\npress button 1 to confirm");
+    while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        delay(100);
+    }
+    lcd.clear();
+    lcd.print("Weighing, please stand by...");
+    uint32_t weight = 0;
+    while (0 /*while value not settled*/) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+    }
+    /* if (!DB.updateWeight(id, weight)) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("FATAL ERROR:\n");
+        lcd.print("Failed to update weight");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }*/
+
+    pendingSync = true;
+    lcd.clear();
+    lcd.print("Weight updated successfully!");
+    lcd.setFastBacklight(0x00FF00);
+    delay(1000);
+    return;
+}
+
+void removeProduct() {
+    lcd.clear();
+    lcd.setFastBacklight(0xFF0000);
+    lcd.print("Please scan product barcode...");
+    while (0 /*check for barcode*/) {
+        if (input(RED_BUTTON, LONG_PRESS)) return; // cancel
+        delay(100);
+    }
+    /* uint32_t id = DB.getLeastRemainingID(barcode);
+    if (!id) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("Product not found in inventory!");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    */
+    /* if (!DB.remove(id, weight)) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("FATAL ERROR:\n");
+        lcd.print("Failed to remove product");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }*/
+
+    pendingSync = true;
+    lcd.clear();
+    lcd.print("Product removed successfully!");
+    lcd.setFastBacklight(0x00FF00);
+    delay(1000);
+    return;
+}
+
+void reset() {
+    lastActiveTime = millis();
+    lcd.setFastBacklight(0xFFFFFF);
+    lcd.clear();
+    lcd.print("Cuisinventory ready!");
+}
+
 void loop() {
     if (usb) return;  // do nothing if in usb mode
-}
-
-void inputCB() {}
-
-/*void setupUSB() {
-    // Set disk vendor id, product id and revision with string up to 8, 16, 4
-characters respectively usb_msc.setID("Vendor", "Cuisinventory", "1.0");
-
-    // Set read write callback
-    usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
-
-    // Still initialize MSC but tell usb stack that MSC is not ready to
-    // read/write If we don't initialize, board will be enumerated as CDC only
-    usb_msc.setUnitReady(false);
-    usb_msc.begin();
-
-    if (!card.init(SPI_HALF_SPEED, SD_PIN)) {
-        lcd.clear();
-        lcd.print("Failed to initialize SD!");
-        while (1) delay(10);
+    if (input(GREEN_BUTTON1, SHORT_PRESS)) { 
+        addProduct();
+        reset();
     }
-
-    // Now we will try to open the 'volume'/'partition' - it should be FAT16 or
-    // FAT32
-    if (!volume.init(card)) {
-        lcd.clear();
-        lcd.print("Couldn't find FAT16/FAT32 partition!");
-        while (1) delay(10);
+    if (input(GREEN_BUTTON2, SHORT_PRESS)) {
+        updateProduct();
+        reset();
     }
-
-    uint32_t block_count = volume.blocksPerCluster() * volume.clusterCount();
-    usb_msc.setCapacity(block_count,
-                        512);    // Set disk size, SD block size is always 512
-    usb_msc.setUnitReady(true);  // msc is ready for read/write
+    if (input(RED_BUTTON, SHORT_PRESS)) {
+        removeProduct();
+        reset();
+    }
+    if (pendingSync && (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFFFF00);
+        lcd.print("Sync in progress...");
+        // if (DB.sync()) pendingSync = false;
+        reset();
+    }
+    delay(100);
 }
 
-// Callback invoked when received READ10 command.
-// Copy disk's data to buffer (up to bufsize) and
-// return number of copied bytes (must be multiple of block size)
-int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
-    (void)bufsize;
-    return card.readBlock(lba, (uint8_t*)buffer) ? 512 : -1;
-}
-
-// Callback invoked when received WRITE10 command.
-// Process data in buffer to disk's storage and
-// return number of written bytes (must be multiple of block size)
-int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
-    (void)bufsize;
-    return card.writeBlock(lba, buffer) ? 512 : -1;
-}
-
-// Callback invoked when WRITE10 command is completed (status received and
-accepted by host).
-// used to flush any pending cache.
-void msc_flush_cb (void)
-{
-  // nothing to do
-}*/

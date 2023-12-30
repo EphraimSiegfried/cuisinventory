@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Constants.h>
+#include <Debug.h>
 #include <SD.h>
 
 #include <vector>
@@ -12,9 +13,10 @@ class DB {
     DB();  // Constructor
     bool getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc);
     bool getIDs(String barcode, std::vector<uint32_t>& ids);
-    bool add(StaticJsonDocument<1024>& doc, float weight);
+    bool add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight);
     bool set(uint32_t id, String key, String value);
     bool remove(uint32_t id, String barcode);
+    bool exists(String barcode);
 
    private:
     uint32_t currentID;

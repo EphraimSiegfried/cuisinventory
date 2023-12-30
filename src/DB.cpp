@@ -1,9 +1,9 @@
 #include <DB.h>
 
 DB::DB() {
-    currentID = 0;
+    currentID = 0; // reserved for product not found in get
     if (!initDatabase()) {
-        Serial.println("Initialize Database failed");
+        LOG("Initialize Database failed");
     }
     getCurrentID();
 }
@@ -12,13 +12,13 @@ bool DB::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     String filename = String(id);
     File jsonFile = SD.open(filename.c_str(), FILE_WRITE);
     if (!jsonFile) {
-        Serial.println("Failed to open keyBar file");
+        LOG("Failed to open keyBar file");
         return false;
     }
     auto error = deserializeJson(doc, jsonFile);
     if (error) {
-        Serial.print(F("failed to get json from id: "));
-        Serial.println(error.c_str());
+        LOG(F("failed to get json from id: "));
+        LOG(error.c_str());
         return false;
     }
     jsonFile.close();
@@ -37,7 +37,7 @@ bool DB::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
-bool DB::add(StaticJsonDocument<JSONSIZE>& doc, float weight) {
+bool DB::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight) {
     this->currentID++;
     String barcode = doc["code"];
     doc[UNIQUE_ID] = currentID;
@@ -69,7 +69,7 @@ bool DB::set(uint32_t id, String key, String value) {
 
 bool DB::remove(uint32_t id, String barcode) {
     if (!SD.remove(String(id).c_str())) {
-        Serial.println(F("Failed to remove file from SD card"));
+        LOG(F("Failed to remove file from SD card"));
         return false;
     }
     if (!removeMappings(id, barcode)) {
@@ -83,14 +83,14 @@ bool DB::getCurrentID() {
     // open state
     stateFile = SD.open(STATEFILE, FILE_WRITE);
     if (!stateFile) {
-        Serial.println("Failed to open state file");
+        LOG("Failed to open state file");
         return false;
     }
     StaticJsonDocument<1024> doc;
     auto error = deserializeJson(doc, stateFile);
     if (error) {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
+        LOG(F("deserializeJson() failed with code "));
+        LOG(error.c_str());
         return false;
     }
     this->currentID = doc["currentID"].as<const uint32_t>();
@@ -174,16 +174,15 @@ bool DB::removeMappings(u_int32_t currentID, String barcode) {
 }
 
 bool DB::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    File jsonFile;
-    jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    File jsonFile = SD.open(name.c_str(), FILE_WRITE);
     if (!jsonFile) {
-        Serial.println("Failed to open json file");
+        LOG("Failed to open json file");
         return false;
     }
     auto error = deserializeJson(jsonDoc, jsonFile);
     if (error) {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
+        LOG(F("deserializeJson() failed with code "));
+        LOG(error.c_str());
         return false;
     }
     jsonFile.close();
@@ -191,10 +190,9 @@ bool DB::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DB::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    File jsonFile;
-    jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    File jsonFile = SD.open(name.c_str(), FILE_WRITE);
     if (!jsonFile) {
-        Serial.println("Failed to open json file");
+        LOG("Failed to open json file");
         return false;
     }
     serializeJson(jsonDoc, jsonFile);
@@ -206,13 +204,13 @@ bool DB::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
     stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
-        Serial.println("Failed to open state file");
+        LOG("Failed to open state file");
         return false;
     }
     auto error = deserializeJson(stateJson, stateFile);
     if (error) {
-        Serial.print(F("deserializeJson() failed with code "));
-        Serial.println(error.c_str());
+        LOG(F("deserializeJson() failed with code "));
+        LOG(error.c_str());
         return false;
     }
     stateFile.close();
@@ -223,7 +221,7 @@ bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
     stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
     if (!stateFile) {
-        Serial.println("Failed to open state file");
+        LOG("Failed to open state file");
         return false;
     }
     serializeJson(stateJson, stateFile);
@@ -234,7 +232,7 @@ bool DB::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 DynamicJsonDocument* DB::loadMapping(String mappingfile) {
     File mappingFile = SD.open(mappingfile.c_str(), FILE_WRITE);
     if (!mappingFile) {
-        Serial.println("Failed to open mapping file");
+        LOG("Failed to open mapping file");
         return nullptr;
     }
     // estimate required filesize
@@ -244,8 +242,8 @@ DynamicJsonDocument* DB::loadMapping(String mappingfile) {
         new DynamicJsonDocument(JSON_OBJECT_SIZE(1 + estimateMembers));
     auto error = deserializeJson(*mapJson, mappingFile);
     if (error) {
-        Serial.print(F("failed to deserialize mapping File: "));
-        Serial.println(error.c_str());
+        LOG(F("failed to deserialize mapping File: "));
+        LOG(error.c_str());
         return nullptr;
     }
     mappingFile.close();
@@ -256,7 +254,7 @@ bool DB::saveMapping(DynamicJsonDocument* doc, String mappingName) {
     File mappingFile;
     mappingFile = SD.open(mappingName.c_str(), FILE_WRITE);
     if (!mappingFile) {
-        Serial.println("Failed to open mapping file for saving");
+        LOG("Failed to open mapping file for saving");
         return false;
     }
     serializeJson(*doc, mappingFile);
@@ -286,7 +284,7 @@ bool DB::checkInitialized(String filename) {
     File file;
     file = SD.open(filename, FILE_WRITE);
     if (!file) {
-        Serial.println("Failed to open file for exist check");
+        LOG("Failed to open file for exist check");
         return false;
     }
     long size = file.size();
@@ -300,7 +298,7 @@ bool DB::initializeStateFile() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
     stateJson[UNIQUE_ID] = currentID;
     if (!saveStateMapping(stateJson)) {
-        Serial.println("Initialize sate mapping failed");
+        LOG("Initialize sate mapping failed");
         return false;
     }
     return true;
@@ -311,7 +309,7 @@ bool DB::initializeKeyBarMapping() {
     // create empty json
     keyBarJson.to<JsonObject>();
     if (!saveJson(keyBarJson, KEY_BAR_MAPPINGFILE)) {
-        Serial.println("Initialize key bar mapping failed");
+        LOG("Initialize key bar mapping failed");
         return false;
     }
     return true;
@@ -322,7 +320,7 @@ bool DB::initializeBarKeyMapping() {
     // create empty json
     barKeyJson.to<JsonObject>();
     if (!saveJson(barKeyJson, BAR_KEYS_MAPPINGFILE)) {
-        Serial.println("Initialize bar key mapping failed");
+        LOG("Initialize bar key mapping failed");
         return false;
     }
     return true;

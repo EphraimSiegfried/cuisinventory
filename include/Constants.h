@@ -1,6 +1,9 @@
 #pragma once
 #include <Arduino.h>
 
+// Main
+const uint64_t IDLE_WAIT_BEFORE_SYNC = 300'000; // ms
+
 // Barcode API
 const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
 const String BARCODE_PATH = "/api/v3/product/";
@@ -8,10 +11,6 @@ const String BARCODE_FIELDS =
     "product_name,generic_name,allergens,conservation_conditions,nutriscore_"
     "grade,ingredients_text,customer_service";
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
-
-// Tasks
-const uint64_t T_INPUT_INTERVAL =
-    100;  // interval between calls to checkInput in ms
 
 // SD
 const int JSONSIZE = 1024;
@@ -42,4 +41,4 @@ const uint32_t LONG_PRESS_DURATION =
 // Don't register button presses that have happened this many ms before we
 // checked for input Tlis is so that if btn1 is pressed while we're waiting for
 // btn2, it doesn't get registered next time we check for btn1
-const uint32_t PRESS_AGE_THRESHOLD = 1000;
+const uint32_t PRESS_AGE_THRESHOLD = 3000;
