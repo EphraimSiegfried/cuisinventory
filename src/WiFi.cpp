@@ -10,8 +10,8 @@ WIFI::WIFI(String ssid, String pw) {
     this->ssid = ssid.c_str();
     this->pw = pw.c_str();
     this->wifiStatus = WL_IDLE_STATUS;
-    connect();
     WiFi.setPins(SPIWIFI_SS, SPIWIFI_ACK, ESP32_RESETN, ESP32_GPIO0, &SPIWIFI);
+    connect();
 }
 
 bool WIFI::connect() {
