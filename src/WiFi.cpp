@@ -21,11 +21,11 @@ bool WIFI::connect() {
         return false;
     }
     LOG("Attempting to connect to WPA SSID: \r\n");
-    LOG(ssid);
+    LOG(this->ssid);
     // Connect to WPA/WPA2 network:
     int amountOfTries = 0;
     do {
-        this->wifiStatus = WiFi.begin(ssid, pw);
+        this->wifiStatus = WiFi.begin(this->ssid, this->pw);
         delay(100);
         amountOfTries++;
     } while (this->wifiStatus != WL_CONNECTED && amountOfTries != 30);
