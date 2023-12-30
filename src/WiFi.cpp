@@ -17,7 +17,7 @@ WIFI::WIFI(String ssid, String pw) {
 bool WIFI::connect() {
     // check for the WiFi module:
     if (WiFi.status() == WL_NO_MODULE) {
-        Serial.println("Communication with WiFi module failed!");
+        LOG("Communication with WiFi module failed!");
         return false;
     }
     LOG("Attempting to connect to WPA SSID: \r\n");
@@ -77,7 +77,7 @@ bool WIFI::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     HttpClient httpClient =
         HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT.c_str(), port);
     // if you get a connection, report back via serial:
-    if (!this->wifiClient.connect(PYTHONANYWHERE_ENDPOINT.c_str(), 443)) {
+    if (!this->wifiClient.connect(PYTHONANYWHERE_ENDPOINT.c_str(), port)) {
         LOG("Connection to server failed");
         return false;
     }
