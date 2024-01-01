@@ -20,7 +20,7 @@ void test_barcode_get_request_sets_json_correctly(void) {
         jsonDoc["product"]["product_name"].as<const char*>());
     TEST_ASSERT_EQUAL_STRING(
         "1000", jsonDoc["product"]["product_quantity"].as<const char*>());
-        JsonArray arr = jsonDoc["product"]
+    JsonArray arr = jsonDoc["product"]
 }
 void test_json_put_request(void) {
     jsonDoc["product"] = "Mehl";
