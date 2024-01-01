@@ -29,8 +29,8 @@ void test_json_put_request(void) {
 void setup() {
     WiFiService.connect(SSID, PASSWORD);
     UNITY_BEGIN();
-    // RUN_TEST(test_barcode_get_request_returns_true);
-    //  RUN_TEST(test_barcode_get_request_sets_json_correctly);
+    RUN_TEST(test_barcode_get_request_returns_true);
+    RUN_TEST(test_barcode_get_request_sets_json_correctly);
     RUN_TEST(test_json_put_request);
     UNITY_END();
 }
