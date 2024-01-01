@@ -85,11 +85,11 @@ bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     serializeJson(jsonDoc, serializedJson);
     LOG(serializedJson);
     String contentType = "application/json";
-    String putData = "{\"key\":\"" + DEVICE_KEY + "\", \"data\":" + serializedJson + "}";
+    String putData =
+        "{\"key\":\"" + DEVICE_KEY + "\", \"data\":" + serializedJson + "}";
     LOG(putData);
-    httpClient.put(
-        PYTHONANYWHERE_ENDPOINT + PYTHONANYWHERE_PATH, contentType,
-        putData);
+    httpClient.put(PYTHONANYWHERE_ENDPOINT + PYTHONANYWHERE_PATH, contentType,
+                   putData);
     // Check HTTP status
     int statusCode = httpClient.responseStatusCode();
     if (statusCode != 200) {
