@@ -33,7 +33,7 @@ const String STATEFILE = "/.state/state";
 const String LOGFILE = "/.state/logs";
 
 // JSON
-const String UNIQUE_ID = "unique_ID";
+const String UNIQUE_ID = "id";
 
 // Clock
 const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds

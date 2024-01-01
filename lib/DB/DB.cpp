@@ -158,7 +158,7 @@ bool DBClass::removeMappings(u_int32_t currentID, String barcode) {
     (*keyBarMapJson).clear();
     delete keyBarMapJson;
     return true;
-}
+}    
 
 bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     File jsonFile = SD.open(name, FILE_READ);
