@@ -10,7 +10,7 @@ DBClass::DBClass() {
 
 bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     String filename = String(id);
-    File jsonFile = SD.open(filename.c_str(), FILE_WRITE);
+    File jsonFile = SD.open(filename, FILE_READ);
     if (!jsonFile) {
         LOG("Failed to open keyBar file");
         return false;
@@ -18,7 +18,7 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     auto error = deserializeJson(doc, jsonFile);
     if (error) {
         LOG(F("failed to get json from id: "));
-        LOG(error.c_str());
+        LOG(error);
         return false;
     }
     jsonFile.close();
@@ -28,7 +28,7 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     DynamicJsonDocument* barKeyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
     // read out field and add to vector
-    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
+    JsonArray keys = (*barKeyMapJson)[barcode];
     for (JsonVariant key : keys) {
         ids.push_back(key.as<uint32_t>());
     }
@@ -68,7 +68,7 @@ bool DBClass::set(uint32_t id, String key, String value) {
 }
 
 bool DBClass::remove(uint32_t id, String barcode) {
-    if (!SD.remove(String(id).c_str())) {
+    if (!SD.remove(String(id))) {
         LOG(F("Failed to remove file from SD card"));
         return false;
     }
@@ -79,22 +79,9 @@ bool DBClass::remove(uint32_t id, String barcode) {
 }
 
 bool DBClass::getCurrentID() {
-    File stateFile;
-    // open state
-    stateFile = SD.open(STATEFILE, FILE_WRITE);
-    if (!stateFile) {
-        LOG("Failed to open state file");
-        return false;
-    }
-    StaticJsonDocument<1024> doc;
-    auto error = deserializeJson(doc, stateFile);
-    if (error) {
-        LOG(F("deserializeJson() failed with code "));
-        LOG(error.c_str());
-        return false;
-    }
-    this->currentID = doc["currentID"].as<const uint32_t>();
-    stateFile.close();
+    StaticJsonDocument<1024> stateJson;
+    loadStateMapping(stateJson);
+    this->currentID = stateJson["currentID"].as<const uint32_t>();
     return true;
 }
 
@@ -113,7 +100,7 @@ bool DBClass::addMappings(u_int32_t currentID, String barcode) {
     if (barKeyMapJson == nullptr) {
         return false;
     }
-    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
+    JsonArray keys = (*barKeyMapJson)[barcode];
     keys.add(currentID);
     if (!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)) {
         (*barKeyMapJson).clear();
@@ -144,7 +131,7 @@ bool DBClass::removeMappings(u_int32_t currentID, String barcode) {
     if (barKeyMapJson == nullptr) {
         return false;
     }
-    JsonArray keys = (*barKeyMapJson)[barcode.c_str()];
+    JsonArray keys = (*barKeyMapJson)[barcode];
     for (JsonArray::iterator it = keys.begin(); it != keys.end(); ++it) {
         if ((*it).as<u_int32_t>() == currentID) {
             keys.remove(it);
@@ -174,7 +161,7 @@ bool DBClass::removeMappings(u_int32_t currentID, String barcode) {
 }
 
 bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    File jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    File jsonFile = SD.open(name, FILE_READ);
     if (!jsonFile) {
         LOG("Failed to open json file");
         return false;
@@ -182,7 +169,7 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     auto error = deserializeJson(jsonDoc, jsonFile);
     if (error) {
         LOG(F("deserializeJson() failed with code "));
-        LOG(error.c_str());
+        LOG(error);
         return false;
     }
     jsonFile.close();
@@ -190,7 +177,8 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    File jsonFile = SD.open(name.c_str(), FILE_WRITE);
+    SD.remove(name);
+    File jsonFile = SD.open(name, FILE_WRITE);
     if (!jsonFile) {
         LOG("Failed to open json file");
         return false;
@@ -202,7 +190,7 @@ bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 
 bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     File stateFile;
-    stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
+    stateFile = SD.open(STATEFILE, FILE_READ);
     if (!stateFile) {
         LOG("Failed to open state file");
         return false;
@@ -210,7 +198,7 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     auto error = deserializeJson(stateJson, stateFile);
     if (error) {
         LOG(F("deserializeJson() failed with code "));
-        LOG(error.c_str());
+        LOG(error);
         return false;
     }
     stateFile.close();
@@ -218,8 +206,8 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    File stateFile;
-    stateFile = SD.open(STATEFILE.c_str(), FILE_WRITE);
+    SD.remove(STATEFILE);
+    File stateFile = SD.open(STATEFILE, FILE_WRITE);
     if (!stateFile) {
         LOG("Failed to open state file");
         return false;
@@ -230,7 +218,7 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
-    File mappingFile = SD.open(mappingfile.c_str(), FILE_WRITE);
+    File mappingFile = SD.open(mappingfile, FILE_READ);
     if (!mappingFile) {
         LOG("Failed to open mapping file");
         return nullptr;
@@ -243,7 +231,7 @@ DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
     auto error = deserializeJson(*mapJson, mappingFile);
     if (error) {
         LOG(F("failed to deserialize mapping File: "));
-        LOG(error.c_str());
+        LOG(error);
         return nullptr;
     }
     mappingFile.close();
@@ -251,8 +239,8 @@ DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument* doc, String mappingName) {
-    File mappingFile;
-    mappingFile = SD.open(mappingName.c_str(), FILE_WRITE);
+    SD.remove(mappingName);
+    File mappingFile = SD.open(mappingName, FILE_WRITE);
     if (!mappingFile) {
         LOG("Failed to open mapping file for saving");
         return false;
@@ -282,7 +270,7 @@ bool DBClass::initDatabase() {
 
 bool DBClass::checkInitialized(String filename) {
     File file;
-    file = SD.open(filename, FILE_WRITE);
+    file = SD.open(filename, FILE_READ);
     if (!file) {
         LOG("Failed to open file for exist check");
         return false;
