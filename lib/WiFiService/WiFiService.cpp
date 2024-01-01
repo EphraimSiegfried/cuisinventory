@@ -44,12 +44,12 @@ bool WiFiServiceClass::get(String barcode,
     }
     LOG("Connected to server");
     // send request
-    httpClient.get(BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS +
-                   " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
-                   "User-Agent: " + USER_AGENT);
+    httpClient.get(BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS);
+    //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
+    //               "User-Agent: " + USER_AGENT);
     // Check HTTP status
     int statusCode = httpClient.responseStatusCode();
-    if (statusCode != 0) {
+    if (statusCode != 200) {
         LOG("Unexpected response:");
         LOG(statusCode);
         return false;
@@ -71,7 +71,7 @@ bool WiFiServiceClass::get(String barcode,
 }
 
 bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
-    int port = 80;
+    int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT.c_str(), port);
     // if you get a connection, report back via serial:
@@ -85,10 +85,10 @@ bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     serializeJson(jsonDoc, serializedJson);
     String contentType = "application/json";
     httpClient.put(PYTHONANYWHERE_ENDPOINT + PYTHONANYWHERE_PATH, contentType,
-                   "key=" + DEVICE_KEY + +"&" + "data=" + serializedJson);
+                   "key=" + DEVICE_KEY + "&" + "data=" + serializedJson);
     // Check HTTP status
     int statusCode = httpClient.responseStatusCode();
-    if (statusCode != 0) {
+    if (statusCode != 200) {
         LOG("Unexpected response:");
         LOG(statusCode);
         return false;

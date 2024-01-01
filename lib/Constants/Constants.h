@@ -13,7 +13,7 @@ const String BARCODE_FIELDS =
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
 
 // Pythonanywhere server
-const String PYTHONANYWHERE_ENDPOINT = "https://kev1n27.pythonanywhere.com";
+const String PYTHONANYWHERE_ENDPOINT = "kev1n27.pythonanywhere.com";
 const String PYTHONANYWHERE_PATH = "/cuisinventory";
 
 // Device constants
