@@ -61,6 +61,7 @@ void test_get_ids_returns_correctly(void) {
     TEST_ASSERT_TRUE(DB.getIDs(sample_json_barcode, ids));
     TEST_ASSERT_EQUAL_INT(1, ids[0]);
     TEST_ASSERT_EQUAL_INT(2, ids[1]);
+    DB.remove(2, sample_json_barcode);
 }
 
 void test_get_ids_returns_false(void) {
@@ -68,6 +69,7 @@ void test_get_ids_returns_false(void) {
     // Add same product twice with same weights
     DB.add(apiJsonDoc, 1000);
     TEST_ASSERT_FALSE(DB.getIDs(sample_json_barcode, ids));
+    DB.remove(2, sample_json_barcode);
 }
 void test_removes_correctly(void) {
     TEST_ASSERT_TRUE(DB.remove(sample_json_id, sample_json_barcode));
