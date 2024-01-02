@@ -18,7 +18,7 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     auto error = deserializeJson(doc, jsonFile);
     if (error) {
         LOG(F("failed to get json from id: "));
-        LOG(error);
+        LOG(error.c_str());
         return false;
     }
     jsonFile.close();
@@ -207,7 +207,7 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     auto error = deserializeJson(jsonDoc, jsonFile);
     if (error) {
         LOG(F("deserializeJson() failed with code "));
-        LOG(error);
+        LOG(error.c_str());
         return false;
     }
     jsonFile.close();
@@ -236,7 +236,7 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     auto error = deserializeJson(stateJson, stateFile);
     if (error) {
         LOG(F("deserializeJson() failed with code "));
-        LOG(error);
+        LOG(error.c_str());
         return false;
     }
     stateFile.close();
@@ -269,7 +269,7 @@ DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
     auto error = deserializeJson(*mapJson, mappingFile);
     if (error) {
         LOG(F("failed to deserialize mapping File: "));
-        LOG(error);
+        LOG(error.c_str());
         return nullptr;
     }
     mappingFile.close();

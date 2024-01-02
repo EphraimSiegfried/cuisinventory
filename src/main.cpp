@@ -172,7 +172,7 @@ void updateProduct() {
     while (0 /*while value not settled*/) {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
     }
-    /* if (!DB.updateWeight(id, weight)) {
+    /* if (!DB.setWeight(id, weight)) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("FATAL ERROR:\n");
@@ -197,7 +197,7 @@ void removeProduct() {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
-    /* uint32_t id = DB.getLeastRemainingID(barcode);
+    /* uint32_t id = DB.getLeastWeightID(barcode);
     if (!id) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
