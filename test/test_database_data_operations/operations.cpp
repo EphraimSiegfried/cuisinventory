@@ -59,7 +59,7 @@ void test_set_returns_false(void) {
 void test_get_ids_returns_correctly(void) {
     std::vector<uint32_t> ids;
     // Add same product twice with different weights
-    DB.add(apiJsonDoc, 500,time);
+    DB.add(apiJsonDoc, 500, time);
     TEST_ASSERT_TRUE(DB.getIDs(sampleJsonBarcode, ids));
     TEST_ASSERT_EQUAL_INT(1, ids[0]);
     TEST_ASSERT_EQUAL_INT(2, ids[1]);
@@ -69,7 +69,7 @@ void test_get_ids_returns_correctly(void) {
 void test_get_ids_returns_false(void) {
     std::vector<uint32_t>& ids;
     // Add same product twice with same weights
-    DB.add(apiJsonDoc, weight,time);
+    DB.add(apiJsonDoc, weight, time);
     TEST_ASSERT_FALSE(DB.getIDs(sampleJsonBarcode, ids));
     DB.remove(2, sampleJsonBarcode);
 }
