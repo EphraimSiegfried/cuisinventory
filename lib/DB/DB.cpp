@@ -76,6 +76,18 @@ bool DBClass::set(uint32_t id, String key, String value) {
     return true;
 }
 
+bool DBClass::setWeight(uint32_t id, String value) {
+    StaticJsonDocument<JSONSIZE> jsonDoc;
+    if (!loadJson(jsonDoc, String(id))) {
+        return false;
+    }
+    jsonDoc["quantity"]["remaining"] = value;
+    if (!saveJson(jsonDoc, String(id))) {
+        return false;
+    }
+    return true;
+}
+
 bool DBClass::remove(uint32_t id, String barcode) {
     if (!SD.remove(String(id))) {
         LOG(F("Failed to remove file from SD card"));
@@ -92,6 +104,23 @@ bool DBClass::getCurrentID() {
     loadStateMapping(stateJson);
     this->currentID = stateJson["currentID"].as<const uint32_t>();
     return true;
+}
+
+u_int32_t DBClass::getLeastWeightID(String barcode) {
+    std::vector<u_int32_t> ids;
+    u_int32_t leastWeightId;
+    int leastWeight = 999999;
+    getIDs(barcode, ids);
+    for (u_int32_t id : ids) {
+        StaticJsonDocument<JSONSIZE> doc;
+        loadJson(doc, String(id));
+        int weight = doc["quantity"]["remaining"];
+        if (weight < leastWeight) {
+            leastWeight = weight;
+            leastWeightId = id;
+        }
+    }
+    return leastWeightId;
 }
 
 bool DBClass::addMappings(u_int32_t currentID, String barcode) {
