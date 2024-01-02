@@ -110,12 +110,12 @@ u_int32_t DBClass::getLeastWeightID(String barcode) {
     std::vector<u_int32_t> ids;
     u_int32_t leastWeightId;
     int leastWeight = 999999;
-    getIDs(barcode,ids);
-    for(u_int32_t id : ids){
+    getIDs(barcode, ids);
+    for (u_int32_t id : ids) {
         StaticJsonDocument<JSONSIZE> doc;
-        loadJson(doc,String(id));
+        loadJson(doc, String(id));
         int weight = doc["quantity"]["remaining"];
-        if(weight < leastWeight){
+        if (weight < leastWeight) {
             leastWeight = weight;
             leastWeightId = id;
         }
