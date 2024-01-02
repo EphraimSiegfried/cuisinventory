@@ -2,16 +2,20 @@
 #include <DB.h>
 #include <unity.h>
 
-void setUp(void) {}
+StaticJsonDocument<JSONSIZE> apiJsonDoc;
+void setUp(void) {
+    deserializeJson(apiJsonDoc, SAMPLE_PRODUCT_JSON);
+}
 
-void tearDown(void) {}
+void tearDown(void) {
+      DB.remove(0, "3017620422003");  // TODO:Find better solution since DB.remove
+                                    // might not work
+}
 
 void test_add_returns_true(void) {
-    deserializeJson(jsonDoc, SAMPLE_PRODUCT_JSON);
     uint32_t weight = 1000;
-    TEST_ASSERT_TRUE(DB.add(jsonDoc, weight));
-    DB.remove(0, "3017620422003");  // TODO:Find better solution since DB.remove
-                                    // might not work
+    uint32_t time = 1000;
+    TEST_ASSERT_TRUE(DB.add(apiJsonDoc, weight, time));
 }
 
 void setup() {
