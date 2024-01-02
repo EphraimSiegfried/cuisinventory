@@ -37,16 +37,25 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
-bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight) {
+bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
+                  uint32_t time) {
     this->currentID++;
+    StaticJsonDocument<JSONSIZE> formattedJson;
+    JsonObject information = formattedJson.to<JsonObject>();
+    information[UNIQUE_ID] = currentID;
     String barcode = doc["code"];
-    doc[UNIQUE_ID] = currentID;
-    doc.remove("errors");
-    doc.remove("result");
-    doc.remove("status");
-    doc.remove("warnings");
-    doc["weight"] = weight;
-    if (saveJson(doc, String(currentID))) {
+    information["code"] = barcode;
+    information["date"] = time;
+    information["name"] = doc["product_name"];
+    information["brand"] = doc["brands"];
+    JsonObject quantity = information.createNestedObject("quantity");
+    quantity["initial"] = weight;
+    quantity["remaining"] = weight;
+    int productQuantity = doc["product_quantity"];
+    quantity["packaging"] = weight - productQuantity;
+    information["image_url"] = doc["image_url"];
+    information["categories"] = doc["categories"];
+    if (saveJson(formattedJson, String(currentID))) {
         return false;
     }
     if (!addMappings(currentID, barcode)) {
@@ -79,7 +88,7 @@ bool DBClass::remove(uint32_t id, String barcode) {
 }
 
 bool DBClass::getCurrentID() {
-    StaticJsonDocument<1024> stateJson;
+    StaticJsonDocument<STATEFILESIZE> stateJson;
     loadStateMapping(stateJson);
     this->currentID = stateJson["currentID"].as<const uint32_t>();
     return true;

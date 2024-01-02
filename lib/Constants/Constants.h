@@ -8,8 +8,10 @@ const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
 const String BARCODE_PATH = "/api/v3/product/";
 const String BARCODE_FIELDS =
-    "product_name,generic_name,allergens,conservation_conditions,nutriscore_"
-    "grade,ingredients_text,customer_service,product_quantity";
+    "empty,product_name,generic_name,allergens,conservation_conditions,"
+    "nutriscore_"
+    "grade,ingredients_text,customer_service,product_quantity,brands,image_url,"
+    "categories,empty";  // APi has bug where first and last fields are ignored
 const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
 
 // Pythonanywhere server
@@ -24,8 +26,8 @@ const String DEVICE_KEY = "th1s1satestk3y";
 #endif
 
 // SD
-const int JSONSIZE = 1024;
-const int STATEFILESIZE = 1024;
+const int JSONSIZE = 1536;
+const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
 const String KEY_BAR_MAPPINGFILE = "/.intern/keybar";
 const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
