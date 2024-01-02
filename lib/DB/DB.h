@@ -15,6 +15,8 @@ class DBClass {
     bool getIDs(String barcode, std::vector<uint32_t>& ids);
     bool add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight, uint32_t time);
     bool set(uint32_t id, String key, String value);
+    bool setWeight(uint32_t id, String value);
+    u_int32_t getLeastWeightID(String bardcode);
     bool remove(uint32_t id, String barcode);
     bool exists(String barcode);
 
