@@ -74,5 +74,5 @@ const String SAMPLE_PRODUCT_JSON =
     "gluten.\",\"product_name\":\"Nutella\",\"product_quantity\":\"400\"},"
     "\"result\":{\"id\":\"product_found\",\"lc_name\":\"Product "
     "found\",\"name\":\"Product "
-    "found\"},\"status\":\"success\",\"warnings\":[]}"
+    "found\"},\"status\":\"success\",\"warnings\":[]}";
 #endif
