@@ -316,7 +316,7 @@ bool DBClass::initDatabase() {
             return false;
         }
     }
-    if(!getCurrentID()){
+    if (!getCurrentID()) {
         return false;
     }
     return true;
