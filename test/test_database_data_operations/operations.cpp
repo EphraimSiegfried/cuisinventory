@@ -90,16 +90,16 @@ void setup() {
     if (!SD.begin(SD_PIN)) {
         LOG("Failed to find SD")
     } else {
-    RUN_TEST(test_exists_returns_true);
-    RUN_TEST(test_exists_returns_false);
-    RUN_TEST(test_get_json_from_id_returns_correctly);
-    RUN_TEST(test_get_json_from_id_returns_false);
-    RUN_TEST(test_sets_correctly);
-    RUN_TEST(test_set_returns_false);
-    RUN_TEST(test_get_ids_returns_correctly);
-    RUN_TEST(test_get_ids_returns_false);
-    RUN_TEST(test_removes_correctly);
-    RUN_TEST(test_remove_returns_false);
+        RUN_TEST(test_exists_returns_true);
+        RUN_TEST(test_exists_returns_false);
+        RUN_TEST(test_get_json_from_id_returns_correctly);
+        RUN_TEST(test_get_json_from_id_returns_false);
+        RUN_TEST(test_sets_correctly);
+        RUN_TEST(test_set_returns_false);
+        RUN_TEST(test_get_ids_returns_correctly);
+        RUN_TEST(test_get_ids_returns_false);
+        RUN_TEST(test_removes_correctly);
+        RUN_TEST(test_remove_returns_false);
     }
     UNITY_END();
 }
