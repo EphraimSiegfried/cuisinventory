@@ -37,11 +37,12 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
-bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,uint32_t time) {
+bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
+                  uint32_t time) {
     this->currentID++;
     StaticJsonDocument<JSONSIZE> formattedJson;
     JsonArray products = formattedJson.createNestedArray("products");
-    JsonObject information  = products.createNestedObject();
+    JsonObject information = products.createNestedObject();
     information[UNIQUE_ID] = currentID;
     String barcode = doc["code"];
     information["code"] = barcode;
