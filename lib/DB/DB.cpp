@@ -41,8 +41,7 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
                   uint32_t time) {
     this->currentID++;
     StaticJsonDocument<JSONSIZE> formattedJson;
-    JsonArray products = formattedJson.createNestedArray("products");
-    JsonObject information = products.createNestedObject();
+    JsonObject information = formattedJson.to<JsonObject>();
     information[UNIQUE_ID] = currentID;
     String barcode = doc["code"];
     information["code"] = barcode;
@@ -56,7 +55,6 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     quantity["packaging"] = weight - productQuantity;
     information["image_url"] = doc["image_url"];
     information["categories"] = doc["categories"];
-
     if (saveJson(formattedJson, String(currentID))) {
         return false;
     }
@@ -90,7 +88,7 @@ bool DBClass::remove(uint32_t id, String barcode) {
 }
 
 bool DBClass::getCurrentID() {
-    StaticJsonDocument<1024> stateJson;
+    StaticJsonDocument<STATEFILESIZE> stateJson;
     loadStateMapping(stateJson);
     this->currentID = stateJson["currentID"].as<const uint32_t>();
     return true;
