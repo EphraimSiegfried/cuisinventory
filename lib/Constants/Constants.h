@@ -57,4 +57,5 @@ const uint32_t PRESS_AGE_THRESHOLD = 3000;
 #ifdef PIO_UNIT_TESTING
 const String SSID = "hotspot";
 const String PASSWORD = "12345678";
+const String SAMPLE_PRODUCT_JSON = "{\"code\":\"3017620422003\",\"errors\":[],\"product\":{\"allergens\":\"en:milk,en:nuts,en:soybeans\",\"brands\":\"Ferrero\",\"conservation_conditions\":\"A conserver au sec et à l'abri de la chaleur. Ne pas mettre au réfrigérateur.\",\"customer_service\":\"FERRERO FRANCE COMMERCIALE - Service Consommateurs, CS 90058 - 76136 MONT SAINT AIGNAN Cedex\",\"generic_name\":\"Pâte à tartiner aux noisettes et au cacao\",\"image_url\":\"https://images.openfoodfacts.org/images/products/301/762/042/2003/front_en.550.400.jpg\",\"ingredients_text\":\"Sucre, huile de palme, NOISETTES 13%, cacao maigre 7,4%, LAIT écrémé en poudre 6,6%, LACTOSERUM en poudre, émulsifiants: lécithines [SOJA), vanilline. Sans gluten.\",\"product_name\":\"Nutella\",\"product_quantity\":\"400\"},\"result\":{\"id\":\"product_found\",\"lc_name\":\"Product found\",\"name\":\"Product found\"},\"status\":\"success\",\"warnings\":[]}"
 #endif
