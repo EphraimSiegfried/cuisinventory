@@ -19,6 +19,7 @@ class DBClass {
     u_int32_t getLeastWeightID(String bardcode);
     bool remove(uint32_t id, String barcode);
     bool exists(String barcode);
+    bool syncDB();
 
    private:
     uint32_t currentID;
