@@ -124,17 +124,17 @@ u_int32_t DBClass::getLeastWeightID(String barcode) {
 }
 
 bool DBClass::syncDB(){
-    StaticJsonDocument<100> startEnd;
+    StaticJsonDocument<JSONSIZE> startEnd;
     startEnd["sync"] = "BEGIN";
-    //WIFI::put startEnd
+    WiFiService.put(startEnd);
     DynamicJsonDocument* keyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
     for (JsonPair keyValue : (*keyMapJson).as<JsonObject>()) {
         StaticJsonDocument<JSONSIZE> jsonSend;
         loadJson(jsonSend,String(keyValue.key().c_str()));
-        //put jsonSend
+        WiFiService.put(jsonSend);
     }
     startEnd["sync"] = "END";
-    //WIFI::put startEnd
+    WiFiService.put(startEnd);
     return true;
 }
 
