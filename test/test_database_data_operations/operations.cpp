@@ -86,6 +86,10 @@ void test_remove_returns_false(void) {
 }
 void setup() {
     UNITY_BEGIN();
+    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
+    if (!SD.begin(SD_PIN)) {
+        LOG("Failed to find SD")
+    } else {
     RUN_TEST(test_exists_returns_true);
     RUN_TEST(test_exists_returns_false);
     RUN_TEST(test_get_json_from_id_returns_correctly);
@@ -96,6 +100,7 @@ void setup() {
     RUN_TEST(test_get_ids_returns_false);
     RUN_TEST(test_removes_correctly);
     RUN_TEST(test_remove_returns_false);
+    }
     UNITY_END();
 }
 

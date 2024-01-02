@@ -10,6 +10,10 @@ void tearDown(void) {
                                     // might not work
 }
 
+void test_initialize_database_returns_true(void) {
+    TEST_ASSERT_TRUE(DB.initDatabase());
+}
+
 void test_add_returns_true(void) {
     uint32_t weight = 1000;
     uint32_t time = 1000;
@@ -18,7 +22,13 @@ void test_add_returns_true(void) {
 
 void setup() {
     UNITY_BEGIN();
-    RUN_TEST(test_add_returns_true);
+    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
+    if (!SD.begin(SD_PIN)) {
+        LOG("Failed to find SD");
+    } else {
+        RUN_TEST(test_initialize_database_returns_true);
+        RUN_TEST(test_add_returns_true);
+    }
     UNITY_END();
 }
 
