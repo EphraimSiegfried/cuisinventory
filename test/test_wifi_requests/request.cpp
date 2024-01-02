@@ -22,7 +22,7 @@ void test_barcode_get_request_sets_json_correctly(void) {
         "1000", jsonDoc["product"]["product_quantity"].as<const char*>());
 }
 void test_json_put_request(void) {
-    jsonDoc["product"] = "Mehl";
+    deserializeJson(jsonDoc, SAMPLE_PRODUCT_JSON);
     TEST_ASSERT_TRUE(WiFiService.put(jsonDoc));
 }
 
