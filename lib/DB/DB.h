@@ -5,8 +5,9 @@
 #include <Constants.h>
 #include <Debug.h>
 #include <SD.h>
-#include <vector>
 #include <WiFiService.h>
+
+#include <vector>
 
 class DBClass {
    public:
