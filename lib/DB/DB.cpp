@@ -51,7 +51,7 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     quantity["packaging"] = weight - productQuantity;
     information["image_url"] = doc["image_url"];
     information["categories"] = doc["categories"];
-    if (saveJson(formattedJson, String(currentID))) {
+    if (!saveJson(formattedJson, String(currentID))) {
         return false;
     }
     if (!addMappings(currentID, barcode)) {
