@@ -2,10 +2,6 @@
 
 DBClass::DBClass() {
     currentID = 0;  // reserved for product not found in get
-    if (!initDatabase()) {
-        LOG("Initialize Database failed");
-    }
-    getCurrentID();
 }
 
 bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
@@ -319,6 +315,9 @@ bool DBClass::initDatabase() {
         if (!initializeBarKeyMapping()) {
             return false;
         }
+    }
+    if(!getCurrentID()){
+        return false;
     }
     return true;
 }

@@ -21,6 +21,7 @@ class DBClass {
     bool remove(uint32_t id, String barcode);
     bool exists(String barcode);
     bool syncDB();
+    bool initDatabase();
 
    private:
     uint32_t currentID;
@@ -33,7 +34,6 @@ class DBClass {
     bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     DynamicJsonDocument* loadMapping(String mappingfile);
     bool saveMapping(DynamicJsonDocument* doc, String mappingName);
-    bool initDatabase();
     bool checkInitialized(String filename);
     bool initializeStateFile();
     bool initializeKeyBarMapping();
