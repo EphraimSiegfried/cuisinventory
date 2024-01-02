@@ -326,7 +326,7 @@ bool DBClass::checkInitialized(String filename) {
     File file;
     file = SD.open(filename, FILE_READ);
     if (!file) {
-        //LOG("Failed to open file for exist check");
+        // LOG("Failed to open file for exist check");
         return false;
     }
     long size = file.size();
