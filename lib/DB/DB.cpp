@@ -133,6 +133,8 @@ bool DBClass::syncDB(){
         loadJson(jsonSend,String(keyValue.key().c_str()));
         WiFiService.put(jsonSend);
     }
+    (*keyMapJson).clear();
+    delete keyMapJson;
     startEnd["sync"] = "END";
     WiFiService.put(startEnd);
     return true;
@@ -329,6 +331,7 @@ bool DBClass::checkInitialized(String filename) {
         return false;
     }
     long size = file.size();
+    file.close();
     if (size <= 1) {
         return false;
     }
