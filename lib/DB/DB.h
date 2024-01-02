@@ -13,7 +13,7 @@ class DBClass {
     DBClass();  // Constructor
     bool getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc);
     bool getIDs(String barcode, std::vector<uint32_t>& ids);
-    bool add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight);
+    bool add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight, uint32_t time);
     bool set(uint32_t id, String key, String value);
     bool remove(uint32_t id, String barcode);
     bool exists(String barcode);
