@@ -26,8 +26,8 @@ const String DEVICE_KEY = "th1s1satestk3y";
 #endif
 
 // SD
-const int JSONSIZE = 1024;
-const int STATEFILESIZE = 1024;
+const int JSONSIZE = 1536;
+const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
 const String KEY_BAR_MAPPINGFILE = "/.intern/keybar";
 const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
