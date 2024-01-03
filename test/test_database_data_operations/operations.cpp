@@ -21,7 +21,7 @@ void setUp(void) {
 
 void tearDown(void) { DB.remove(sampleJsonId, sampleJsonBarcode); }
 
-bool exists(String barcode){
+bool exists(String barcode) {
     std::vector<uint32_t> ids;
     DB.getIDs(barcode, ids);
     return ids.size() >= 1;
@@ -45,10 +45,10 @@ void test_sets_weight_correctly(void) {
     TEST_ASSERT_TRUE(DB.setWeight(sampleJsonId, weight));
     StaticJsonDocument<JSONSIZE> databaseJsonDoc;
     DB.getJsonFromID(sampleJsonId, databaseJsonDoc);
-    TEST_ASSERT_EQUAL_STRING("{\"initial\": 1010,\"remaining\": 50,\"packaging\": 10}",
-                             databaseJsonDoc["quantity"].as<const char*>());
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"initial\": 1010,\"remaining\": 50,\"packaging\": 10}",
+        databaseJsonDoc["quantity"].as<const char*>());
 }
-
 
 void test_get_ids_returns_correctly(void) {
     std::vector<uint32_t> ids;
