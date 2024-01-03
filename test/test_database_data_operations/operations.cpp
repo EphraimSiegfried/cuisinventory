@@ -20,7 +20,7 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-    //DB.remove(sampleJsonId, sampleJsonBarcode);
+    // DB.remove(sampleJsonId, sampleJsonBarcode);
 }
 
 bool exists(String barcode) {
