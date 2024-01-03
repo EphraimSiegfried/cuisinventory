@@ -73,7 +73,7 @@ bool DBClass::setWeight(uint32_t id, uint32_t value) {
 }
 
 bool DBClass::remove(uint32_t id, String barcode) {
-    if (!SD.remove(String(id))) {
+    if (!SD.remove(DATA_FOLDER + String(id))) {
         LOG(F("Failed to remove file from SD card"));
         return false;
     }
@@ -257,7 +257,7 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
-    File mappingFile = SD.open(mappingfile, FILE_READ);
+    File mappingFile = SD.open(INTERNAL_FOLDER + "/" + mappingfile, FILE_READ);
     if (!mappingFile) {
         LOG("loadMapping(): Failed to open mapping file");
         return nullptr;
@@ -278,8 +278,8 @@ DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument* doc, String mappingName) {
-    SD.remove(mappingName);
-    File mappingFile = SD.open(mappingName, FILE_WRITE);
+    SD.remove(INTERNAL_FOLDER + "/" + mappingName);
+    File mappingFile = SD.open(INTERNAL_FOLDER + "/" + mappingName, FILE_WRITE);
     if (!mappingFile) {
         LOG("saveMapping(): Failed to open mapping file");
         return false;
