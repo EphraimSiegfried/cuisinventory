@@ -14,7 +14,7 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
     auto error = deserializeJson(doc, jsonFile);
     if (error) {
         LOG(F("failed to get json from id: "));
-        LOG(error.c_str()F);
+        LOG(error.c_str() F);
         return false;
     }
     jsonFile.close();
