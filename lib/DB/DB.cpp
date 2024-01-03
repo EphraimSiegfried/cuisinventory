@@ -268,6 +268,7 @@ DynamicJsonDocument* DBClass::loadMapping(String mappingfile) {
         new DynamicJsonDocument(JSON_OBJECT_SIZE(1 + estimateMembers));
     auto error = deserializeJson(*mapJson, mappingFile);
     if (error) {
+        delete mapJson;
         LOG(F("loadMapping(): deserializeJson() failed with code "));
         LOG(error.c_str());
         return nullptr;
