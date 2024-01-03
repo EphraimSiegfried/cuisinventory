@@ -19,7 +19,9 @@ void setUp(void) {
     DB.add(apiJsonDoc, weight, time);
 }
 
-void tearDown(void) { DB.remove(sampleJsonId, sampleJsonBarcode); }
+void tearDown(void) {
+    //DB.remove(sampleJsonId, sampleJsonBarcode);
+}
 
 bool exists(String barcode) {
     std::vector<uint32_t> ids;

@@ -31,8 +31,8 @@ class DBClass {
     bool saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name);
     bool loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
     bool saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson);
-    DynamicJsonDocument* loadMapping(String mappingfile);
-    bool saveMapping(DynamicJsonDocument* doc, String mappingName);
+    DynamicJsonDocument loadMapping(String mappingfile);
+    bool saveMapping(DynamicJsonDocument doc, String mappingName);
     bool initializeStateFile();
     bool initializeKeyBarMapping();
     bool initializeBarKeyMapping();

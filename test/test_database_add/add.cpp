@@ -6,7 +6,7 @@ StaticJsonDocument<JSONSIZE> apiJsonDoc;
 void setUp(void) { deserializeJson(apiJsonDoc, SAMPLE_PRODUCT_JSON); }
 
 void tearDown(void) {
-    DB.remove(0, "3017620422003");  // TODO:Find better solution since DB.remove
+   // DB.remove(0, "3017620422003");  // TODO:Find better solution since DB.remove
                                     // might not work
 }
 
