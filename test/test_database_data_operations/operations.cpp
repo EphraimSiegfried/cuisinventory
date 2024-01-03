@@ -21,11 +21,11 @@ void setUp(void) {
 
 void tearDown(void) { DB.remove(sampleJsonId, sampleJsonBarcode); }
 
-void test_exists_returns_true(void) {
-    TEST_ASSERT_TRUE(DB.exists(sampleJsonBarcode));
+bool exists(String barcode){
+    std::vector<uint32_t> ids;
+    DB.getIDs(barcode, ids);
+    return ids.size() >= 1;
 }
-
-void test_exists_returns_false(void) { TEST_ASSERT_FALSE(DB.exists("000000")); }
 
 void test_get_json_from_id_returns_correctly(void) {
     StaticJsonDocument<JSONSIZE> databaseJsonDoc;
@@ -40,21 +40,15 @@ void test_get_json_from_id_returns_false(void) {
     TEST_ASSERT_FALSE(DB.getJsonFromID(id, databaseJsonDoc));
 }
 
-void test_sets_correctly(void) {
-    String key = "quantity";
-    String value = "{\"initial\": 1010,\"remaining\": 50,\"packaging\": 10}";
-    TEST_ASSERT_TRUE(DB.set(sampleJsonId, key, value));
+void test_sets_weight_correctly(void) {
+    uint32_t weight = 50;
+    TEST_ASSERT_TRUE(DB.setWeight(sampleJsonId, weight));
     StaticJsonDocument<JSONSIZE> databaseJsonDoc;
     DB.getJsonFromID(sampleJsonId, databaseJsonDoc);
-    TEST_ASSERT_EQUAL_STRING(value.c_str(),
+    TEST_ASSERT_EQUAL_STRING("{\"initial\": 1010,\"remaining\": 50,\"packaging\": 10}",
                              databaseJsonDoc["quantity"].as<const char*>());
 }
 
-void test_set_returns_false(void) {
-    String key = "invalid_key";
-    String value = "{}";
-    TEST_ASSERT_FALSE(DB.set(sampleJsonId, key, value));
-}
 
 void test_get_ids_returns_correctly(void) {
     std::vector<uint32_t> ids;
@@ -75,30 +69,34 @@ void test_get_ids_returns_false(void) {
 }
 void test_removes_correctly(void) {
     TEST_ASSERT_TRUE(DB.remove(sampleJsonId, sampleJsonBarcode));
-    TEST_ASSERT_FALSE(DB.exists(sampleJsonBarcode));
+    TEST_ASSERT_FALSE(exists(sampleJsonBarcode));
 }
 
 void test_remove_returns_false(void) {
     TEST_ASSERT_FALSE(DB.remove(sampleJsonId, "000"));
     TEST_ASSERT_FALSE(DB.remove(900, sampleJsonBarcode));
     TEST_ASSERT_FALSE(DB.remove(900, "000"));
-    TEST_ASSERT_TRUE(DB.exists(sampleJsonBarcode));
+    TEST_ASSERT_TRUE(exists(sampleJsonBarcode));
 }
 void setup() {
     UNITY_BEGIN();
     pinMode(SD_PIN, OUTPUT);  // set SD pin mode
     if (!SD.begin(SD_PIN)) {
-        LOG("Failed to find SD")
+        LOG("Failed to find SD");
     } else {
-        RUN_TEST(test_exists_returns_true);
-        RUN_TEST(test_exists_returns_false);
+        LOG("1");
         RUN_TEST(test_get_json_from_id_returns_correctly);
+        LOG("2");
         RUN_TEST(test_get_json_from_id_returns_false);
-        RUN_TEST(test_sets_correctly);
-        RUN_TEST(test_set_returns_false);
+        LOG("3");
+        RUN_TEST(test_sets_weight_correctly);
+        LOG("4");
         RUN_TEST(test_get_ids_returns_correctly);
+        LOG("5");
         RUN_TEST(test_get_ids_returns_false);
+        LOG("6");
         RUN_TEST(test_removes_correctly);
+        LOG("7");
         RUN_TEST(test_remove_returns_false);
     }
     UNITY_END();
