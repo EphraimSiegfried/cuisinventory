@@ -302,7 +302,7 @@ bool DBClass::initDatabase() {
             return false;
         }
     }
-    if (!SD.exists(DATA_FOLDER)){
+    if (!SD.exists(DATA_FOLDER)) {
         SD.mkdir(DATA_FOLDER);
     }
     if (!getCurrentID()) {
