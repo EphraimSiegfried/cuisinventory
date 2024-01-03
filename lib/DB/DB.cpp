@@ -86,7 +86,7 @@ bool DBClass::remove(uint32_t id, String barcode) {
 bool DBClass::getCurrentID() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
     loadStateMapping(stateJson);
-    this->currentID = stateJson["currentID"].as<const uint32_t>();
+    this->currentID = stateJson[UNIQUE_ID].as<const uint32_t>();
     return true;
 }
 
@@ -130,7 +130,7 @@ bool DBClass::addMappings(uint32_t currentID, String barcode) {
     if (!loadStateMapping(stateJson)) {
         return false;
     }
-    stateJson["currentID"] = String(currentID);
+    stateJson[UNIQUE_ID] = String(currentID);
     if (!saveStateMapping(stateJson)) {
         return false;
     }
@@ -322,10 +322,10 @@ bool DBClass::initializeStateFile() {
 }
 
 bool DBClass::initializeKeyBarMapping() {
-    StaticJsonDocument<JSONSIZE> keyBarJson;
+    DynamicJsonDocument keyBarJson(100);
     // create empty json
     keyBarJson.to<JsonObject>();
-    if (!saveJson(keyBarJson, KEY_BAR_MAPPINGFILE)) {
+    if (!saveMapping(&keyBarJson, KEY_BAR_MAPPINGFILE)) {
         LOG("Initialize key bar mapping failed");
         return false;
     }
@@ -333,10 +333,10 @@ bool DBClass::initializeKeyBarMapping() {
 }
 
 bool DBClass::initializeBarKeyMapping() {
-    StaticJsonDocument<JSONSIZE> barKeyJson;
+    DynamicJsonDocument barKeyJson(100);
     // create empty json
     barKeyJson.to<JsonObject>();
-    if (!saveJson(barKeyJson, BAR_KEYS_MAPPINGFILE)) {
+    if (!saveMapping(&barKeyJson, BAR_KEYS_MAPPINGFILE)) {
         LOG("Initialize bar key mapping failed");
         return false;
     }
