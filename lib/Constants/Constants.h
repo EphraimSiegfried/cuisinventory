@@ -29,12 +29,12 @@ const String DEVICE_KEY = "th1s1satestk3y";
 const int JSONSIZE = 1536;
 const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
-const String INTERNAL_FOLDER = "/.intern";
-const String STATE_FOLDER = "/.state";
-const String DATA_FOLDER = "/.data";
-const String KEY_BAR_MAPPINGFILE = "/.intern/keybar";
-const String BAR_KEYS_MAPPINGFILE = "/.intern/barkey";
-const String STATEFILE = "/.state/state";
+const String INTERNAL_FOLDER = "/intern";
+const String STATE_FOLDER = "/state";
+const String DATA_FOLDER = "/data";
+const String KEY_BAR_MAPPINGFILE = "/intern/keybar";
+const String BAR_KEYS_MAPPINGFILE = "/intern/barkey";
+const String STATEFILE = "/state/state";
 
 // JSON
 const String UNIQUE_ID = "id";
