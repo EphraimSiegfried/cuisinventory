@@ -9,7 +9,7 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
 }
 
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
-    DynamicJsonDocument barKeyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
+    DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
     if (barKeyMapJson.capacity() <= 0) return false;
     // read out field and add to vector
     JsonArray keys = barKeyMapJson[barcode];
@@ -29,15 +29,15 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     String barcode = doc["code"];
     information["code"] = barcode;
     information["date"] = time;
-    information["name"] = doc["product_name"];
-    information["brand"] = doc["brands"];
+    information["name"] = doc["product"]["product_name"];
+    information["brand"] = doc["product"]["brands"];
     JsonObject quantity = information.createNestedObject("quantity");
     quantity["initial"] = weight;
     quantity["remaining"] = weight;
-    int productQuantity = doc["product_quantity"];
+    int productQuantity = doc["product"]["product_quantity"];
     quantity["packaging"] = weight - productQuantity;
-    information["image_url"] = doc["image_url"];
-    information["categories"] = doc["categories"];
+    information["image_url"] = doc["product"]["image_url"];
+    information["categories"] = doc["product"]["categories"];
     if (!saveJson(formattedJson, String(currentID))) {
         return false;
     }
@@ -73,14 +73,14 @@ bool DBClass::setWeight(uint32_t id, uint32_t value) {
 
 bool DBClass::remove(uint32_t id, String barcode) {
     String path = DATA_FOLDER + "/" + String(id);
-    if (!SD.remove(DATA_FOLDER + "/" + String(id))) {
+    if (!SD.remove(path)) {
         LOG(F("Failed to remove file from SD card"));
         return false;
     }
     if (!removeMappings(id, barcode)) {
         return false;
     }
-    return false;
+    return true;
 }
 
 bool DBClass::getCurrentID() {
@@ -163,6 +163,10 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
     // update bar key mapping
     DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
     if (barKeyMapJson.capacity() <= 0) {
+        return false;
+    }
+    if (!barKeyMapJson.containsKey(barcode)) {
+        LOG("Barcode doesn't exist");
         return false;
     }
     JsonArray keys = barKeyMapJson[barcode];
