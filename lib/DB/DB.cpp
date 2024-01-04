@@ -165,7 +165,7 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
     if (barKeyMapJson.capacity() <= 0) {
         return false;
     }
-    if(!barKeyMapJson.containsKey(barcode)){
+    if (!barKeyMapJson.containsKey(barcode)) {
         LOG("Barcode doesn't exist");
         return false;
     }

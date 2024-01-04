@@ -38,7 +38,7 @@ void test_get_json_from_id_returns_correctly(void) {
     StaticJsonDocument<JSONSIZE> databaseJsonDoc;
     TEST_ASSERT_TRUE(DB.getJsonFromID(sampleJsonId, databaseJsonDoc));
     char output[JSONSIZE];
-    serializeJson(databaseJsonDoc,output);
+    serializeJson(databaseJsonDoc, output);
     LOG("Output: " + String(output));
     TEST_ASSERT_EQUAL_STRING(apiJsonDoc["product"]["product_name"],
                              databaseJsonDoc["name"]);
@@ -56,9 +56,10 @@ void test_sets_weight_correctly(void) {
     StaticJsonDocument<JSONSIZE> databaseJsonDoc;
     DB.getJsonFromID(sampleJsonId, databaseJsonDoc);
     char output[JSONSIZE];
-    serializeJson(databaseJsonDoc,output);
+    serializeJson(databaseJsonDoc, output);
     LOG("Output: " + String(output));
-    TEST_ASSERT_EQUAL_INT(50,databaseJsonDoc["quantity"]["remaining"].as<const int32_t>());
+    TEST_ASSERT_EQUAL_INT(
+        50, databaseJsonDoc["quantity"]["remaining"].as<const int32_t>());
 }
 
 void test_get_ids_returns_correctly(void) {
