@@ -355,7 +355,7 @@ bool DBClass::initializeBarKeyMapping() {
 }
 
 void DBClass::clearFiles(String file) {
-    File dir  = SD.open(file);
+    File dir = SD.open(file);
     dir.rmRfStar();
 }
 

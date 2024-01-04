@@ -3,8 +3,8 @@
 #include <Adafruit_TinyUSB.h>
 #include <Constants.h>
 #include <Debug.h>
-#include <SdFat.h>
 #include <SPI.h>
+#include <SdFat.h>
 
 void setupUSB();
 int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize);

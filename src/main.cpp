@@ -13,7 +13,6 @@
 #include <WiFiService.h>
 #include <Wire.h>
 
-
 SerLCD lcd;
 RTC_PCF8523 rtc;
 extern QwiicButton greenButton1;
@@ -67,7 +66,7 @@ void setup() {
     if (redButton.isPressed()) {
         lcd.print("** USB MSC activated **");
         usb = true;
-        //setupUSB();
+        // setupUSB();
         return;
     }
 
