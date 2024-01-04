@@ -9,9 +9,7 @@ void setUp(void) {
     deserializeJson(apiJsonDoc, SAMPLE_PRODUCT_JSON);
 }
 
-void tearDown(void) {
-    DB.clear();
-}
+void tearDown(void) { DB.clear(); }
 
 void test_initialize_database_returns_true(void) {
     TEST_ASSERT_TRUE(DB.initDatabase());

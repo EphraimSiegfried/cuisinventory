@@ -20,9 +20,7 @@ void setUp(void) {
     DB.add(apiJsonDoc, weight, time1);
 }
 
-void tearDown(void) {
-    DB.clear();
-}
+void tearDown(void) { DB.clear(); }
 
 bool exists(String barcode) {
     std::vector<uint32_t> ids;
