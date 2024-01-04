@@ -63,53 +63,53 @@ void test_get_ids_returns_correctly(void) {
     DB.remove(2, sampleJsonBarcode);
 }*/
 
-    void test_get_ids_returns_false(void) {
-        std::vector<uint32_t> ids;
-        // Add same product twice with same weights
-        DB.add(apiJsonDoc, weight, time);
-        TEST_ASSERT_FALSE(DB.getIDs(sampleJsonBarcode, ids));
-       // DB.remove(2, sampleJsonBarcode);
-    }
+void test_get_ids_returns_false(void) {
+    std::vector<uint32_t> ids;
+    // Add same product twice with same weights
+    DB.add(apiJsonDoc, weight, time);
+    TEST_ASSERT_FALSE(DB.getIDs(sampleJsonBarcode, ids));
+    // DB.remove(2, sampleJsonBarcode);
+}
 
-    void test_removes_correctly(void) {
-       // TEST_ASSERT_TRUE(DB.remove(sampleJsonId, sampleJsonBarcode));
-        TEST_ASSERT_FALSE(exists(sampleJsonBarcode));
-    }
+void test_removes_correctly(void) {
+    // TEST_ASSERT_TRUE(DB.remove(sampleJsonId, sampleJsonBarcode));
+    TEST_ASSERT_FALSE(exists(sampleJsonBarcode));
+}
 
-    void test_remove_returns_false(void) {
-       // TEST_ASSERT_FALSE(DB.remove(sampleJsonId, "000"));
-       // TEST_ASSERT_FALSE(DB.remove(900, sampleJsonBarcode));
-       // TEST_ASSERT_FALSE(DB.remove(900, "000"));
-        TEST_ASSERT_TRUE(exists(sampleJsonBarcode));
+void test_remove_returns_false(void) {
+    // TEST_ASSERT_FALSE(DB.remove(sampleJsonId, "000"));
+    // TEST_ASSERT_FALSE(DB.remove(900, sampleJsonBarcode));
+    // TEST_ASSERT_FALSE(DB.remove(900, "000"));
+    TEST_ASSERT_TRUE(exists(sampleJsonBarcode));
+}
+void setup() {
+    UNITY_BEGIN();
+    Serial.begin(9600);
+    while (!Serial) {
+        ;  // wait for serial port to connect. Needed for native USB port
+           // only
     }
-    void setup() {
-        UNITY_BEGIN();
-        Serial.begin(9600);
-        while (!Serial) {
-            ;  // wait for serial port to connect. Needed for native USB port
-               // only
-        }
-        pinMode(SD_PIN, OUTPUT);  // set SD pin mode
-        if (!SD.begin(SD_PIN)) {
-            LOG("Failed to find SD");
-        } else {
-            RUN_TEST(test_get_json_from_id_returns_correctly);
-            LOG("1");
-            RUN_TEST(test_get_json_from_id_returns_correctly);
-            LOG("2");
-            RUN_TEST(test_get_json_from_id_returns_false);
-            LOG("3");
-            RUN_TEST(test_sets_weight_correctly);
-            // LOG("4");
-            // RUN_TEST(test_get_ids_returns_correctly);
-            /*  LOG("5");
-               RUN_TEST(test_get_ids_returns_false);
-               LOG("6");
-               RUN_TEST(test_removes_correctly);
-               LOG("7");
-               RUN_TEST(test_remove_returns_false);*/
-        }
-        UNITY_END();
+    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
+    if (!SD.begin(SD_PIN)) {
+        LOG("Failed to find SD");
+    } else {
+        RUN_TEST(test_get_json_from_id_returns_correctly);
+        LOG("1");
+        RUN_TEST(test_get_json_from_id_returns_correctly);
+        LOG("2");
+        RUN_TEST(test_get_json_from_id_returns_false);
+        LOG("3");
+        RUN_TEST(test_sets_weight_correctly);
+        // LOG("4");
+        // RUN_TEST(test_get_ids_returns_correctly);
+        /*  LOG("5");
+           RUN_TEST(test_get_ids_returns_false);
+           LOG("6");
+           RUN_TEST(test_removes_correctly);
+           LOG("7");
+           RUN_TEST(test_remove_returns_false);*/
     }
+    UNITY_END();
+}
 
-    void loop() {}
+void loop() {}
