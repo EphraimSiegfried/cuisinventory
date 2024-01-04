@@ -63,13 +63,13 @@ void test_get_ids_returns_correctly(void) {
     DB.remove(2, sampleJsonBarcode);
 }*/
 
-    void test_get_ids_returns_false(void) {
-        std::vector<uint32_t> ids;
-        // Add same product twice with same weights
-        DB.add(apiJsonDoc, weight, time);
-        TEST_ASSERT_FALSE(DB.getIDs(sampleJsonBarcode, ids));
-        DB.remove(2, sampleJsonBarcode);
-    }
+void test_get_ids_returns_false(void) {
+    std::vector<uint32_t> ids;
+    // Add same product twice with same weights
+    DB.add(apiJsonDoc, weight, time);
+    TEST_ASSERT_FALSE(DB.getIDs(sampleJsonBarcode, ids));
+    DB.remove(2, sampleJsonBarcode);
+}
 
 void test_removes_correctly(void) {
     // TEST_ASSERT_TRUE(DB.remove(sampleJsonId, sampleJsonBarcode));
