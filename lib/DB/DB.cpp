@@ -137,7 +137,7 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
     if (barKeyMapJson.capacity() <= 0) {
         return false;
     }
-    if(!barKeyMapJson.containsKey(barcode)){
+    if (!barKeyMapJson.containsKey(barcode)) {
         /*StaticJsonDocument<1> doc;
         JsonArray array = doc.to<JsonArray>();*/
         barKeyMapJson.createNestedArray(barcode);
@@ -255,7 +255,7 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
     }
     // estimate required filesize
     uint64_t estimateMembers = mappingFile.size() / 12;
-    DynamicJsonDocument mapJson(200+JSON_OBJECT_SIZE(1 + estimateMembers));
+    DynamicJsonDocument mapJson(200 + JSON_OBJECT_SIZE(1 + estimateMembers));
     auto error = deserializeJson(mapJson, mappingFile);
     if (error) {
         LOG(F("loadMapping(): deserializeJson() failed with code "));
