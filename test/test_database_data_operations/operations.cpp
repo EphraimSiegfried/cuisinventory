@@ -10,9 +10,7 @@ uint32_t sampleJsonId;
 String sampleJsonBarcode;
 
 void setUp(void) {
-    DB.clearFiles(INTERNAL_FOLDER);
-    DB.clearFiles(DATA_FOLDER);
-    DB.clearFiles(STATE_FOLDER);
+    DB.clear();
     DB.initDatabase();
     deserializeJson(apiJsonDoc, SAMPLE_PRODUCT_JSON);
     weight = 1000;
@@ -23,9 +21,7 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-    DB.clearFiles(INTERNAL_FOLDER);
-    DB.clearFiles(DATA_FOLDER);
-    DB.clearFiles(INTERNAL_FOLDER);
+    DB.clear();
 }
 
 bool exists(String barcode) {
