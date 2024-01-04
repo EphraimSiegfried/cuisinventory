@@ -238,7 +238,7 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
-    File mappingFile = SD.open(INTERNAL_FOLDER + "/" + mappingfile, FILE_READ);
+    File mappingFile = SD.open(mappingfile, FILE_READ);
     if (!mappingFile) {
         LOG("loadMapping(): Failed to open mapping file");
         return DynamicJsonDocument(0);
@@ -257,7 +257,7 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
-    String path = INTERNAL_FOLDER + "/" + mappingName;
+    String path = mappingName;
     SD.remove(path);
     File mappingFile = SD.open(path, FILE_WRITE);
     if (!mappingFile) {
