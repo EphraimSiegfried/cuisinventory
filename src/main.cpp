@@ -140,15 +140,15 @@ void addProduct() {
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
     }
-   /* if (!DB.add(doc, weight) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("FATAL ERROR:\n");
-        lcd.print("Failed to save product");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
-        return;
-    }
-    */
+    /* if (!DB.add(doc, weight) {
+         lcd.clear();
+         lcd.setFastBacklight(0xFF0000);
+         lcd.print("FATAL ERROR:\n");
+         lcd.print("Failed to save product");
+         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+         return;
+     }
+     */
     pendingSync = true;
     lcd.clear();
     lcd.print("Product added successfully!");
