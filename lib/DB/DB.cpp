@@ -324,7 +324,7 @@ bool DBClass::checkInitialized(String filename) {
 
 bool DBClass::initializeStateFile() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
-    stateJson[UNIQUE_ID] = currentID;
+    stateJson[UNIQUE_ID] = 0;
     if (!saveStateMapping(stateJson)) {
         LOG("Initialize state mapping failed");
         return false;
@@ -352,6 +352,27 @@ bool DBClass::initializeBarKeyMapping() {
         return false;
     }
     return true;
+}
+
+void DBClass::clearFiles(String file) {
+    File dir  = SD.open(file);
+  while (true) {
+    File entry = dir.openNextFile();
+    if (!entry) {
+      // No more files
+      break;
+    }
+    if (entry.isDirectory()) {
+      // If it's a directory, delete its contents
+      clearFiles(entry.name());
+    } else {
+      // If it's a file, delete it
+      Serial.println("Deleting file: " + String(entry.name()));
+      entry.close(); // Close the file before deleting
+      SD.remove(entry.name()); // Remove the file
+    }
+    entry.close();
+  }
 }
 
 DBClass DB;

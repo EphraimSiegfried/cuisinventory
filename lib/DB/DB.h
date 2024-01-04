@@ -21,6 +21,7 @@ class DBClass {
     bool remove(uint32_t id, String barcode);
     bool syncDB();
     bool initDatabase();
+    void clearFiles(String file);
 
    private:
     uint32_t currentID;
@@ -37,6 +38,7 @@ class DBClass {
     bool initializeKeyBarMapping();
     bool initializeBarKeyMapping();
     bool checkInitialized(String filename);
+    
 };
 
 extern DBClass DB;
