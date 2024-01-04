@@ -197,7 +197,7 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    SD.remove(name);
+    SD.remove(DATA_FOLDER + "/" + name);
     File jsonFile = SD.open(DATA_FOLDER + "/" + name, FILE_WRITE);
     if (!jsonFile) {
         LOG("saveJson(): Failed to open json file");
@@ -257,9 +257,8 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
-    String path = mappingName;
-    SD.remove(path);
-    File mappingFile = SD.open(path, FILE_WRITE);
+    SD.remove(mappingName);
+    File mappingFile = SD.open(mappingName, FILE_WRITE);
     if (!mappingFile) {
         LOG("saveMapping(): Failed to open mapping file");
         return false;
