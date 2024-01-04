@@ -100,10 +100,16 @@ void setup() {
     lcd.clear();
 
     // *** Scale ***
-    initScale();
+    if (!initScale()) {
+        lcd.print("Failed to initialize the scale");
+        while (1) delay(10);
+    };
 
     // *** Barcode ***
-    initBarReader();
+    if (!initBarReader()) {
+        lcd.print("Failed to initialize the barcode reader");
+        while (1) delay(10);
+    };
 }
 
 String scanProductBarcode() {
