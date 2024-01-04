@@ -1,7 +1,6 @@
 #include <USB.h>
 
-Sd2Card card;
-SdVolume volume;
+SdFat card;
 Adafruit_USBD_MSC usb_msc;
 
 void setupUSB() {
@@ -16,19 +15,20 @@ void setupUSB() {
     usb_msc.setUnitReady(false);
     usb_msc.begin();
 
-    if (!card.init(SPI_HALF_SPEED, SD_PIN)) {
+    if (!card.begin(SD_PIN, SPI_HALF_SPEED)) {
         LOG("Failed to initialize SD!");
         while (1) delay(10);
     }
 
     // Now we will try to open the 'volume'/'partition' - it should be FAT16 or
     // FAT32
-    if (!volume.init(card)) {
+    if (!card.vol()->init(card.card())) {
         LOG("Couldn't find FAT16/FAT32 partition!");
         while (1) delay(10);
     }
 
-    uint32_t block_count = volume.blocksPerCluster() * volume.clusterCount();
+    uint32_t block_count =
+        card.vol()->sectorsPerCluster() * card.vol()->clusterCount();
     usb_msc.setCapacity(block_count,
                         512);    // Set disk size, SD block size is always 512
     usb_msc.setUnitReady(true);  // msc is ready for read/write
@@ -39,7 +39,7 @@ void setupUSB() {
 // return number of copied bytes (must be multiple of block size)
 int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
     (void)bufsize;
-    return card.readBlock(lba, (uint8_t*)buffer) ? 512 : -1;
+    return card.card()->readBlock(lba, (uint8_t*)buffer) ? 512 : -1;
 }
 
 // Callback invoked when received WRITE10 command.
@@ -47,7 +47,7 @@ int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
 // return number of written bytes (must be multiple of block size)
 int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
     (void)bufsize;
-    return card.writeBlock(lba, buffer) ? 512 : -1;
+    return card.card()->writeBlock(lba, buffer) ? 512 : -1;
 }
 
 // Callback invoked when WRITE10 command is completed (status received and

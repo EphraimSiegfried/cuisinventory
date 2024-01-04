@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include <Constants.h>
 #include <Debug.h>
-#include <SD.h>
+#include <SdFat.h>
 #include <WiFiService.h>
 
 #include <vector>
@@ -41,3 +41,4 @@ class DBClass {
 };
 
 extern DBClass DB;
+extern SdFat SD;
