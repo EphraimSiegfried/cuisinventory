@@ -1,10 +1,10 @@
 #include "BarReader.h"
 
-SoftwareSerial softSerial(RX_PIN,TX_PIN);
+SoftwareSerial softSerial(RX_PIN, TX_PIN);
 DE2120 scanner;
 
-bool initBarReader(){
-    if (!scanner.begin(softSerial)){
+bool initBarReader() {
+    if (!scanner.begin(softSerial)) {
         LOG("Couldn't initialize Barcode Reader");
         return false;
     }
