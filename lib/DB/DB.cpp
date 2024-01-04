@@ -72,6 +72,7 @@ bool DBClass::setWeight(uint32_t id, uint32_t value) {
 }
 
 bool DBClass::remove(uint32_t id, String barcode) {
+    String path = DATA_FOLDER + "/" + String(id);
     if (!SD.remove(DATA_FOLDER + "/" + String(id))) {
         LOG(F("Failed to remove file from SD card"));
         return false;
@@ -181,7 +182,8 @@ bool DBClass::removeMappings(uint32_t currentID, String barcode) {
 }
 
 bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    File jsonFile = SD.open(DATA_FOLDER + "/" + name, FILE_READ);
+    String path = DATA_FOLDER + "/" + name;
+    File jsonFile = SD.open(path, FILE_READ);
     if (!jsonFile) {
         LOG("loadJson(): Failed to open json file");
         return false;
@@ -197,8 +199,9 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    SD.remove(name);
-    File jsonFile = SD.open(DATA_FOLDER + "/" + name, FILE_WRITE);
+    String path = DATA_FOLDER + "/" + name;
+    SD.remove(path);
+    File jsonFile = SD.open(path, FILE_WRITE);
     if (!jsonFile) {
         LOG("saveJson(): Failed to open json file");
         return false;
@@ -209,8 +212,8 @@ bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    File stateFile;
-    stateFile = SD.open(STATEFILE, FILE_READ);
+    String path = STATE_FOLDER + "/" + STATEFILE;
+    File stateFile = SD.open(path, FILE_READ);
     if (!stateFile) {
         LOG("loadStateMapping(): Failed to open state file");
         return false;
@@ -226,8 +229,9 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    SD.remove(STATEFILE);
-    File stateFile = SD.open(STATEFILE, FILE_WRITE);
+    String path = STATE_FOLDER + "/" + STATEFILE;
+    SD.remove(path);
+    File stateFile = SD.open(path, FILE_WRITE);
     if (!stateFile) {
         LOG("saveStateMapping(): Failed to open state file");
         return false;
@@ -238,7 +242,8 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
-    File mappingFile = SD.open(INTERNAL_FOLDER + "/" + mappingfile, FILE_READ);
+    String path = INTERNAL_FOLDER + "/" + mappingfile;
+    File mappingFile = SD.open(path, FILE_READ);
     if (!mappingFile) {
         LOG("loadMapping(): Failed to open mapping file");
         return DynamicJsonDocument(0);
@@ -279,17 +284,17 @@ bool DBClass::initDatabase() {
     if (!SD.exists(DATA_FOLDER)) {
         SD.mkdir(DATA_FOLDER);
     }
-    if (!checkInitialized(STATEFILE)) {
+    if (!checkInitialized(STATE_FOLDER+"/"+STATEFILE)) {
         if (!initializeStateFile()) {
             return false;
         }
     }
-    if (!checkInitialized(KEY_BAR_MAPPINGFILE)) {
+    if (!checkInitialized(INTERNAL_FOLDER + "/" + KEY_BAR_MAPPINGFILE)) {
         if (!initializeKeyBarMapping()) {
             return false;
         }
     }
-    if (!checkInitialized(BAR_KEYS_MAPPINGFILE)) {
+    if (!checkInitialized(INTERNAL_FOLDER + "/" + BAR_KEYS_MAPPINGFILE)) {
         if (!initializeBarKeyMapping()) {
             return false;
         }
