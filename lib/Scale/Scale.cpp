@@ -27,7 +27,7 @@ bool initScale() {
     }
 
     calibrated = false;
-    for (int i=0; i < 10 && !nau.calibrate(NAU7802_CALMOD_OFFSET); i++) {
+    for (int i = 0; i < 10 && !nau.calibrate(NAU7802_CALMOD_OFFSET); i++) {
         delay(500);
         if (nau.calibrate(NAU7802_CALMOD_OFFSET)) {
             calibrated = true;
