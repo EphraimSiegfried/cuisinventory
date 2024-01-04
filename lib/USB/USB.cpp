@@ -1,4 +1,4 @@
-#include <USB.h>
+/*#include <USB.h>
 
 Sd2Card card;
 SdVolume volume;
@@ -55,4 +55,4 @@ int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
 // used to flush any pending cache.
 void msc_flush_cb(void) {
     // nothing to do
-}
+}*/

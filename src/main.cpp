@@ -9,9 +9,10 @@
 #include <Scale.h>
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
-#include <USB.h>
+//#include <USB.h>
 #include <WiFiService.h>
 #include <Wire.h>
+
 
 SerLCD lcd;
 RTC_PCF8523 rtc;
@@ -66,7 +67,7 @@ void setup() {
     if (redButton.isPressed()) {
         lcd.print("** USB MSC activated **");
         usb = true;
-        setupUSB();
+        //setupUSB();
         return;
     }
 
