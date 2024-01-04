@@ -98,8 +98,8 @@ void setup() {
         RUN_TEST(test_get_json_from_id_returns_false);
         LOG("3");
         RUN_TEST(test_sets_weight_correctly);
-        //LOG("4");
-        //RUN_TEST(test_get_ids_returns_correctly);
+        // LOG("4");
+        // RUN_TEST(test_get_ids_returns_correctly);
         LOG("5");
         RUN_TEST(test_get_ids_returns_false);
         LOG("6");
