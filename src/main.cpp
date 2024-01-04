@@ -1,3 +1,4 @@
+#include <Adafruit_NAU7802.h>
 #include <Adafruit_TinyUSB.h>
 #include <Constants.h>
 #include <DB.h>
@@ -5,6 +6,7 @@
 #include <Input.h>
 #include <RTClib.h>
 #include <SPI.h>
+#include <Scale.h>
 #include <SerLCD.h>
 #include <SparkFun_Qwiic_Button.h>
 #include <USB.h>
@@ -97,6 +99,9 @@ void setup() {
 
     rtc.start();
     lcd.clear();
+
+    // *** Scale ***
+    initScale();
 }
 
 void addProduct() {
