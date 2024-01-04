@@ -25,7 +25,7 @@ void setUp(void) {
 void tearDown(void) {
     DB.clearFiles(INTERNAL_FOLDER);
     DB.clearFiles(DATA_FOLDER);
-    DB.clearFiles(INTERNAL_FOLDER);
+    DB.clearFiles(STATE_FOLDER);
 }
 
 bool exists(String barcode) {

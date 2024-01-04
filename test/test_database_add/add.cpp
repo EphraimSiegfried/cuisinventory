@@ -14,7 +14,7 @@ void setUp(void) {
 void tearDown(void) {
     DB.clearFiles(INTERNAL_FOLDER);
     DB.clearFiles(DATA_FOLDER);
-    DB.clearFiles(INTERNAL_FOLDER);
+    DB.clearFiles(STATE_FOLDER);
 }
 
 void test_initialize_database_returns_true(void) {
