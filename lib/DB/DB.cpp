@@ -137,7 +137,7 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
     if (barKeyMapJson.capacity() <= 0) {
         return false;
     }
-    if(!barKeyMapJson.containsKey(barcode)){
+    if (!barKeyMapJson.containsKey(barcode)) {
         barKeyMapJson[barcode] = JsonArray();
     }
     JsonArray keys = barKeyMapJson[barcode];
