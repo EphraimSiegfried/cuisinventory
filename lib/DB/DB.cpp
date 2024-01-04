@@ -84,7 +84,7 @@ bool DBClass::remove(uint32_t id, String barcode) {
 
 bool DBClass::getCurrentID() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
-    loadStateMapping(stateJson);
+    if(loadStateMapping(stateJson))
     this->currentID = stateJson[UNIQUE_ID].as<const uint32_t>();
     return true;
 }
@@ -270,22 +270,43 @@ bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
 }
 
 bool DBClass::initDatabase() {
-    if (!SD.exists(STATEFILE)) {
+    if(!SD.exists(STATE_FOLDER)){
         SD.mkdir(STATE_FOLDER);
+    }
+    if(!SD.exists(INTERNAL_FOLDER)){
+        SD.mkdir(INTERNAL_FOLDER);
+    }
+    if(!SD.exists(DATA_FOLDER)){
+        SD.mkdir(DATA_FOLDER);
+    }
+    if(!checkInitialized(STATEFILE)){
         if (!initializeStateFile()) {
             return false;
         }
     }
-    if (!SD.exists(INTERNAL_FOLDER)) {
-        SD.mkdir(INTERNAL_FOLDER);
-        if (!initializeKeyBarMapping() || !initializeBarKeyMapping()) {
+    if(!checkInitialized(KEY_BAR_MAPPINGFILE)){
+        if(!initializeKeyBarMapping()){
             return false;
         }
     }
-    if (!SD.exists(DATA_FOLDER)) {
-        SD.mkdir(DATA_FOLDER);
+    if(!checkInitialized(BAR_KEYS_MAPPINGFILE)){
+        if(!initializeBarKeyMapping()){
+            return false;
+        }
     }
     if (!getCurrentID()) {
+        return false;
+    }
+    return true;
+}
+
+bool DBClass::checkInitialized(String filename) {
+    File file = SD.open(filename, FILE_READ);
+    if (!file) {
+        return false;
+    }
+    long size = file.size();
+    if (size <= 1) {
         return false;
     }
     return true;

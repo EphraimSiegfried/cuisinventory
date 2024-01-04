@@ -36,6 +36,7 @@ class DBClass {
     bool initializeStateFile();
     bool initializeKeyBarMapping();
     bool initializeBarKeyMapping();
+    bool checkInitialized(String filename);
 };
 
 extern DBClass DB;

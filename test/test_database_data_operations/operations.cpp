@@ -91,6 +91,7 @@ void setup() {
     if (!SD.begin(SD_PIN)) {
         LOG("Failed to find SD");
     } else {
+        RUN_TEST(test_get_json_from_id_returns_correctly);
         LOG("1");
         RUN_TEST(test_get_json_from_id_returns_correctly);
         LOG("2");
