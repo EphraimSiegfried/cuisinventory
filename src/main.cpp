@@ -140,7 +140,7 @@ void addProduct() {
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
     }
-    if (!DB.add(doc, weight,rtc.now().unixtime())) {
+    if (!DB.add(doc, weight, rtc.now().unixtime())) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("FATAL ERROR:\n");
