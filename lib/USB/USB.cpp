@@ -27,7 +27,8 @@ void setupUSB() {
         while (1) delay(10);
     }
 
-    uint32_t block_count = card.vol()->sectorsPerCluster() * card.vol()->clusterCount();
+    uint32_t block_count =
+        card.vol()->sectorsPerCluster() * card.vol()->clusterCount();
     usb_msc.setCapacity(block_count,
                         512);    // Set disk size, SD block size is always 512
     usb_msc.setUnitReady(true);  // msc is ready for read/write
