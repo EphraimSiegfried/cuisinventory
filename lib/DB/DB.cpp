@@ -72,7 +72,7 @@ bool DBClass::setWeight(uint32_t id, uint32_t value) {
 }
 
 bool DBClass::remove(uint32_t id, String barcode) {
-    if (!SD.remove(DATA_FOLDER + String(id))) {
+    if (!SD.remove(DATA_FOLDER + "/" + String(id))) {
         LOG(F("Failed to remove file from SD card"));
         return false;
     }
