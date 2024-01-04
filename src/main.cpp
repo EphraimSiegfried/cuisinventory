@@ -106,21 +106,26 @@ void setup() {
     initBarReader();
 }
 
-void addProduct() {
+String scanProductBarcode() {
     lcd.clear();
-    lcd.setFastBacklight(0x00FF00);
+    lcd.setFastBacklight(0x0000FF);
     lcd.print("Please scan product barcode...");
     scanner.startScan();
     String barcode;
     while (!readBar(barcode)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return "";  // cancel
         delay(100);
     }
     scanner.stopScan();
     lcd.clear();
+    return barcode;
+}
+
+uint32_t measureProductWeight() {
+    lcd.clear();
     lcd.print("Please weigh product,\npress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     }
     lcd.clear();
@@ -128,18 +133,21 @@ void addProduct() {
     uint32_t weight = 0;
     while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
         weight = nau.read();
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     }
+    lcd.clear();
+    return weight;
+}
+
+void addProduct() {
+    String barcode = scanProductBarcode();
+    if (barcode.length() == 0) return;
+
+    uint32_t weight = measureProductWeight();
+    if (weight == 0) return;
+
     StaticJsonDocument<JSONSIZE> doc;
-    if (!WiFiService.get(barcode, doc)) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("Product was not found in our database!\n");
-        lcd.print("You may add it using the openfoodfacts app");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
-        return;
-    }
     if (!DB.add(doc, weight, rtc.now().unixtime())) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
@@ -157,16 +165,9 @@ void addProduct() {
 }
 
 void updateProduct() {
-    lcd.clear();
-    lcd.setFastBacklight(0x0000FF);
-    lcd.print("Please scan product barcode...");
-    scanner.startScan();
-    String barcode;
-    while (!readBar(barcode)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
-        delay(100);
-    }
-    scanner.stopScan();
+    String barcode = scanProductBarcode();
+    if (barcode.length() == 0) return;
+
     uint32_t id = DB.getLeastWeightID(barcode);
     if (id == 0) {
         lcd.clear();
@@ -176,19 +177,10 @@ void updateProduct() {
         return;
     }
     lcd.clear();
-    lcd.print("Please weigh product,\npress button 1 to confirm");
-    while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
-        delay(100);
-    }
-    lcd.clear();
-    lcd.print("Weighing, please stand by...");
-    uint32_t weight = 0;
-    while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
-        weight = nau.read();
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
-        delay(100);
-    }
+
+    uint32_t weight = measureProductWeight();
+    if (weight == 0) return;
+
     if (!DB.setWeight(id, weight)) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
@@ -206,16 +198,9 @@ void updateProduct() {
 }
 
 void removeProduct() {
-    lcd.clear();
-    lcd.setFastBacklight(0xFF0000);
-    lcd.print("Please scan product barcode to remove...");
-    scanner.startScan();
-    String barcode;
-    while (!readBar(barcode)) {
-        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
-        delay(100);
-    }
-    scanner.stopScan();
+    String barcode = scanProductBarcode();
+    if (barcode.length() == 0) return;
+
     uint32_t id = DB.getLeastWeightID(barcode);
     if (id == 0) {
         lcd.clear();
