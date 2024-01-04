@@ -283,7 +283,7 @@ bool DBClass::initDatabase() {
     if (!SD.exists(DATA_FOLDER)) {
         SD.mkdir(DATA_FOLDER);
     }
-    if (!checkInitialized(STATE_FOLDER+"/"+STATEFILE)) {
+    if (!checkInitialized(STATE_FOLDER + "/" + STATEFILE)) {
         if (!initializeStateFile()) {
             return false;
         }

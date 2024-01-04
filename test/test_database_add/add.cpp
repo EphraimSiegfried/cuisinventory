@@ -31,7 +31,7 @@ void setup() {
         LOG("Failed to find SD");
     } else {
         RUN_TEST(test_initialize_database_returns_true);
-       // RUN_TEST(test_add_returns_true);
+        // RUN_TEST(test_add_returns_true);
     }
     UNITY_END();
 }
