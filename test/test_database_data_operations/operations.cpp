@@ -83,6 +83,11 @@ void test_remove_returns_false(void) {
 }
 void setup() {
     UNITY_BEGIN();
+    UNITY_BEGIN();
+    Serial.begin(9600);
+    while (!Serial) {
+        ;  // wait for serial port to connect. Needed for native USB port only
+    }
     pinMode(SD_PIN, OUTPUT);  // set SD pin mode
     if (!SD.begin(SD_PIN)) {
         LOG("Failed to find SD");
