@@ -11,9 +11,9 @@ bool initBarReader(){
     return true;
 }
 
-bool readBar(String& scannedCode){
+bool readBar(String& scannedCode) {
     char scanBuffer[40];
-    if(scanner.readBarcode(scanBuffer, 40)){
+    if (scanner.readBarcode(scanBuffer, 40)) {
         scannedCode = String(scanBuffer);
         return true;
     }

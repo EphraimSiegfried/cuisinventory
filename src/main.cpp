@@ -1,4 +1,5 @@
 #include <Adafruit_TinyUSB.h>
+#include <BarReader.h>
 #include <Constants.h>
 #include <DB.h>
 #include <Debug.h>
@@ -11,7 +12,6 @@
 #include <USB.h>
 #include <WiFiService.h>
 #include <Wire.h>
-#include <BarReader.h>
 
 SerLCD lcd;
 RTC_PCF8523 rtc;
