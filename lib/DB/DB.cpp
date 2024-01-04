@@ -91,7 +91,7 @@ bool DBClass::getCurrentID() {
 
 uint32_t DBClass::getLeastWeightID(String barcode) {
     std::vector<uint32_t> ids;
-    uint32_t leastWeightId;
+    uint32_t leastWeightId = 0;
     int leastWeight = 999999;
     getIDs(barcode, ids);
     for (uint32_t id : ids) {

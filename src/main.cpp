@@ -140,15 +140,14 @@ void addProduct() {
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
     }
-    /* if (!DB.add(doc, weight) {
-         lcd.clear();
-         lcd.setFastBacklight(0xFF0000);
-         lcd.print("FATAL ERROR:\n");
-         lcd.print("Failed to save product");
-         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
-         return;
-     }
-     */
+    if (!DB.add(doc, weight,rtc.now().unixtime())) {
+        lcd.clear();
+        lcd.setFastBacklight(0xFF0000);
+        lcd.print("FATAL ERROR:\n");
+        lcd.print("Failed to save product");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }
     pendingSync = true;
     lcd.clear();
     lcd.print("Product added successfully!");
@@ -161,18 +160,21 @@ void updateProduct() {
     lcd.clear();
     lcd.setFastBacklight(0x0000FF);
     lcd.print("Please scan product barcode...");
-    while (0 /*check for barcode*/) {
+    scanner.startScan();
+    String barcode;
+    while (!readBar(barcode)) {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
-    /* uint32_t id = DB.getLeastRemainingID(barcode);
-    if (!id) {
+    scanner.stopScan();
+    uint32_t id = DB.getLeastWeightID(barcode);
+    if (id == 0) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("Please add product first!");
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
-    */
+    }
     lcd.clear();
     lcd.print("Please weigh product,\npress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
@@ -182,18 +184,19 @@ void updateProduct() {
     lcd.clear();
     lcd.print("Weighing, please stand by...");
     uint32_t weight = 0;
-    while (0 /*while value not settled*/) {
+    while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
+        weight = nau.read();
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        delay(100);
     }
-    /* if (!DB.setWeight(id, weight)) {
+    if (!DB.setWeight(id, weight)) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("FATAL ERROR:\n");
         lcd.print("Failed to update weight");
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
-    }*/
-
+    }
     pendingSync = true;
     lcd.clear();
     lcd.print("Weight updated successfully!");
@@ -205,28 +208,30 @@ void updateProduct() {
 void removeProduct() {
     lcd.clear();
     lcd.setFastBacklight(0xFF0000);
-    lcd.print("Please scan product barcode...");
-    while (0 /*check for barcode*/) {
+    lcd.print("Please scan product barcode to remove...");
+    scanner.startScan();
+    String barcode;
+    while (!readBar(barcode)) {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
-    /* uint32_t id = DB.getLeastWeightID(barcode);
-    if (!id) {
+    scanner.stopScan();
+    uint32_t id = DB.getLeastWeightID(barcode);
+    if (id == 0) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("Product not found in inventory!");
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
-    */
-    /* if (!DB.remove(id, weight)) {
+    }
+    if (!DB.remove(id, barcode)) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("FATAL ERROR:\n");
         lcd.print("Failed to remove product");
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
-    }*/
-
+    }
     pendingSync = true;
     lcd.clear();
     lcd.print("Product removed successfully!");
