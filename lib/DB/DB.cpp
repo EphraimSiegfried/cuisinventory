@@ -363,5 +363,5 @@ void DBClass::clearFiles(String file) {
     dir.rmRfStar();
 }
 
-extern SdFat SD;
+SdFat SD;
 DBClass DB;
