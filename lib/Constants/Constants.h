@@ -58,6 +58,10 @@ const uint32_t LONG_PRESS_DURATION =
 // btn2, it doesn't get registered next time we check for btn1
 const uint32_t PRESS_AGE_THRESHOLD = 3000;
 
+//UART Barcode
+const uint8_t RX_PIN = 2;
+const uint8_t TX_PIN = 3;
+
 #ifdef PIO_UNIT_TESTING
 const String SSID = "hotspot";
 const String PASSWORD = "12345678";

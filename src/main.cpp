@@ -10,6 +10,7 @@
 #include <USB.h>
 #include <WiFiService.h>
 #include <Wire.h>
+#include <BarReader.h>
 
 SerLCD lcd;
 RTC_PCF8523 rtc;
@@ -102,10 +103,13 @@ void addProduct() {
     lcd.clear();
     lcd.setFastBacklight(0x00FF00);
     lcd.print("Please scan product barcode...");
-    while (0 /*check for barcode*/) {
+    scanner.startScan();
+    String barcode;
+    while (!readBar(barcode)) {
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
         delay(100);
     }
+    scanner.stopScan();
     lcd.clear();
     lcd.print("Please weigh product,\npress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
