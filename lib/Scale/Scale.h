@@ -1,6 +1,9 @@
+#pragma once
 #include <Adafruit_NAU7802.h>
 #include <Constants.h>
 #include <Debug.h>
+
 bool weightIsSettled(int32_t &weight, unsigned int &stableReadingsCount,
                      unsigned int &unstableReadingsCount);
 bool initScale();
+extern Adafruit_NAU7802 nau;

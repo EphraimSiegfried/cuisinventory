@@ -1,3 +1,4 @@
+#pragma once
 #include <SparkFun_DE2120_Arduino_Library.h>
 #include <SoftwareSerial.h>
 #include "Constants.h"

@@ -1,6 +1,6 @@
 #include <Scale.h>
 
-extern Adafruit_NAU7802 nau;
+Adafruit_NAU7802 nau;
 bool initScale() {
     if (!nau.begin()) {
         LOG("Failed to find NAU7802");

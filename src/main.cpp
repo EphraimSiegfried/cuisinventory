@@ -1,4 +1,3 @@
-#include <Adafruit_NAU7802.h>
 #include <Adafruit_TinyUSB.h>
 #include <Constants.h>
 #include <DB.h>
@@ -102,6 +101,9 @@ void setup() {
 
     // *** Scale ***
     initScale();
+
+    // *** Barcode ***
+    initBarReader();
 }
 
 void addProduct() {
@@ -124,11 +126,13 @@ void addProduct() {
     lcd.clear();
     lcd.print("Weighing, please stand by...");
     uint32_t weight = 0;
-    while (0 /*while value not settled*/) {
+    while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
+        weight = nau.read();
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        delay(100);
     }
     StaticJsonDocument<JSONSIZE> doc;
-    /*if (!WiFiService.get(barcode, doc) {
+    if (!WiFiService.get(barcode, doc)) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("Product was not found in our database!\n");
@@ -136,7 +140,7 @@ void addProduct() {
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
     }
-    if (!DB.add(doc, weight) {
+   /* if (!DB.add(doc, weight) {
         lcd.clear();
         lcd.setFastBacklight(0xFF0000);
         lcd.print("FATAL ERROR:\n");
