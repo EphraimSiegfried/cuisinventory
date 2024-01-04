@@ -14,6 +14,7 @@
 #include <Wire.h>
 
 SerLCD lcd;
+SdFat SD;
 RTC_PCF8523 rtc;
 extern QwiicButton greenButton1;
 extern QwiicButton greenButton2;
