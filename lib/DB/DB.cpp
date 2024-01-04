@@ -122,13 +122,13 @@ bool DBClass::syncDB() {
     return true;
 }
 
-bool DBClass::addMappings(uint32_t pCurrentID, String barcode) {
+bool DBClass::addMappings(uint32_t id, String barcode) {
     // update statefile
     StaticJsonDocument<STATEFILESIZE> stateJson;
     if (!loadStateMapping(stateJson)) {
         return false;
     }
-    stateJson[UNIQUE_ID] = String(pCurrentID);
+    stateJson[UNIQUE_ID] = String(id);
     if (!saveStateMapping(stateJson)) {
         return false;
     }
@@ -137,24 +137,27 @@ bool DBClass::addMappings(uint32_t pCurrentID, String barcode) {
     if (barKeyMapJson.capacity() <= 0) {
         return false;
     }
+    if(!barKeyMapJson.containsKey(barcode)){
+        barKeyMapJson[barcode] = JsonArray();
+    }
     JsonArray keys = barKeyMapJson[barcode];
-    keys.add(pCurrentID);
+    keys.add(id);
     if (!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)) {
         return false;
     }
     // update key bar mapping
     DynamicJsonDocument keyBarMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
-    if (keyBarMapJson == nullptr) {
+    if (keyBarMapJson.capacity() <= 0) {
         return false;
     }
-    keyBarMapJson[String(pCurrentID)] = barcode;
+    keyBarMapJson[String(id)] = barcode;
     if (!saveMapping(keyBarMapJson, KEY_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
 }
 
-bool DBClass::removeMappings(uint32_t pCurrentID, String barcode) {
+bool DBClass::removeMappings(uint32_t id, String barcode) {
     // update bar key mapping
     DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
     if (barKeyMapJson.capacity() <= 0) {
@@ -162,7 +165,7 @@ bool DBClass::removeMappings(uint32_t pCurrentID, String barcode) {
     }
     JsonArray keys = barKeyMapJson[barcode];
     for (JsonArray::iterator it = keys.begin(); it != keys.end(); ++it) {
-        if ((*it).as<uint32_t>() == pCurrentID) {
+        if ((*it).as<uint32_t>() == id) {
             keys.remove(it);
         }
     }
@@ -174,7 +177,7 @@ bool DBClass::removeMappings(uint32_t pCurrentID, String barcode) {
     if (keyBarMapJson.capacity() <= 0) {
         return false;
     }
-    keyBarMapJson.remove(String(pCurrentID));
+    keyBarMapJson.remove(String(id));
     if (!saveMapping(keyBarMapJson, KEY_BAR_MAPPINGFILE)) {
         return false;
     }
@@ -262,8 +265,9 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
-    SD.remove(mappingName);
-    File mappingFile = SD.open(mappingName, FILE_WRITE);
+    String path = INTERNAL_FOLDER + "/" + mappingName;
+    SD.remove(path);
+    File mappingFile = SD.open(path, FILE_WRITE);
     if (!mappingFile) {
         LOG("saveMapping(): Failed to open mapping file");
         return false;
