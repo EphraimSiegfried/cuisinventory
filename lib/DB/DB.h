@@ -21,7 +21,7 @@ class DBClass {
     bool remove(uint32_t id, String barcode);
     bool syncDB();
     bool initDatabase();
-    void clearFiles(String file);
+    void clear();
 
    private:
     uint32_t currentID;

@@ -29,9 +29,9 @@ const String DEVICE_KEY = "th1s1satestk3y";
 const int JSONSIZE = 1536;
 const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
-const String INTERNAL_FOLDER = "/intern";
-const String STATE_FOLDER = "/state";
-const String DATA_FOLDER = "/data";
+const String INTERNAL_FOLDER = "/.intern";
+const String STATE_FOLDER = "/.state";
+const String DATA_FOLDER = "/.data";
 const String KEY_BAR_MAPPINGFILE = "keybar";
 const String BAR_KEYS_MAPPINGFILE = "barkey";
 const String STATEFILE = "state";
@@ -57,7 +57,7 @@ const uint8_t RED_BUTTON_ADDRESS = 0x71;
 const uint32_t LONG_PRESS_DURATION =
     2000;  // duration threshold of a long press
 // Don't register button presses that have happened this many ms before we
-// checked for input Tlis is so that if btn1 is pressed while we're waiting for
+// checked for input This is so that if btn1 is pressed while we're waiting for
 // btn2, it doesn't get registered next time we check for btn1
 const uint32_t PRESS_AGE_THRESHOLD = 3000;
 
@@ -66,7 +66,7 @@ const uint8_t RX_PIN = 2;
 const uint8_t TX_PIN = 3;
 
 #ifdef PIO_UNIT_TESTING
-const String SSID = "hotspot";
+const String SSID = "iPhone";
 const String PASSWORD = "12345678";
 const String SAMPLE_PRODUCT_JSON =
     "{\"code\":\"3017620422003\",\"errors\":[],\"product\":{\"allergens\":\"en:"

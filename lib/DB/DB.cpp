@@ -358,9 +358,16 @@ bool DBClass::initializeBarKeyMapping() {
     return true;
 }
 
-void DBClass::clearFiles(String file) {
-    File dir = SD.open(file);
+void DBClass::clear() {
+    File dir = SD.open(INTERNAL_FOLDER);
     dir.rmRfStar();
+    dir.close();
+    dir = SD.open(DATA_FOLDER);
+    dir.rmRfStar();
+    dir.close();
+    dir = SD.open(STATE_FOLDER);
+    dir.rmRfStar();
+    dir.close();
 }
 
 SdFat SD;
