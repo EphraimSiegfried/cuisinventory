@@ -32,8 +32,8 @@ const int SD_PIN = 10;
 const String INTERNAL_FOLDER = "/.intern";
 const String STATE_FOLDER = "/.state";
 const String DATA_FOLDER = "/.data";
-const String KEY_BAR_MAPPINGFILE = "keybar";
-const String BAR_KEYS_MAPPINGFILE = "barkey";
+const String ID_BAR_MAPPINGFILE = "idbar";
+const String BAR_ID_MAPPINGFILE = "barid";
 const String STATEFILE = "state";
 
 // JSON

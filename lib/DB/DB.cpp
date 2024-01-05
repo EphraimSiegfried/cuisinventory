@@ -9,14 +9,14 @@ bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
 }
 
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
-    DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
-    if (barKeyMapJson.capacity() <= 0) return false;
+    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
+    if (barIdMapJson.capacity() <= 0) return false;
     // read out field and add to vector
-    JsonArray keys = barKeyMapJson[barcode];
-    for (JsonVariant key : keys) {
-        ids.push_back(key.as<uint32_t>());
+    JsonArray productIds = barIdMapJson[barcode];
+    for (JsonVariant id : productIds) {
+        ids.push_back(id.as<uint32_t>());
     }
-    barKeyMapJson.clear();
+    barIdMapJson.clear();
     return true;
 }
 
@@ -111,8 +111,8 @@ bool DBClass::syncDB() {
     StaticJsonDocument<JSONSIZE> startEnd;
     startEnd["sync"] = "BEGIN";
     WiFiService.put(startEnd);
-    DynamicJsonDocument keyMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
-    for (JsonPair keyValue : keyMapJson.as<JsonObject>()) {
+    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
+    for (JsonPair keyValue : idBarJson.as<JsonObject>()) {
         StaticJsonDocument<JSONSIZE> jsonSend;
         loadJson(jsonSend, String(keyValue.key().c_str()));
         WiFiService.put(jsonSend);
@@ -132,59 +132,59 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
     if (!saveStateMapping(stateJson)) {
         return false;
     }
-    // update bar key mapping
-    DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
-    if (barKeyMapJson.capacity() <= 0) {
+    // update bar id mapping
+    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
+    if (barIdMapJson.capacity() <= 0) {
         return false;
     }
-    if (!barKeyMapJson.containsKey(barcode)) {
+    if (!barIdMapJson.containsKey(barcode)) {
         /*StaticJsonDocument<1> doc;
         JsonArray array = doc.to<JsonArray>();*/
-        barKeyMapJson.createNestedArray(barcode);
+        barIdMapJson.createNestedArray(barcode);
     }
-    JsonArray keys = barKeyMapJson[barcode];
-    keys.add(id);
-    if (!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)) {
+    JsonArray ids = barIdMapJson[barcode];
+    ids.add(id);
+    if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
         return false;
     }
-    // update key bar mapping
-    DynamicJsonDocument keyBarMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
-    if (keyBarMapJson.capacity() <= 0) {
+    // update id bar mapping
+    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
+    if (idBarJson.capacity() <= 0) {
         return false;
     }
-    keyBarMapJson[String(id)] = barcode;
-    if (!saveMapping(keyBarMapJson, KEY_BAR_MAPPINGFILE)) {
+    idBarJson[String(id)] = barcode;
+    if (!saveMapping(idBarJson, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
 }
 
 bool DBClass::removeMappings(uint32_t id, String barcode) {
-    // update bar key mapping
-    DynamicJsonDocument barKeyMapJson = loadMapping(BAR_KEYS_MAPPINGFILE);
-    if (barKeyMapJson.capacity() <= 0) {
+    // update bar id mapping
+    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
+    if (barIdMapJson.capacity() <= 0) {
         return false;
     }
-    if (!barKeyMapJson.containsKey(barcode)) {
+    if (!barIdMapJson.containsKey(barcode)) {
         LOG("Barcode doesn't exist");
         return false;
     }
-    JsonArray keys = barKeyMapJson[barcode];
-    for (JsonArray::iterator it = keys.begin(); it != keys.end(); ++it) {
+    JsonArray ids = barIdMapJson[barcode];
+    for (JsonArray::iterator it = ids.begin(); it != ids.end(); ++it) {
         if ((*it).as<uint32_t>() == id) {
-            keys.remove(it);
+            ids.remove(it);
         }
     }
-    if (!saveMapping(barKeyMapJson, BAR_KEYS_MAPPINGFILE)) {
+    if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
         return false;
     }
-    // update key bar mapping
-    DynamicJsonDocument keyBarMapJson = loadMapping(KEY_BAR_MAPPINGFILE);
-    if (keyBarMapJson.capacity() <= 0) {
+    // update id bar mapping
+    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
+    if (idBarJson.capacity() <= 0) {
         return false;
     }
-    keyBarMapJson.remove(String(id));
-    if (!saveMapping(keyBarMapJson, KEY_BAR_MAPPINGFILE)) {
+    idBarJson.remove(String(id));
+    if (!saveMapping(idBarJson, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
@@ -298,13 +298,13 @@ bool DBClass::initDatabase() {
             return false;
         }
     }
-    if (!checkInitialized(INTERNAL_FOLDER + "/" + KEY_BAR_MAPPINGFILE)) {
-        if (!initializeKeyBarMapping()) {
+    if (!checkInitialized(INTERNAL_FOLDER + "/" + ID_BAR_MAPPINGFILE)) {
+        if (!initializeIdBarMapping()) {
             return false;
         }
     }
-    if (!checkInitialized(INTERNAL_FOLDER + "/" + BAR_KEYS_MAPPINGFILE)) {
-        if (!initializeBarKeyMapping()) {
+    if (!checkInitialized(INTERNAL_FOLDER + "/" + BAR_ID_MAPPINGFILE)) {
+        if (!initializeBarIdMapping()) {
             return false;
         }
     }
@@ -336,23 +336,23 @@ bool DBClass::initializeStateFile() {
     return true;
 }
 
-bool DBClass::initializeKeyBarMapping() {
-    DynamicJsonDocument keyBarJson(100);
+bool DBClass::initializeIdBarMapping() {
+    DynamicJsonDocument IdBarJson(100);
     // create empty json
-    keyBarJson.to<JsonObject>();
-    if (!saveMapping(keyBarJson, KEY_BAR_MAPPINGFILE)) {
-        LOG("Initialize key bar mapping failed");
+    IdBarJson.to<JsonObject>();
+    if (!saveMapping(IdBarJson, ID_BAR_MAPPINGFILE)) {
+        LOG("Initialize id bar mapping failed");
         return false;
     }
     return true;
 }
 
-bool DBClass::initializeBarKeyMapping() {
-    DynamicJsonDocument barKeyJson(100);
+bool DBClass::initializeBarIdMapping() {
+    DynamicJsonDocument barIdJson(100);
     // create empty json
-    barKeyJson.to<JsonObject>();
-    if (!saveMapping(barKeyJson, BAR_KEYS_MAPPINGFILE)) {
-        LOG("Initialize bar key mapping failed");
+    barIdJson.to<JsonObject>();
+    if (!saveMapping(barIdJson, BAR_ID_MAPPINGFILE)) {
+        LOG("Initialize bar id mapping failed");
         return false;
     }
     return true;

@@ -35,8 +35,8 @@ class DBClass {
     DynamicJsonDocument loadMapping(String mappingfile);
     bool saveMapping(DynamicJsonDocument doc, String mappingName);
     bool initializeStateFile();
-    bool initializeKeyBarMapping();
-    bool initializeBarKeyMapping();
+    bool initializeIdBarMapping();
+    bool initializeBarIdMapping();
     bool checkInitialized(String filename);
 };
 
