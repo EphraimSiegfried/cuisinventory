@@ -36,11 +36,36 @@
 \section{Cuisinventory Introduction}
 Cuisinventory is a grocery inventory managament system offering an easy way to keep track of consumption and additional product information.
 It comes in the form of a station which has a barcode scanner and a weight scale with which you can interact. You can scan your groceries' barcode at the Cuisinventory station and
-it will automatically fetch related product information like name, brands, allergens and conversation conditions. Additionally you will be able to weigh the groceries and with the fetched information about product quantity,
+it will automatically fetch related product information like name, brands, allergens and conservation conditions. Additionally you will be able to weigh the groceries and with the fetched information about product quantity,
 Cuisinventory will be able to provide percentage information about how much food is left for consumption. All of the inventory information is saved locally in a custom developed database, you can view it on a web application with which the station communicates.
 
 \section{Materials and Libraries}
-
+\subsection{Hardware}
+The following table lists the hardware used to implement the project.
+\\[10pt]
+\begin{tabular}{l l}
+	\hline
+	Component              & Model\\
+	\hline
+	Main Controller        & Adafruit Feather nRF52840\\
+	Barcode-Code Scanner   & SparkFun 2D Barcode Scanner Breakout\\
+	Strain Gauge Load Cell & Strain Gauge Load Cell - 4 Wires - 5Kg\\
+	ADC-Chip               & Adafruit NAU7802 24-Bit ADC - STEMMA QT / Qwiic\\
+	Display                & SparkFun LCD-16398\\
+	WLAN Co-Processor      & Adafruit AirLift FeatherWing ESP32\\
+	I2C Interface          & SparkFun Qwiic / Stemma QT FeatherWing\\
+	3 * Buttons            & SparkFun Zubehör Qwiic Button - Green LED\\
+	Cable                  & SparkFun Qwiic Cable Kit\\
+	Adalogger              & Adalogger FeatherWing - RTC + SD Add-on\\
+	Stacking Headers       & Adafruit 12-pin and 16-pin female headers\\
+	\hline
+\end{tabular} \\[10pt]
+Fundamentally we have the main controller, the Adafruit Feather nRF52840, offering a 64MHz ARM Cortex M4F processor along with 256KB of SRAM.
+It supports Arduino libraries and has a wide array of external ports to which we can connect the other components.
+We expand the capabilties of our main controller with a WLAN Chip and a SD card.
+For the interaction with the controller we use 3 main buttons, a strain gauge load cell which measures weight and a barcode scanner.
+A small LCD display outputs information. 
+\subsection{Required Libraries}
 \section{User Manual}
 
 \section{Implementation}
