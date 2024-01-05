@@ -1,4 +1,5 @@
 \documentclass{article}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{times}
@@ -13,10 +14,13 @@
 \usepackage[round,authoryear]{natbib}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage[hyphens]{url}
-\usepackage{graphicx}
+\usepackage{caption} 
 \usepackage{booktabs}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{lipsum}
 
+\graphicspath{ {./images} }
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -47,7 +51,7 @@ It comes in the form of a station which has a barcode scanner and a weight scale
 it will automatically fetch related product information like name, brands, allergens and conservation conditions. Additionally you will be able to weigh the groceries and with the fetched information about product quantity,
 Cuisinventory will be able to provide percentage information about how much food is left for consumption. All of the inventory information is saved locally in a custom developed database, you can view it on a web application with which the station communicates.
 
-\section{Materials and Libraries}
+\section{Materials and Software}
 \subsection{Hardware}
 The following table lists the hardware used to implement the project.
 \\[10pt]
@@ -92,11 +96,33 @@ Below is a table showing the hardware components and a github link to the corres
 Additionally we also rely on the SPI, Wire and SoftwareSerial libraries which are included in the Arduino Core and enable communication protocols for the provided pins of our main controller. \\
 On the software side we use the \href{https://github.com/arduino-libraries/ArduinoHttpClient}{Arduino HTTP Client} to help us structure the sending and receiving of HTTP requests.
 One of the most important libraries for this project is the \href{https://github.com/bblanchon/ArduinoJson}{Arduino Json Library} with which we can correctly serialize and deserialize JSON Files on our local controller and SD card.
-Our database logic fundamentally relies on saving and retrieving information in the JSON format.
+Our database logic fundamentally relies on saving and retrieving information in the JSON format. \\
+\subsection{Software Development}
+We used git version control to collaborate on the code.
+As we weren't happy with the limitations of the Arduino IDE we switched our IDE to PlatformIO.
+PlatformIO enabled us a more professional approach. We can define different environments for our compilation and also have automatic library management over a central config file.
+With this we can code using external editors and don't have to worry about naming limitations like .ino or different local library versions. Additionally we could implement unit tests for our important classes.
 
 \section{User Manual}
-
+\lipsum[1]\lipsum[1]
 \section{Implementation}
+\subsection{Hardware}
+With a lot of hardware components for this project we had to make sure that we can connect all of them to the microcontroller.
+We started with the SD Card extension (Adalogger) and the Wlan Co-Processor. Both of them are small boards about as big as the microcontroller, so using stacking headers we stacked both of them on top of the main controller.\\
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{cat.jpg}
+    \caption{Stacking Wifi and SD Card}
+    \label{fig:mesh1}
+\end{figure}\\
+Now whats left is the strain load cell along with the adc chip for weight measurement, the LCD display, the three buttons and the barcode scanner. 
+Everything apart from the barcode scanner uses the I2C protocol for communication. This is convenient as I2C supports multiple devices on the same BUS.
+We connected the three Buttons, the ADC weight chip and the LCD display over I2C to the same BUS. Additionally we used the SparkFun Qwiic I2C connectors which enable just plugging cables with
+connectors together in daisy chain requiring less soldering. The QWIIC connectors required a SparkFun Qwiic Shield board to which we connect the I2C pins and which we again stacked on top of the other boards.\\
+This leaves the Barcode Scanner which communicates over UART and still has place on the so far unused RX and TX pins.
+With everything connected we just have to check that there is no overlap in the I2C addresses of the devices which are connected to our single I2C Bus.
+In our case we had to manually change the I2C addresses of the three buttons over the button software library.
+\subsection{Software}
 
 \section{Problems and Solutions}
 
