@@ -110,6 +110,28 @@ void setup() {
         lcd.print("Failed to initialize the barcode reader");
         while (1) delay(10);
     };
+
+    // Retrieve user wifi settings
+    File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
+    if (!settingsFile) {
+        LOG("Failed to open settings file");
+        lcd.print("Failed to open the user settings file");
+        while (1) delay(10);
+    }
+    StaticJsonDocument<JSONSIZE> settingsJson;
+    auto error = deserializeJson(settingsJson, settingsFile);
+    if (error) {
+        LOG(F("Failed to deserialize settings file:"));
+        LOG(error.c_str());
+    }
+    settingsFile.close();
+
+    // connect to wifi
+    if (!WiFiService.connect(String(settingsFile["SSID"]),
+                             String(settingsFile["Password"]))) {
+        lcd.print("Failed to connect to Wi-Fi");
+        while (1) delay(10);
+    }
 }
 
 String scanProductBarcode() {
