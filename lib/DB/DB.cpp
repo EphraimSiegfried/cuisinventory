@@ -20,6 +20,19 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     return true;
 }
 
+std::vector<uint32_t> DBClass::getAllIDs() {
+    std::vector<uint32_t> ids;
+    DynamicJsonDocument idBarMapJson = loadMapping(ID_BAR_MAPPINGFILE);
+    JsonObject obj = idBarMapJson.as<JsonObject>();
+    for (JsonPair kv : obj) {
+        const char* keyStr = kv.key().c_str();
+        uint32_t id = static_cast<uint32_t>(atol(keyStr));
+        ids.push_back(id);
+    }
+    idBarMapJson.clear();
+    return ids;
+}
+
 bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
                   uint32_t time) {
     this->currentID++;

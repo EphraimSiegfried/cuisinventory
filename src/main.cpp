@@ -253,6 +253,37 @@ void removeProduct() {
     return;
 }
 
+void printProducts() {
+    std::vector<uint32_t> ids = DB.getAllIDs();
+    if (ids.size() == 0) {
+        lcd.print("The inventory is empty!");
+        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        return;
+    }
+    for (uint32_t i = ids.size() - 1; i >= 0; i--) {
+        StaticJsonDocument<JSONSIZE> productJson;
+        DB.getJsonFromID(ids[i], productJson);
+
+        char dateformat[] = "DD.MM.YY: hh:mm";
+        uint32_t unixtime = productJson["date"].as<uint32_t>();
+
+        // Print the name of the product and the date it was added
+        lcd.print(productJson["name"].as<String>() + "\n" +
+                  "Enter Date: " + DateTime(unixtime).toString(dateformat));
+
+        while (!input(GREEN_BUTTON1, SHORT_PRESS) &&
+               !input(RED_BUTTON, LONG_PRESS)) {
+            delay(10);  // wait until user wants to see next item
+        }
+        if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
+        lcd.clear();
+    }
+    lcd.print("You have inspected all products!");
+    lcd.setFastBacklight(0xFF8040);  // orange
+    delay(1000);
+    return;
+}
+
 void reset() {
     lastActiveTime = millis();
     lcd.setFastBacklight(0xFFFFFF);
@@ -272,6 +303,10 @@ void loop() {
     }
     if (input(RED_BUTTON, SHORT_PRESS)) {
         removeProduct();
+        reset();
+    }
+    if (input(GREEN_BUTTON1, LONG_PRESS)) {
+        printProducts();
         reset();
     }
     if (pendingSync && (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
