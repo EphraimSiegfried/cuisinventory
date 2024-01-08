@@ -107,6 +107,7 @@ With this we can code using external editors and don't have to worry about namin
 \lipsum[1]\lipsum[1]
 \section{Implementation}
 \subsection{Hardware}
+\subsubsection{Putting the sensors together}
 With a lot of hardware components for this project we had to make sure that we can connect all of them to the microcontroller.
 We started with the SD Card extension (Adalogger) and the Wlan Co-Processor. Both of them are small boards about as big as the microcontroller, so using stacking headers we stacked both of them on top of the main controller.\\
 \begin{figure}[h]
@@ -122,9 +123,52 @@ connectors together in daisy chain requiring less soldering. The QWIIC connector
 This leaves the Barcode Scanner which communicates over UART and still has place on the so far unused RX and TX pins.
 With everything connected we just have to check that there is no overlap in the I2C addresses of the devices which are connected to our single I2C Bus.
 In our case we had to manually change the I2C addresses of the three buttons over the button software library.
+\subsubsection{Designing the case}
+As we are building a kitchen station with a weight sensor, we have the need for a case.
+Write more here.
 \subsection{Software}
+The Cuisinventory station fundamentally has three functions which are offered to the user: Adding a product, updating the weight of a product and removing a product.
+These three functions are coded in the main logic with calls to secondary classes which contain the implementation for necessary hardware and software components.
+Additionally the main logic contains the necessary initializations for the hardware components. 
+\subsubsection{Buttons}
+For the Buttons we rely on the \href{https://github.com/sparkfun/SparkFun_Qwiic_Button_Arduino_Library}{SparkFun Qwiic Button Arduino Library} with which we can read out the buffer of presses which is saved on the button itself.
+In the file Input.cpp we have logic for reading out the input of a desired button which filters out input from the buffer which is too old.
+Additionally we can also differentiate between a long and a short press of the button.
+\subsubsection{LCD Display}
+The LCD uses the \href{https://github.com/sparkfun/SparkFun_SerLCD_Arduino_Library}{SparkFun SerLCD Arduino Library} and is quite straightforward to use. It doesn't have its own cpp file but is just initialized in the main logic
+and then called in the three main functions to display info to the user.
+\subsubsection{Weightsensor}
+The weightsensor consists of two parts, the strain load cell which sends electrical output based on the strain its put on and the analog to digital converter (ADC chip) which interprets this output into a digital value.
+For the ADC chip we rely on the \href{https://github.com/adafruit/Adafruit_NAU7802}{Adafruit NAU7802}\\ library to read out digital measurements.
+These measurements then have to be converted to grams by multiplication with a factor which we have to find by calibrating the sensor with different weights.
+The ADC chip has its own Scale.cpp file in which we handle initialization and calibrating the offset at the start to zero.
+\subsubsection{Barcode Scanner}
+The barcode scanner is the only sensor connected over UART. It contains an internal buffer with successfully read barcodes.
+We use the \href{https://github.com/sparkfun/SparkFun_DE2120_Arduino_Library}{SparkFun DE2120 Arduino Library} to interact with the scanner.
+The usage is pretty straightforward, we basically have to initialize the sensor and we can then read out the internal buffer.
+The implemenation is found in the BarReader.cpp file.
+\subsubsection{WLAN Co-Processor and the WifiService Class}
+For the WLAN Co-Processor we rely on the \href{https://github.com/adafruit/WiFiNINA}{WiFiNINA Adafruit Fork} library.
+The logic concerning the WLAN initialization and internet communciation is found in the WiFiService.cpp file.
+When initializing we try to connect to a WIFI network using the SSID and password which is found on a json file saved on the SD card.
+After the user scans a barcode we have to fetch information from an external barcode database, in our case the barcode API from https://world.openfoodfacts.org/ is free and offers an excellent amount of information about a wide range of products.
+The WIFIService class handles sending a http request to the API with the help of \href{https://github.com/arduino-libraries/ArduinoHttpClient}{Arduino HTTP Client}.
+The response will be a JSON containing the information which is processed with the \href{https://github.com/bblanchon/ArduinoJson}{Arduino Json Library}.
+Additionally to receiving information we also need to send information to our own webserver which displays the full inventory, for this the WIFIService class contains a method which sends a JSON File to the server. 
+\subsubsection{SD card and the Database class}
+We have a micro SD card in our "Adalogger" module on which we want to save our inventory information.
+For writing and reading from the SD card we work with the \href{https://github.com/adafruit/SdFat}{SdFat Adafruit Fork} library.
+The logic of the database is found in the DBClass, DB.cpp file. Fundamentally we want to save all relevant information about the products in the inventory in JSON Files on the SD card.
+The DBClass provides methods for saving and retrieving information, it relies heavily on the \href{https://github.com/bblanchon/ArduinoJson}{Arduino Json Library} with which we serialize and deserialize JSON files.
+As we have to work with the limited amount of RAM of a microchip we can't just put the entire inventory in a single JSON file.
+Instead, every product in the inventory has its own JSON File and we generate unique IDs to differentiate them. We have to do this as our inventory can contain multiple products with the same barcode.
+These unique IDs are written into the json file of the product and the json file itself has the unique ID as filename when saved on the SD card.
+To work with all the JSON Files we keep two mapping files on the SD card. One mapping file contains every unique ID and its corresponding barcode.
+The other mapping file contains every barcode and a list of corresponding unique IDs. The mapping files are also saved as JSON Files.
+These two mappings enable us to quickly find the corresponding files when searching for a barcode and also contain an overview over all products in the inventory.
 
 \section{Problems and Solutions}
+
 
 \section{Summary}
 
