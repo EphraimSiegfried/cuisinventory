@@ -255,35 +255,39 @@ void removeProduct() {
 
 void printProducts() {
     std::vector<uint32_t> ids = DB.getAllIDs();
-    if (ids.size() == 0) {
+    if (ids.empty()) {
         lcd.print("The inventory is empty!");
         while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
         return;
     }
-    for (uint32_t i = ids.size() - 1; i >= 0; i--) {
-        StaticJsonDocument<JSONSIZE> productJson;
-        DB.getJsonFromID(ids[i], productJson);
 
-        char dateformat[] = "DD.MM.YY: hh:mm";
-        uint32_t unixtime = productJson["date"].as<uint32_t>();
+    StaticJsonDocument<JSONSIZE> productJson;
+    char dateformat[] = "DD.MM.YY: hh:mm";
 
-        // Print the name of the product and the date it was added
-        lcd.print(productJson["name"].as<String>() + "\n" +
-                  "Enter Date: " + DateTime(unixtime).toString(dateformat));
+    auto printProd = [&](size_t i, StaticJsonDocument<JSONSIZE>& doc) {
+        DB.getJsonFromID(ids[i], doc);
+        char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
+        String name = doc["name"].as<String>();
+        String current = String(i) + "/" + String(ids.size());
+        lcd.print(current + "\n" + name + "\n" + "Enter date: " + date);
+    };
 
-        while (!input(GREEN_BUTTON1, SHORT_PRESS) &&
-               !input(RED_BUTTON, LONG_PRESS)) {
-            delay(10);  // wait until user wants to see next item
+    size_t i = ids.size() - 1;
+    printProd(ids[i], productJson);
+
+    while (1) {
+        if (input(GREEN_BUTTON1, SHORT_PRESS)) {  // forwards
+            i = (i + 1) % ids.size();
+            printProd(i, productJson);
+        }
+        if (input(GREEN_BUTTON2, SHORT_PRESS)) {  // backwards
+            i = (i == 0) ? ids.size() - 1 : i - 1;
+            printProd(i, productJson);
         }
         if (input(RED_BUTTON, LONG_PRESS)) return;  // cancel
-        lcd.clear();
+        delay(100);
     }
-    lcd.print("You have inspected all products!");
-    lcd.setFastBacklight(0xFF8040);  // orange
-    delay(1000);
-    return;
 }
-
 void reset() {
     lastActiveTime = millis();
     lcd.setFastBacklight(0xFFFFFF);
