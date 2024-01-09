@@ -151,19 +151,26 @@ String scanProductBarcode() {
 
 uint32_t measureProductWeight() {
     lcd.clear();
-    lcd.print("Please weigh product,\npress button 1 to confirm");
+    lcd.print(
+        "Please put the product on the scale,\nPress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     }
     lcd.clear();
-    lcd.print("Weighing, please stand by...");
-    uint32_t weight = 0;
-    while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
+    lcd.print("Weighing, please stand by...\n");
+    uint32_t weight;
+    do {
         weight = nau.read();
+        lcd.print(weight * SCALING);
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
+    } while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD));
+    // get average
+    for (uint8_t i; i < SAMPLE_AMOUNT; i++) {
+        weight += nau.read();
     }
+    weight = (weight / (SAMPLE_AMOUNT - 1)) * SCALING;
     lcd.clear();
     return weight;
 }

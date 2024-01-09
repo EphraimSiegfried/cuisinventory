@@ -45,6 +45,8 @@ const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
 
 // Scale
 const uint32_t STABILITY_THRESHOLD = 1;  // TODO: Change constant
+const uint32_t SCALING = 1;              // TODO: Change constant
+const uint32_t SAMPLE_AMOUNT = 10;       // TODO: Change constant
 
 // Buttons
 const uint8_t BTN_LIGHT_IDLE =
