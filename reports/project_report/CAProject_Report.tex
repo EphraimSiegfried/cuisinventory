@@ -98,10 +98,12 @@ On the software side we use the \href{https://github.com/arduino-libraries/Ardui
 One of the most important libraries for this project is the \href{https://github.com/bblanchon/ArduinoJson}{Arduino Json Library} with which we can correctly serialize and deserialize JSON Files on our local controller and SD card.
 Our database logic fundamentally relies on saving and retrieving information in the JSON format. \\
 \subsection{Software Development}
-We used git version control to collaborate on the code.
+We used git version control with github to collaborate on the code.
 As we weren't happy with the limitations of the Arduino IDE we switched our IDE to PlatformIO.
 PlatformIO enabled us a more professional approach. We can define different environments for our compilation and also have automatic library management over a central config file.
 With this we can code using external editors and don't have to worry about naming limitations like .ino or different local library versions. Additionally we could implement unit tests for our important classes.
+With github and platformio we were able to set up a continuous integration system, we set up github actions to format the codestyle and run a compile of the code.
+The remote execution function of platformio enabled us to run unit tests on the controller over another github action.
 
 \section{User Manual}
 \lipsum[1]\lipsum[1]
@@ -169,7 +171,32 @@ These two mappings enable us to quickly find the corresponding files when search
 
 \section{Problems and Solutions}
 
-
+\subsection{Arduino IDE Troubles}
+When starting out on the project we produced our first few lines of code using Arduino IDE, however as the project became bigger we ran into several inconveniences.
+Arduino IDE fundamentally puts everything into a single .ino file for the compilation. With additional .cpp files used for code structure there is an annoying limitation that it still requires a .ino file with the parent folder name being the same as the .ino file. \\
+As we have a lot of hardware and an adafruit controller, we needed to install specific Adafruit library forks for the code to run. 
+Since Arduino IDE doesn't offer collaborative library management, you had to make sure to have the correct libraries and library versions set up correctly on every single client. \\
+When we finished work on a relevant module like the database class, Arduino IDE provided no testing framework for unittests which we could easily use to ensure correctness. \\
+Lastly we also wanted to use external code editors instead of working with the Arduino IDE interface.
+We did some research into alternatives and pleasantly found PlatformIO, an IDE for embedded software development.
+It very much offered all we were looking for, we can define our platform, the specific microcontroller, and then list all required libraries and versions in a single central config file.
+With the "Unity" test framework we also set up unit tests for our wifi and database functions.
+Now running or testing the project just required to pull it from github and run it with platformio.
+\subsection{Database}
+When programming the database logic, which was supposed to hold the information about the inventory, we struggled with the RAM constrains of a microcontroller.
+We looked into SQL but soon found that a SQL database on a microcontroller doesn't make sense as you run into processing power and RAM limitations.
+We then settled for the JSON format which seemed like a solid way to store information and there was a Arduino JSON library available.
+However we couldn't just store all products in a single inventory JSON file as eventually opening this file would fill up our available RAM.
+So we came up with the idea to simply store single JSON files for each product and in additonal files store logical mappings so we are able to find the relevant files again.
+Getting this to work correctly took a lot of unit testing as saving the files correctly on the SD card and editing the mappings with the Arduino JSON library was prone to errors.
+\subsection{SD Card Library}
+We initially used the standard \href{https://github.com/arduino-libraries/SD}{Arduino SD Library} for writing and reading files on the SD card. The bulk of our database logic was implemented using it.
+It had annoying limitations like the filename not being allowed to be over 8 characters but that was acceptable.
+However as we began to use folder structures for saving files we also found out that the library doesn't support deleting a folder containing other files, even though the documentation states that the folder deletion works recursively.
+This was a problem, especially for testing, so we started looking for alternatives. We found that the SD library is in reality a simple wrapper for the more powerful \href{https://github.com/greiman/SdFat}{SD Fat} library, which offers more functions and less limitations.
+And luckily we also found an \href{https://github.com/adafruit/SdFat}{SdFat Adafruit Fork} for our microcontroller. Fearing that with the new library we need to rewrite a lot of implementation, we switched to it.
+To our surprise, we didn't need to change a single line of code in our database logic for it to work. It used the same class and function names as before, only now we had access to more useful functions like recursively deleting directories.
+This was a funny exception to us, as so far, things generally didn't work when trying them out.
 \section{Summary}
 
 \section{Sources}
