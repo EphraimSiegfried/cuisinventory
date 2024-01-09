@@ -21,6 +21,7 @@ extern QwiicButton redButton;
 
 bool usb = false;             // whether to act as usb mass storage
 bool pendingSync = false;     // whether we need to send data to server
+bool offlineMode = false;     // whether the user is connected to wifi
 uint64_t lastActiveTime = 0;  // millis() of last action
 
 void setup() {
@@ -129,8 +130,7 @@ void setup() {
     // connect to wifi
     if (!WiFiService.connect(String(settingsFile["SSID"]),
                              String(settingsFile["Password"]))) {
-        lcd.print("Failed to connect to Wi-Fi");
-        while (1) delay(10);
+        lcd.print("Failed to connect to Wi-Fi\nEntering offline mode\n");
     }
 }
 
@@ -313,11 +313,12 @@ void loop() {
         printProducts();
         reset();
     }
-    if (pendingSync && (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
+    if (!offlineMode && pendingSync &&
+        (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
         lcd.clear();
         lcd.setFastBacklight(0xFFFF00);
         lcd.print("Sync in progress...");
-        // if (DB.sync()) pendingSync = false;
+        if (DB.syncDB()) pendingSync = false;
         reset();
     }
     delay(100);
