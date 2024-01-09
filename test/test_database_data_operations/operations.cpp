@@ -70,6 +70,16 @@ void test_removes_correctly(void) {
     TEST_ASSERT_FALSE(exists(sampleJsonBarcode));
 }
 
+void test_gets_all_ids(void) {
+    std::vector<uint32_t> ids = DB.getAllIDs();
+    DB.add(apiJsonDoc, 200, 200);
+    TEST_ASSERT_EQUAL(1, ids[0]);
+    TEST_ASSERT_EQUAL(2, ids[1]);
+    DB.remove(1, sampleJsonBarcode);
+    DB.remove(2, sampleJsonBarcode);
+    TEST_ASSERT_TRUE(ids.empty());
+}
+
 void test_remove_returns_false(void) {
     TEST_ASSERT_FALSE(DB.remove(sampleJsonId, "000"));
     TEST_ASSERT_FALSE(DB.remove(900, sampleJsonBarcode));

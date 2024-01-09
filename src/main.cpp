@@ -21,6 +21,7 @@ extern QwiicButton redButton;
 
 bool usb = false;             // whether to act as usb mass storage
 bool pendingSync = false;     // whether we need to send data to server
+bool offlineMode = false;     // whether the user is connected to wifi
 uint64_t lastActiveTime = 0;  // millis() of last action
 
 void setup() {
@@ -129,8 +130,7 @@ void setup() {
     // connect to wifi
     if (!WiFiService.connect(String(settingsFile["SSID"]),
                              String(settingsFile["Password"]))) {
-        lcd.print("Failed to connect to Wi-Fi");
-        while (1) delay(10);
+        lcd.print("Failed to connect to Wi-Fi\nEntering offline mode\n");
     }
 }
 
@@ -151,19 +151,26 @@ String scanProductBarcode() {
 
 uint32_t measureProductWeight() {
     lcd.clear();
-    lcd.print("Please weigh product,\npress button 1 to confirm");
+    lcd.print(
+        "Please put the product on the scale,\nPress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     }
     lcd.clear();
-    lcd.print("Weighing, please stand by...");
-    uint32_t weight = 0;
-    while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD)) {
+    lcd.print("Weighing, please stand by...\n");
+    uint32_t weight;
+    do {
         weight = nau.read();
+        lcd.print(weight * SCALING);
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
+    } while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD));
+    // get average
+    for (uint8_t i; i < SAMPLE_AMOUNT; i++) {
+        weight += nau.read();
     }
+    weight = (weight / (SAMPLE_AMOUNT - 1)) * SCALING;
     lcd.clear();
     return weight;
 }
@@ -313,11 +320,12 @@ void loop() {
         printProducts();
         reset();
     }
-    if (pendingSync && (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
+    if (!offlineMode && pendingSync &&
+        (millis() - lastActiveTime >= IDLE_WAIT_BEFORE_SYNC)) {
         lcd.clear();
         lcd.setFastBacklight(0xFFFF00);
         lcd.print("Sync in progress...");
-        // if (DB.sync()) pendingSync = false;
+        if (DB.syncDB()) pendingSync = false;
         reset();
     }
     delay(100);
