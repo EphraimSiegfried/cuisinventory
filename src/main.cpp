@@ -112,25 +112,41 @@ void setup() {
         while (1) delay(10);
     };
 
+    // helper lambda
+    auto enterOfflineMode = [&](const String& message) {
+        LOG(message);
+        lcd.print(message);
+        lcd.print("\nEntering offline mode");
+        delay(2000);
+        lcd.clear();
+        offlineMode = true;
+    };
+
     // Retrieve user wifi settings
     File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
     if (!settingsFile) {
-        LOG("Failed to open settings file");
-        lcd.print("Failed to open the user settings file");
-        while (1) delay(10);
+        enterOfflineMode("Failed to open the user settings file");
+        return;
     }
-    StaticJsonDocument<JSONSIZE> settingsJson;
-    auto error = deserializeJson(settingsJson, settingsFile);
-    if (error) {
-        LOG(F("Failed to deserialize settings file:"));
-        LOG(error.c_str());
-    }
-    settingsFile.close();
 
+    StaticJsonDocument<JSONSIZE> settingsJson;
+    DeserializationError error = deserializeJson(settingsJson, settingsFile);
+    settingsFile.close();
+    if (error) {
+        enterOfflineMode("Failed to deserialize settings");
+        return;
+    }
+
+    if (!settingsJson.containsKey("SSID") ||
+        !settingsJson.containsKey("Password")) {
+        enterOfflineMode("Wi-Fi settings incomplete");
+        return;
+    }
     // connect to wifi
     if (!WiFiService.connect(String(settingsFile["SSID"]),
                              String(settingsFile["Password"]))) {
-        lcd.print("Failed to connect to Wi-Fi\nEntering offline mode\n");
+        enterOfflineMode("Failed to connect to Wi-Fi");
+        return;
     }
 }
 
