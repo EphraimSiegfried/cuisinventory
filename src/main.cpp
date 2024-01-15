@@ -112,10 +112,10 @@ void setup() {
         while (1) delay(10);
     };
 
-    // helper lambda
-    auto enterOfflineMode = [&](const String& message) {
-        LOG(message);
-        lcd.print(message);
+    // helper lambda to handle wifi-setup errors
+    auto enterOfflineMode = [&](const String& errorMessage) {
+        LOG(errorMessage);
+        lcd.print(errorMessage);
         lcd.print("\nEntering offline mode");
         delay(2000);
         lcd.clear();
