@@ -115,6 +115,7 @@ void setup() {
     // helper lambda to handle wifi-setup errors
     auto enterOfflineMode = [&](const String& errorMessage) {
         LOG(errorMessage);
+        lcd.setFastBacklight(0xFF0000);
         lcd.print(errorMessage);
         lcd.print("\nEntering offline mode");
         delay(2000);
@@ -150,10 +151,29 @@ void setup() {
     }
 }
 
-String scanProductBarcode() {
+void printError(String errorMessage) {
+    lcd.clear();
+    lcd.setFastBacklight(0xFF0000);
+    LOG(errorMessage);
+    lcd.print(errorMessage);
+    // wait for confirmation
+    while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+}
+void printSuccess(String successMessage) {
+    lcd.clear();
+    lcd.setFastBacklight(0x00FF00);
+    lcd.print(successMessage);
+    delay(1000);
+}
+
+void printInfo(String infoMessage) {
     lcd.clear();
     lcd.setFastBacklight(0x0000FF);
-    lcd.print("Please scan product barcode...");
+    lcd.print(infoMessage);
+}
+
+String scanProductBarcode() {
+    printInfo("Please scan product barcode...");
     scanner.startScan();
     String barcode;
     while (!readBar(barcode)) {
@@ -166,19 +186,17 @@ String scanProductBarcode() {
 }
 
 uint32_t measureProductWeight() {
-    lcd.clear();
-    lcd.print(
+    printInfo(
         "Please put the product on the scale,\nPress button 1 to confirm");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     }
-    lcd.clear();
-    lcd.print("Weighing, please stand by...\n");
+    printInfo("Weighing, please stand by...\n");
     uint32_t weight;
     do {
         weight = nau.read();
-        lcd.print(weight * SCALING);
+        printInfo(String(weight * SCALING));
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     } while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD));
@@ -200,18 +218,11 @@ void addProduct() {
 
     StaticJsonDocument<JSONSIZE> doc;
     if (!DB.add(doc, weight, rtc.now().unixtime())) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("FATAL ERROR:\n");
-        lcd.print("Failed to save product");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("FATAL ERROR\nFailed to save product");
         return;
     }
     pendingSync = true;
-    lcd.clear();
-    lcd.print("Product added successfully!");
-    lcd.setFastBacklight(0x00FF00);
-    delay(1000);
+    printSuccess("Product added successfully!");
     return;
 }
 
@@ -221,30 +232,18 @@ void updateProduct() {
 
     uint32_t id = DB.getLeastWeightID(barcode);
     if (id == 0) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("Please add product first!");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("Please add product first!");
         return;
     }
-    lcd.clear();
 
     uint32_t weight = measureProductWeight();
     if (weight == 0) return;
 
     if (!DB.setWeight(id, weight)) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("FATAL ERROR:\n");
-        lcd.print("Failed to update weight");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("FATAL ERROR\nFailed to update weight");
         return;
     }
-    pendingSync = true;
-    lcd.clear();
-    lcd.print("Weight updated successfully!");
-    lcd.setFastBacklight(0x00FF00);
-    delay(1000);
+    printSuccess("Weight updated successfully!");
     return;
 }
 
@@ -254,33 +253,21 @@ void removeProduct() {
 
     uint32_t id = DB.getLeastWeightID(barcode);
     if (id == 0) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("Product not found in inventory!");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("Product not found in inventory!");
         return;
     }
     if (!DB.remove(id, barcode)) {
-        lcd.clear();
-        lcd.setFastBacklight(0xFF0000);
-        lcd.print("FATAL ERROR:\n");
-        lcd.print("Failed to remove product");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("FATAL ERROR\nFailed to remove product");
         return;
     }
-    pendingSync = true;
-    lcd.clear();
-    lcd.print("Product removed successfully!");
-    lcd.setFastBacklight(0x00FF00);
-    delay(1000);
+    printSuccess("Product removed successfully!");
     return;
 }
 
 void printProducts() {
     std::vector<uint32_t> ids = DB.getAllIDs();
     if (ids.empty()) {
-        lcd.print("The inventory is empty!");
-        while (!input(GREEN_BUTTON1, SHORT_PRESS)) delay(100);
+        printError("The inventory is empty!");
         return;
     }
 
@@ -292,7 +279,7 @@ void printProducts() {
         char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
         String name = doc["name"].as<String>();
         String current = String(i) + "/" + String(ids.size());
-        lcd.print(current + "\n" + name + "\n" + "Enter date: " + date);
+        printInfo(current + "\n" + name + "\n" + "Enter date: " + date);
     };
 
     size_t i = ids.size() - 1;
