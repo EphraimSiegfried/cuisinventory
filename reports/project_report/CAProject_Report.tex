@@ -4,7 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{times}
 \usepackage[margin=3cm]{geometry}
-
+\usepackage{enumitem}
 
 % German
 %\usepackage[ngerman]{babel}
@@ -27,7 +27,7 @@
     filecolor=magenta,      
     urlcolor=blue,
 }
-
+\setlist{noitemsep}
 
 % German
 %\newtheorem{definition}{Definition}
@@ -57,40 +57,40 @@ The following table lists the hardware used to implement the project.
 \\[10pt]
 \begin{tabular}{l l}
 	\hline
-	Component              & Model\\
+	Component              & Model                                           \\
 	\hline
-	Main Controller        & Adafruit Feather nRF52840\\
-	Barcode-Code Scanner   & SparkFun 2D Barcode Scanner Breakout\\
-	Strain Gauge Load Cell & Strain Gauge Load Cell - 4 Wires - 5Kg\\
-	ADC-Chip               & Adafruit NAU7802 24-Bit ADC - STEMMA QT / Qwiic\\
-	Display                & SparkFun LCD-16398\\
-	WLAN Co-Processor      & Adafruit AirLift FeatherWing ESP32\\
-	I2C Interface          & SparkFun Qwiic / Stemma QT FeatherWing\\
-	3 * Buttons            & SparkFun Zubehör Qwiic Button - Green LED\\
-	Cable                  & SparkFun Qwiic Cable Kit\\
-	Adalogger              & Adalogger FeatherWing - RTC + SD Add-on\\
-	Stacking Headers       & Adafruit 12-pin and 16-pin female headers\\
+	Main Controller        & Adafruit Feather nRF52840                       \\
+	Barcode-Code Scanner   & SparkFun 2D Barcode Scanner Breakout            \\
+	Strain Gauge Load Cell & Strain Gauge Load Cell - 4 Wires - 5Kg          \\
+	ADC-Chip               & Adafruit NAU7802 24-Bit ADC - STEMMA QT / Qwiic \\
+	Display                & SparkFun LCD-16398                              \\
+	WLAN Co-Processor      & Adafruit AirLift FeatherWing ESP32              \\
+	I2C Interface          & SparkFun Qwiic / Stemma QT FeatherWing          \\
+	3 * Buttons            & SparkFun Zubehör Qwiic Button - Green LED       \\
+	Cable                  & SparkFun Qwiic Cable Kit                        \\
+	Adalogger              & Adalogger FeatherWing - RTC + SD Add-on         \\
+	Stacking Headers       & Adafruit 12-pin and 16-pin female headers       \\
 	\hline
 \end{tabular} \\[10pt]
 Fundamentally, we have the main controller, the Adafruit Feather nRF52840, offering a 64MHz ARM Cortex M4F processor along with 256KB of SRAM.
 It supports Arduino libraries and has a wide array of external ports to which we can connect the other components.
 We expand the capabilities of our main controller with a WLAN Chip and a SD card.
 For the interaction with the controller we use three main buttons, a strain gauge load cell which measures weight, and a barcode scanner.
-A small LCD display outputs information. 
+A small LCD display outputs information.
 \subsection{Required Libraries}
-Conveniently, every required hardware component offered at least one library we could use for the software implementation. 
+Conveniently, every required hardware component offered at least one library we could use for the software implementation.
 Below is a table showing the hardware components and a github link to the corresponding libraries we decided for.
 \\[10pt]
 \begin{tabular}{l l}
 	\hline
-	Component              & Library\\
+	Component             & Library                                                                                                         \\
 	\hline
-	Barcode-Scanner        & \href{https://github.com/sparkfun/SparkFun_DE2120_Arduino_Library}{SparkFun DE2120 Arduino Library}\\
-	Load Cell \& ADC-Chip  & \href{https://github.com/adafruit/Adafruit_NAU7802}{Adafruit NAU7802}\\
-	Display                & \href{https://github.com/sparkfun/SparkFun_SerLCD_Arduino_Library}{SparkFun SerLCD Arduino Library}\\
-	WLAN Co-Processor      & \href{https://github.com/adafruit/WiFiNINA}{WiFiNINA Adafruit Fork}\\
-	Buttons                & \href{https://github.com/sparkfun/SparkFun_Qwiic_Button_Arduino_Library}{SparkFun Qwiic Button Arduino Library}\\
-	Adalogger              & \href{https://github.com/adafruit/SdFat}{SdFat Adafruit Fork}\\
+	Barcode-Scanner       & \href{https://github.com/sparkfun/SparkFun_DE2120_Arduino_Library}{SparkFun DE2120 Arduino Library}             \\
+	Load Cell \& ADC-Chip & \href{https://github.com/adafruit/Adafruit_NAU7802}{Adafruit NAU7802}                                           \\
+	Display               & \href{https://github.com/sparkfun/SparkFun_SerLCD_Arduino_Library}{SparkFun SerLCD Arduino Library}             \\
+	WLAN Co-Processor     & \href{https://github.com/adafruit/WiFiNINA}{WiFiNINA Adafruit Fork}                                             \\
+	Buttons               & \href{https://github.com/sparkfun/SparkFun_Qwiic_Button_Arduino_Library}{SparkFun Qwiic Button Arduino Library} \\
+	Adalogger             & \href{https://github.com/adafruit/SdFat}{SdFat Adafruit Fork}                                                   \\
 	\hline
 \end{tabular} \\[10pt]
 Additionally, we also rely on the SPI, Wire and SoftwareSerial libraries which are included in the Arduino Core and enable communication protocols for the provided pins of our main controller. \\
@@ -106,19 +106,89 @@ With GitHub and PlatformIO we were able to set up a continuous integration syste
 The remote execution function of PlatformIO enabled us to run unit tests on the controller over GitHub actions too.
 
 \section{User Manual}
-\lipsum[1]\lipsum[1]
+\subsection{System Overview}
+The Cuisinventory system is equipped with an LCD interface and three tactile buttons:
+\begin{itemize}
+	\item GB1 (Green Button 1): Located above and to the left of the LCD screen.
+	\item GB2 (Green Button 2): Positioned below and to the left of the LCD screen.
+	\item RB (Red Button): Situated to the right of the LCD screen.
+\end{itemize}
+
+\subsection{Initial setup}
+\subsubsection{USB-Mode Configuration}
+\begin{enumerate}
+	\item Connect the system to your computer using a USB cable.
+	\item Press and hold RB to enter USB-Mode.
+	\item On your computer, locate and open the SD-Storage of the system.
+	\item Edit the \textit{settings.json} file to input your Wi-Fi details:
+	      \begin{itemize}
+		      \item "SSID": Your Wi-Fi network name.
+		      \item "PASSWORD": Your Wi-Fi password.
+	      \end{itemize}
+	\item Save the file and disconnect the USB cable.
+\end{enumerate}
+
+\subsubsection{System Registration}
+\begin{enumerate}
+	\item Locate the system ID beneath the device.
+	\item Visit \url{https://ephraimsiegfried.github.io/cuisinventory-web/}.
+	\item Log in using your system ID to access and manage your kitchen inventory online.
+\end{enumerate}
+
+\subsection{Daily Operations}
+\subsubsection{Adding new Products}
+\begin{enumerate}
+	\item Short press GB1 to initiate the addition process.
+	\item Position the product barcode facing downwards and scan it.
+	\item Place the product on the Cuisinventory scale.
+	\item Confirm to weigh by pressing GB1.
+	\item A success message indicates the product has been added successfully.
+\end{enumerate}
+
+\subsubsection{Updating new products}
+\begin{enumerate}
+	\item Short press GB2 to start the update process.
+	\item Repeat the scanning and weighing process as described in the addition of new products.
+	\item A success message confirms the product weight has been updated.
+\end{enumerate}
+
+\subsubsection{Removing Products}
+\begin{enumerate}
+	\item Short press RB to initiate removal.
+	\item Scan the product barcode.
+	\item A success message confirms the product has been removed.
+\end{enumerate}
+
+\subsubsection{Inspecting Products on the System LCD}
+\begin{enumerate}
+	\item Long press GB1 to view products.
+	\item Navigate through products:
+	      \begin{itemize}
+		      \item Next product: Short press GB1.
+		      \item Previous product: Short press GB2.
+	      \end{itemize}
+	\item Exit the view by long pressing RB.
+\end{enumerate}
+
+\subsubsection{Inspecting Products on the Cuisinventory Website}
+\begin{enumerate}
+	\item Visit \url{https://ephraimsiegfried.github.io/cuisinventory-web/} to view your entire inventory.
+	\item Products can be sorted by date or quantity for easier management.
+\end{enumerate}
+\subsubsection{Note: Aborting}
+For any operation, you can abort and return to the main screen by long pressing RB.
 \section{Implementation}
 \subsection{Hardware}
 \subsubsection{Putting the sensors together}
 With a lot of hardware components for this project we had to make sure that we can connect all of them to the microcontroller.
 We started with the SD Card extension (Adalogger) and the Wlan Co-Processor. Both of them are small boards about as big as the microcontroller, so using stacking headers we stacked both of them on top of the main controller.\\
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{cat.jpg}
-    \caption{Stacking Wifi and SD Card}
-    \label{fig:mesh1}
+	\centering
+	\includegraphics[width=0.5\textwidth]{cat.jpg}
+	\caption{Stacking Wifi and SD Card}
+	\label{fig:mesh1}
 \end{figure}\\
-Now what's left is the strain load cell, along with the adc chip for weight measurement, the LCD, the three buttons and the barcode scanner. 
+Now what's left is the strain load cell, along with the adc chip for weight measurement, the LCD, the three buttons and the barcode scanner.
 Everything apart from the barcode scanner uses the I2C protocol for communication. This is convenient as I2C supports multiple devices on the same BUS.
 We connected the three buttons, the ADC weight chip and the LCD over I2C to the same BUS. Additionally, we used the SparkFun Qwiic I2C connectors that enable just plugging cables with
 connectors together in a daisy chain, requiring less soldering. The QWIIC connectors required a SparkFun Qwiic Shield board which offers 4 Qwiic connector plugs.
@@ -133,7 +203,7 @@ Write more here.
 The Cuisinventory station fundamentally has five functions that are offered to the user. The first three are managing the inventory: Adding a product, updating the weight of a product and removing a product.
 The last two are displaying the inventory on the local LCD and putting the main controller in USB mode, so you can make changes on the config files on the local SD card.
 These three functions are coded in the main logic with calls to secondary classes which contain the implementation for necessary hardware and software components.
-Additionally, the main logic contains the necessary initializations for the hardware components. 
+Additionally, the main logic contains the necessary initializations for the hardware components.
 \subsubsection{Buttons}
 For the Buttons we rely on the \href{https://github.com/sparkfun/SparkFun_Qwiic_Button_Arduino_Library}{SparkFun Qwiic Button Arduino Library} with which we can read out the buffer of presses, which are saved on the button itself.
 In the file Input.cpp we have logic for reading out the input of a desired button; this also filters out input from the buffer that happened too long ago.
@@ -158,7 +228,7 @@ When initializing, we try to connect to a Wi-Fi network using the SSID and passw
 After the user scans a barcode, we have to fetch information from an external barcode database. In our case, the barcode API from https://world.openfoodfacts.org/ is free and offers an excellent amount of information about a wide range of products.
 The WIFIService class handles sending a http request to the API with the help of \href{https://github.com/arduino-libraries/ArduinoHttpClient}{Arduino HTTP Client}.
 The response will be a JSON containing the information, which is processed with the \href{https://github.com/bblanchon/ArduinoJson}{Arduino Json Library}.
-Additionally to receiving information we also need to send information to our own web server which displays the full inventory. For this, the WIFIService class contains a method which sends a JSON File to the server. 
+Additionally to receiving information we also need to send information to our own web server which displays the full inventory. For this, the WIFIService class contains a method which sends a JSON File to the server.
 \subsubsection{SD card and the Database class}
 We have a micro SD card in our "Adalogger" module, on which we want to save our inventory information.
 For writing and reading from the SD card, we work with the \href{https://github.com/adafruit/SdFat}{SdFat Adafruit Fork} library.
@@ -176,7 +246,7 @@ These two mappings enable us to quickly find the corresponding files when search
 \subsection{Arduino IDE Troubles}
 When starting out on the project we produced our first few lines of code using Arduino IDE, however as the project became bigger we ran into several inconveniences.
 Arduino IDE fundamentally puts everything into a single .ino file for compilation. With additional .cpp files used for code structure there is an annoying limitation that it still requires a .ino file with the parent folder name being the same as the .ino file. \\
-As we have a lot of hardware and an adafruit controller, we needed to install specific Adafruit library forks for the code to run. 
+As we have a lot of hardware and an adafruit controller, we needed to install specific Adafruit library forks for the code to run.
 Since Arduino IDE doesn't offer collaborative library management, you had to make sure to have the correct libraries and library versions set up correctly on every single client. \\
 When we finished work on a relevant module like the database class, Arduino IDE provided no testing framework for unittests which we could easily use to ensure correctness. \\
 Lastly, we also wanted to use external code editors instead of working with the Arduino IDE interface.
