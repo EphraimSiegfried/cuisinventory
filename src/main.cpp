@@ -115,7 +115,6 @@ void setup() {
     // helper lambda to handle wifi-setup errors
     auto enterOfflineMode = [&](const String& errorMessage) {
         LOG(errorMessage);
-        lcd.setFastBacklight(0xFF0000);
         lcd.print(errorMessage);
         lcd.print("\nEntering offline mode");
         delay(2000);
@@ -163,7 +162,7 @@ void printSuccess(String successMessage) {
     lcd.clear();
     lcd.setFastBacklight(0x00FF00);
     lcd.print(successMessage);
-    delay(1000);
+    delay(2000);
 }
 
 void printInfo(String infoMessage) {
@@ -181,7 +180,6 @@ String scanProductBarcode() {
         delay(100);
     }
     scanner.stopScan();
-    lcd.clear();
     return barcode;
 }
 
@@ -196,7 +194,7 @@ uint32_t measureProductWeight() {
     uint32_t weight;
     do {
         weight = nau.read();
-        printInfo(String(weight * SCALING));
+        lcd.print(String(weight * SCALING));
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     } while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD));
@@ -205,7 +203,6 @@ uint32_t measureProductWeight() {
         weight += nau.read();
     }
     weight = (weight / (SAMPLE_AMOUNT - 1)) * SCALING;
-    lcd.clear();
     return weight;
 }
 
