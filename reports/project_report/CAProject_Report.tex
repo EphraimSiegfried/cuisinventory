@@ -196,9 +196,8 @@ The SparkFun Qwiic Shield board is then connected to the I2C pins of the main co
 This leaves the Barcode Scanner which communicates over UART and still has place on the so far unused RX and TX pins.
 With everything connected, we just have to check that there is no overlap in the I2C addresses of the devices that are connected to our single I2C Bus.
 In our case, we had to manually change the I2C addresses of the three buttons over the button software library.
-\subsubsection{Designing the case}
-As we are building a kitchen station with a weight sensor, we have the need for a case.
-Write more here.
+\subsubsection{Building the case}
+We wanted to build a case that houses all required hardware components and offers convenient interaction with them in the scope of a kitchen station inventory management system.
 \subsection{Software}
 The Cuisinventory station fundamentally has five functions that are offered to the user. The first three are managing the inventory: Adding a product, updating the weight of a product and removing a product.
 The last two are displaying the inventory on the local LCD and putting the main controller in USB mode, so you can make changes on the config files on the local SD card.
@@ -240,6 +239,7 @@ These unique IDs are written into the json file of the product, and the JSON fil
 To work with all the JSON files, we keep two mapping files on the SD card. One mapping file contains every unique ID and its corresponding barcode.
 The other mapping file contains every barcode and a list of corresponding unique IDs. The mapping files are also saved as JSON Files.
 These two mappings enable us to quickly find the corresponding files when searching for a barcode and also contain an overview of all products in the inventory.
+\subsection{Webserver}
 
 \section{Problems and Solutions}
 
@@ -270,11 +270,15 @@ And luckily we also found an \href{https://github.com/adafruit/SdFat}{SdFat Adaf
 To our surprise, we didn't need to change a single line of code in our database logic for it to work. It used the same class and function names as before, only now we had access to more useful functions like recursively deleting directories.
 This was a funny exception for us, as so far, things generally didn't work when trying them out.
 \section{Summary}
+At the beginning of the planning phase, we were looking for a project idea that offered enough complexity, while also being something that we would consider useful.
+With Cuisinventory, a grocery inventory management system, we found such an idea. The amount of hardware components and software logic we needed to implement the functionality fulfilled our complexity requirements.
+Furthermore, we also implemented an external web server and the whole station had a case we designed and built using 3D printing and woodworking.
+To achieve all this, we needed regularly scheduled meetups on which we worked together and set goals for the implementation of components and logic.
+Here we also set up more efficient collaboration processes, like switching to a more convenient IDE and implementing automated GitHub actions.
+As we managed to actually implement all of this without cutting corners, we are very happy with the result of the project.
+We created a conveniently usable kitchen station that offers grocery management with a local database and a complementary website.
+
 
 \section{Sources}
 
-
-
-\bibliographystyle{apalike}
-\bibliography{references}
 \end{document}
