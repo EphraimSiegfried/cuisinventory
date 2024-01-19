@@ -65,8 +65,8 @@ const uint32_t LONG_PRESS_DURATION =
 const uint32_t PRESS_AGE_THRESHOLD = 3000;
 
 // UART Barcode
-const uint8_t RX_PIN = 2;
-const uint8_t TX_PIN = 3;
+const uint8_t RX_PIN = 5;
+const uint8_t TX_PIN = 6;
 
 #ifdef PIO_UNIT_TESTING
 const String SSID = "iPhone";
