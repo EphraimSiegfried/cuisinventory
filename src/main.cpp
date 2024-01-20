@@ -30,10 +30,11 @@ void setup() {
 #endif
     Wire.begin();
     lcd.begin(Wire);
-   // Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
+    // Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
     lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
-    lcd.setContrast(LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
+    lcd.setContrast(
+        LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
     lcd.clear();
     delay(5000);
     LOG("start!");
@@ -98,7 +99,7 @@ void setup() {
     // *** Scale ***
     if (!initScale()) {
         lcd.print("Failed to initialize the scale");
-        while (1){
+        while (1) {
             LOG("fail scale");
             delay(1000);
         }
@@ -107,49 +108,48 @@ void setup() {
     // *** Barcode ***
     if (!initBarReader()) {
         lcd.print("Failed to initialize the barcode reader");
-        while (1){
+        while (1) {
             LOG("fail barcode");
             delay(1000);
         }
     }
-/*
-    // helper lambda to handle wifi-setup errors
-    auto enterOfflineMode = [&](const String& errorMessage) {
-        LOG(errorMessage);
-        lcd.print(errorMessage);
-        lcd.print("\nEntering offline mode");
-        delay(2000);
-        lcd.clear();
-        offlineMode = true;
-    };
+    /*
+        // helper lambda to handle wifi-setup errors
+        auto enterOfflineMode = [&](const String& errorMessage) {
+            LOG(errorMessage);
+            lcd.print(errorMessage);
+            lcd.print("\nEntering offline mode");
+            delay(2000);
+            lcd.clear();
+            offlineMode = true;
+        };
 
-    // Retrieve user wifi settings
-    File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
-    if (!settingsFile) {
-        enterOfflineMode("Failed to open the user settings file");
-        return;
-    }
+        // Retrieve user wifi settings
+        File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
+        if (!settingsFile) {
+            enterOfflineMode("Failed to open the user settings file");
+            return;
+        }
 
-    StaticJsonDocument<JSONSIZE> settingsJson;
-    DeserializationError error = deserializeJson(settingsJson, settingsFile);
-    settingsFile.close();
-    if (error) {
-        enterOfflineMode("Failed to deserialize settings");
-        return;
-    }
+        StaticJsonDocument<JSONSIZE> settingsJson;
+        DeserializationError error = deserializeJson(settingsJson,
+       settingsFile); settingsFile.close(); if (error) {
+            enterOfflineMode("Failed to deserialize settings");
+            return;
+        }
 
-    if (!settingsJson.containsKey("SSID") ||
-        !settingsJson.containsKey("Password")) {
-        enterOfflineMode("Wi-Fi settings incomplete");
-        return;
-    }
-    // connect to wifi
-    if (!WiFiService.connect(String(settingsFile["SSID"]),
-                             String(settingsFile["Password"]))) {
-        enterOfflineMode("Failed to connect to Wi-Fi");
-        return;
-    }
-    */
+        if (!settingsJson.containsKey("SSID") ||
+            !settingsJson.containsKey("Password")) {
+            enterOfflineMode("Wi-Fi settings incomplete");
+            return;
+        }
+        // connect to wifi
+        if (!WiFiService.connect(String(settingsFile["SSID"]),
+                                 String(settingsFile["Password"]))) {
+            enterOfflineMode("Failed to connect to Wi-Fi");
+            return;
+        }
+        */
 
     LOG("all initialized!");
     lcd.setFastBacklight(0xFFFFFF);
@@ -183,7 +183,7 @@ String scanProductBarcode() {
     scanner.startScan();
     String barcode;
     while (!readBar(barcode)) {
-       // scanner.startScan();
+        // scanner.startScan();
         if (input(RED_BUTTON, LONG_PRESS)) return "";  // cancel
         delay(100);
     }
