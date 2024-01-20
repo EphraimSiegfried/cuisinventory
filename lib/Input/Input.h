@@ -2,6 +2,7 @@
 
 #include <Constants.h>
 #include <SparkFun_Qwiic_Button.h>
+#include <Debug.h>
 
 extern QwiicButton greenButton1;
 extern QwiicButton greenButton2;

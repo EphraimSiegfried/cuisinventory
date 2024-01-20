@@ -30,12 +30,14 @@ void setup() {
 #endif
     Wire.begin();
     lcd.begin(Wire);
-    Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
+   // Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
     lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
-    lcd.setContrast(
-        LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
+    lcd.setContrast(LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
     lcd.clear();
+    delay(5000);
+    LOG("start!");
+    lcd.print("Initializing station.");
 
     // *** Buttons ***
 
@@ -59,18 +61,6 @@ void setup() {
     greenButton2.LEDon(BTN_LIGHT_IDLE);
     redButton.LEDon(BTN_LIGHT_IDLE);
 
-    lcd.clear();
-
-    // *** USB ***
-
-    // hold red button while plugging in to enable usb msc
-    if (redButton.isPressed()) {
-        lcd.print("** USB MSC activated **");
-        usb = true;
-        setupUSB();
-        return;
-    }
-
     // *** SD ***
 
     pinMode(SD_PIN, OUTPUT);  // set SD pin mode
@@ -80,9 +70,15 @@ void setup() {
         lcd.print("Please insert SD card...");
         delay(200);
     }
+    // *** USB ***
 
-    lcd.clear();
-
+    // hold red button while plugging in to enable usb msc
+    if (redButton.isPressed()) {
+        lcd.print("** USB MSC activated **");
+        usb = true;
+        setupUSB();
+        return;
+    }
     // *** Clock ***
 
     while (!rtc.begin()) {
@@ -98,20 +94,25 @@ void setup() {
     }
 
     rtc.start();
-    lcd.clear();
 
     // *** Scale ***
     if (!initScale()) {
         lcd.print("Failed to initialize the scale");
-        while (1) delay(10);
-    };
+        while (1){
+            LOG("fail scale");
+            delay(1000);
+        }
+    }
 
     // *** Barcode ***
     if (!initBarReader()) {
         lcd.print("Failed to initialize the barcode reader");
-        while (1) delay(10);
-    };
-
+        while (1){
+            LOG("fail barcode");
+            delay(1000);
+        }
+    }
+/*
     // helper lambda to handle wifi-setup errors
     auto enterOfflineMode = [&](const String& errorMessage) {
         LOG(errorMessage);
@@ -148,6 +149,12 @@ void setup() {
         enterOfflineMode("Failed to connect to Wi-Fi");
         return;
     }
+    */
+
+    LOG("all initialized!");
+    lcd.setFastBacklight(0xFFFFFF);
+    lcd.clear();
+    lcd.print("Cuisinventory ready!");
 }
 
 void printError(String errorMessage) {
@@ -176,6 +183,7 @@ String scanProductBarcode() {
     scanner.startScan();
     String barcode;
     while (!readBar(barcode)) {
+       // scanner.startScan();
         if (input(RED_BUTTON, LONG_PRESS)) return "";  // cancel
         delay(100);
     }

@@ -1,6 +1,6 @@
 #include "BarReader.h"
 
-SoftwareSerial softSerial(RX_PIN, TX_PIN);
+SoftwareSerial softSerial(TX_PIN, RX_PIN);
 DE2120 scanner;
 
 bool initBarReader() {
