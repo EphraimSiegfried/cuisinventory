@@ -36,16 +36,29 @@ bool WiFiServiceClass::get(String barcode,
                            StaticJsonDocument<JSONSIZE> &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
-        HttpClient(this->wifiClient, BARCODE_ENDPOINT.c_str(), port);
+        HttpClient(this->wifiClient, BARCODE_ENDPOINT, port);
     // if you get a connection, report back via serial:
-    if (!this->wifiClient.connect(BARCODE_ENDPOINT.c_str(), port)) {
+    if (!this->wifiClient.connect(BARCODE_ENDPOINT, port)) {
         LOG("Connection to server failed");
         return false;
     }
     LOG("Connected to server");
     // send request
-    LOG("request: "+ BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS);
-    httpClient.get(BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS);
+    String request = "";
+    LOG("barcode path:" + String(BARCODE_PATH));
+    request = request + String(BARCODE_PATH);
+    request = request + barcode;
+    LOG(request);
+    char request2[request.length() + 1]; // +1 for the null terminator
+    request.toCharArray(request2, sizeof(request2));
+    char finalRequest[300] = "";
+    strcat(finalRequest,request2);
+        LOG(String(finalRequest));
+    strcat(finalRequest,"?fields=");
+        LOG(String(finalRequest));
+    strcat(finalRequest,BARCODE_FIELDS);
+    LOG(String(finalRequest));
+    httpClient.get("/api/v3/product/7610238272310?fields=empty,product_name,generic_name,allergens,conservation_conditions,nutriscore_grade,ingredients_text,customer_service,product_quantity,brands,image_url,categories,empty");
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);
     // Check HTTP status

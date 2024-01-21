@@ -7,20 +7,18 @@ QwiicButton redButton;
 QwiicButton* btns[] = {&greenButton1, &greenButton2, &redButton};
 
 bool input(Button btn, Press press) {
-    while (!btns[btn]->isClickedQueueEmpty() &&
-           !btns[btn]->isPressedQueueEmpty()) {
         uint32_t start = btns[btn]->timeSinceLastPress();
         btns[btn]->popPressedQueue();  // ms since button down
         uint32_t end = btns[btn]->timeSinceLastClick();
         btns[btn]->popClickedQueue();  // ms since button up
+       // LOG("start" + String(start));
+       // LOG("end" + String(end));
         if (start >= PRESS_AGE_THRESHOLD) {
-            continue;  // disregard too old presses
+            return false;  // disregard too old presses
         }
         if (press == LONG_PRESS) {
             return (start - end >= LONG_PRESS_DURATION);
         }
         return true;
-        delay(20);
-    }
     return false;
 }

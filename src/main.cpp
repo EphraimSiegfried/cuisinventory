@@ -234,11 +234,15 @@ void addProduct() {
 
     uint32_t weight = measureProductWeight();
     if (weight == 0) return;
+
+    LOG("barcode: ");
+    LOG(barcode);
     StaticJsonDocument<JSONSIZE> doc;
     if(!WiFiService.get(barcode,doc)){
         printError("FATAL ERROR\nFailed to get product info");
         return;
     }
+
     if (!DB.add(doc, weight, rtc.now().unixtime())) {
         printError("FATAL ERROR\nFailed to save product");
         return;
@@ -333,19 +337,24 @@ void reset() {
 
 void loop() {
     if (usb) return;  // do nothing if in usb mode
+    //LOG("tick");
     if (input(GREEN_BUTTON1, SHORT_PRESS)) {
+        LOG("green 1 short");
         addProduct();
         reset();
     }
     if (input(GREEN_BUTTON2, SHORT_PRESS)) {
+        LOG("green 2 short");
         updateProduct();
         reset();
     }
     if (input(RED_BUTTON, SHORT_PRESS)) {
+        LOG("red short");
         removeProduct();
         reset();
     }
     if (input(GREEN_BUTTON1, LONG_PRESS)) {
+        LOG("green 1 long");
         printProducts();
         reset();
     }
