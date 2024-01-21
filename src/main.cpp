@@ -30,7 +30,7 @@ void setup() {
 #endif
     Wire.begin();
     lcd.begin(Wire);
-    //Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
+    Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
     lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
     lcd.setContrast(
@@ -94,7 +94,9 @@ void setup() {
     }
 
     rtc.start();
-
+    if(!DB.initDatabase()){
+        LOG("failed init database");
+    }
     // *** Scale ***
     if (!initScale()) {
         lcd.print("Failed to initialize the scale");
@@ -209,6 +211,7 @@ uint32_t measureProductWeight() {
     printInfo("Weighing, please stand by...\n");
     uint32_t weight;
     do {
+        lcd.clear();
         weight = nau.read();
         lcd.print(String(weight * SCALING));
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
