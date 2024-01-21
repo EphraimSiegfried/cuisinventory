@@ -6,14 +6,14 @@
 const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 
 // Barcode API
-const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
-const String BARCODE_PATH = "/api/v3/product/";
-const String BARCODE_FIELDS =
-    "empty,product_name,generic_name,allergens,conservation_conditions,"
-    "nutriscore_"
-    "grade,ingredients_text,customer_service,product_quantity,brands,image_url,"
-    "categories,empty";  // APi has bug where first and last fields are ignored
-const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
+#define BARCODE_ENDPOINT "world.openfoodfacts.org"
+#define BARCODE_PATH     "/api/v3/product/"
+#define BARCODE_FIELDS                                                     \
+    "empty,product_name,generic_name,allergens,conservation_conditions,"   \
+    "nutriscore_grade,ingredients_text,customer_service,product_quantity," \
+    "brands,image_url,categories,empty"  // APi has bug where first and last
+                                         // fields are ignored
+#define USER_AGENT "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"
 
 // Pythonanywhere server
 const String PYTHONANYWHERE_ENDPOINT = "kev1n27.pythonanywhere.com";
@@ -55,8 +55,8 @@ const uint8_t BTN_LIGHT_IDLE =
 const uint8_t BTN_LIGHT_ACTIVE =
     50;  // brightness of buttons during click, between 0 and 255 LCD
 const uint8_t LCD_CONTRAST = 5;
-const uint8_t GREEN_BUTTON1_ADDRESS = 0x6f;
-const uint8_t GREEN_BUTTON2_ADDRESS = 0x70;
+const uint8_t GREEN_BUTTON1_ADDRESS = 0x70;
+const uint8_t GREEN_BUTTON2_ADDRESS = 0x6f;
 const uint8_t RED_BUTTON_ADDRESS = 0x71;
 const uint32_t LONG_PRESS_DURATION =
     2000;  // duration threshold of a long press
