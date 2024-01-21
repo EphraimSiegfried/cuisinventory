@@ -61,16 +61,6 @@ void setup() {
     greenButton1.LEDon(BTN_LIGHT_IDLE);
     greenButton2.LEDon(BTN_LIGHT_IDLE);
     redButton.LEDon(BTN_LIGHT_IDLE);
-
-    // *** SD ***
-
-    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
-
-    while (!SD.begin(SD_PIN)) {
-        lcd.clear();
-        lcd.print("Please insert SD card...");
-        delay(200);
-    }
     // *** USB ***
 
     // hold red button while plugging in to enable usb msc
@@ -80,6 +70,16 @@ void setup() {
         setupUSB();
         return;
     }
+    // *** SD ***
+
+    pinMode(SD_PIN, OUTPUT);  // set SD pin mode
+
+    while (!SD.begin(SD_PIN)) {
+        lcd.clear();
+        lcd.print("Please insert SD card...");
+        delay(200);
+    }
+   
     // *** Clock ***
 
     while (!rtc.begin()) {
