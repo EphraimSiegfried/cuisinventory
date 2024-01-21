@@ -27,12 +27,6 @@ The Cuisinventory system is equipped with an LCD interface and three tactile but
    - "PASSWORD": Your Wi-Fi password.
 5. Save the file and disconnect the USB cable.
 
-### System Registration
-
-1. Locate the system ID beneath the device.
-2. Visit [ephraimsiegfried.github.io/cuisinventory-web](https://ephraimsiegfried.github.io/cuisinventory-web/).
-3. Log in using your system ID to access and manage your kitchen inventory online.
-
 ## Daily Operations
 
 ### Adding new Products
@@ -66,7 +60,8 @@ The Cuisinventory system is equipped with an LCD interface and three tactile but
 ### Inspecting Products on the Cuisinventory Website
 
 1. Visit [ephraimsiegfried.github.io/cuisinventory-web](https://ephraimsiegfried.github.io/cuisinventory-web/) to view your entire inventory.
-2. Products can be sorted by date or quantity for easier management.
+2. Locate the system ID beneath the device and log in using this ID.
+3. Inspect your products. Products can be sorted by date or quantity for easier management.
 
 ### Note: Aborting
 
