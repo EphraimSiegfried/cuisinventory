@@ -31,12 +31,12 @@ const int JSONSIZE = 1536;
 const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
 #define INTERNAL_FOLDER "/.intern"
-#define STATE_FOLDER "/.state"
-#define DATA_FOLDER "/.data"
+#define STATE_FOLDER    "/.state"
+#define DATA_FOLDER     "/.data"
 const String SETTINGSFILE = "settings.json";
 #define ID_BAR_MAPPINGFILE "idbar"
 #define BAR_ID_MAPPINGFILE "barid"
-#define STATEFILE "state"
+#define STATEFILE          "state"
 
 // JSON
 const String UNIQUE_ID = "id";
