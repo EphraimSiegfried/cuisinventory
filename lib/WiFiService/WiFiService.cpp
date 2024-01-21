@@ -49,16 +49,20 @@ bool WiFiServiceClass::get(String barcode,
     request = request + String(BARCODE_PATH);
     request = request + barcode;
     LOG(request);
-    char request2[request.length() + 1]; // +1 for the null terminator
+    char request2[request.length() + 1];  // +1 for the null terminator
     request.toCharArray(request2, sizeof(request2));
     char finalRequest[300] = "";
-    strcat(finalRequest,request2);
-        LOG(String(finalRequest));
-    strcat(finalRequest,"?fields=");
-        LOG(String(finalRequest));
-    strcat(finalRequest,BARCODE_FIELDS);
+    strcat(finalRequest, request2);
     LOG(String(finalRequest));
-    httpClient.get("/api/v3/product/7610238272310?fields=empty,product_name,generic_name,allergens,conservation_conditions,nutriscore_grade,ingredients_text,customer_service,product_quantity,brands,image_url,categories,empty");
+    strcat(finalRequest, "?fields=");
+    LOG(String(finalRequest));
+    strcat(finalRequest, BARCODE_FIELDS);
+    LOG(String(finalRequest));
+    httpClient.get(
+        "/api/v3/product/"
+        "7610238272310?fields=empty,product_name,generic_name,allergens,"
+        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
+        "service,product_quantity,brands,image_url,categories,empty");
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);
     // Check HTTP status
