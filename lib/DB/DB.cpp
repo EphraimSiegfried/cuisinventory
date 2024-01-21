@@ -328,21 +328,21 @@ bool DBClass::initDatabase() {
         SD.mkdir(DATA_FOLDER);
     }
     String path = "";
-    path =  path + STATE_FOLDER + "/" + STATEFILE;
+    path = path + STATE_FOLDER + "/" + STATEFILE;
     if (!checkInitialized(path)) {
         if (!initializeStateFile()) {
             return false;
         }
     }
     path = "";
-    path =  path + INTERNAL_FOLDER + "/" + ID_BAR_MAPPINGFILE;
+    path = path + INTERNAL_FOLDER + "/" + ID_BAR_MAPPINGFILE;
     if (!checkInitialized(path)) {
         if (!initializeIdBarMapping()) {
             return false;
         }
     }
     path = "";
-    path =  path + INTERNAL_FOLDER + "/" + BAR_ID_MAPPINGFILE;
+    path = path + INTERNAL_FOLDER + "/" + BAR_ID_MAPPINGFILE;
     if (!checkInitialized(path)) {
         if (!initializeBarIdMapping()) {
             return false;
