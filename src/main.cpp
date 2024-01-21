@@ -78,7 +78,7 @@ void setup() {
         lcd.print("Please insert SD card...");
         delay(200);
     }
-   
+
     // *** Clock ***
 
     while (!rtc.begin()) {
