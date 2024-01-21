@@ -85,7 +85,7 @@ bool DBClass::setWeight(uint32_t id, uint32_t value) {
 }
 
 bool DBClass::remove(uint32_t id, String barcode) {
-    String path = DATA_FOLDER + "/" + String(id);
+    String path = String(DATA_FOLDER) + "/" + String(id);
     if (!SD.remove(path)) {
         LOG(F("Failed to remove file from SD card"));
         return false;
@@ -204,7 +204,7 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
 }
 
 bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    String path = DATA_FOLDER + "/" + name;
+    String path = String(DATA_FOLDER) + "/" + String(name);
     File jsonFile = SD.open(path, FILE_READ);
     if (!jsonFile) {
         LOG("loadJson(): Failed to open json file");
@@ -221,7 +221,8 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    String path = DATA_FOLDER + "/" + name;
+    String path = String(DATA_FOLDER) + "/" + name;
+    LOG(path);
     SD.remove(path);
     File jsonFile = SD.open(path, FILE_WRITE);
     if (!jsonFile) {
@@ -234,7 +235,13 @@ bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    String path = STATE_FOLDER + "/" + STATEFILE;
+    LOG(STATEFILE);
+    String path = String(STATE_FOLDER) + "/" + String(STATEFILE);
+    LOG(STATE_FOLDER);
+    LOG(STATEFILE);
+    if(!SD.exists(path)){
+        LOG(path+"doesnt exist");
+    }
     File stateFile = SD.open(path, FILE_READ);
     if (!stateFile) {
         LOG("loadStateMapping(): Failed to open state file");
@@ -251,9 +258,16 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    String path = STATE_FOLDER + "/" + STATEFILE;
-    SD.remove(path);
-    File stateFile = SD.open(path, FILE_WRITE);
+    String path = String(STATE_FOLDER) + "/" + String(STATEFILE);
+    LOG(STATE_FOLDER);
+    LOG(STATEFILE);
+    if(!SD.exists(path)){
+        LOG(path+"doesnt exist");
+    }
+    if(!SD.remove(path)){
+        LOG("failed remove");
+    }
+    File stateFile = SD.open(path, FILE_WRITE );
     if (!stateFile) {
         LOG("saveStateMapping(): Failed to open state file");
         return false;
@@ -264,7 +278,7 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
 }
 
 DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
-    String path = INTERNAL_FOLDER + "/" + mappingfile;
+    String path = String(INTERNAL_FOLDER) + "/" + String(mappingfile);
     File mappingFile = SD.open(path, FILE_READ);
     if (!mappingFile) {
         LOG("loadMapping(): Failed to open mapping file");
@@ -284,7 +298,7 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
 }
 
 bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
-    String path = INTERNAL_FOLDER + "/" + mappingName;
+    String path = String(INTERNAL_FOLDER) + "/" + String(mappingName);
     SD.remove(path);
     File mappingFile = SD.open(path, FILE_WRITE);
     if (!mappingFile) {
@@ -306,17 +320,17 @@ bool DBClass::initDatabase() {
     if (!SD.exists(DATA_FOLDER)) {
         SD.mkdir(DATA_FOLDER);
     }
-    if (!checkInitialized(STATE_FOLDER + "/" + STATEFILE)) {
+    if (!checkInitialized(String(STATE_FOLDER) + "/" + String(STATEFILE))) {
         if (!initializeStateFile()) {
             return false;
         }
     }
-    if (!checkInitialized(INTERNAL_FOLDER + "/" + ID_BAR_MAPPINGFILE)) {
+    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" + String(ID_BAR_MAPPINGFILE))) {
         if (!initializeIdBarMapping()) {
             return false;
         }
     }
-    if (!checkInitialized(INTERNAL_FOLDER + "/" + BAR_ID_MAPPINGFILE)) {
+    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" + String(BAR_ID_MAPPINGFILE))) {
         if (!initializeBarIdMapping()) {
             return false;
         }
@@ -333,6 +347,7 @@ bool DBClass::checkInitialized(String filename) {
         return false;
     }
     long size = file.size();
+    file.close();
     if (size <= 1) {
         return false;
     }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Constants_h
+#define Constants_h
 #include <Arduino.h>
 
 // Main
@@ -29,13 +30,13 @@ const String DEVICE_KEY = "th1s1satestk3y";
 const int JSONSIZE = 1536;
 const int STATEFILESIZE = 500;
 const int SD_PIN = 10;
-const String INTERNAL_FOLDER = "/intern";
-const String STATE_FOLDER = "/state";
-const String DATA_FOLDER = "/data";
-const String SETTINGSFILE = "settings.json";
-const String ID_BAR_MAPPINGFILE = "idbar";
-const String BAR_ID_MAPPINGFILE = "barid";
-const String STATEFILE = "state";
+const char* INTERNAL_FOLDER = "/.intern";
+const char* STATE_FOLDER = "/.state";
+const char* DATA_FOLDER = "/.data";
+const char* SETTINGSFILE = "settings.json";
+const char* ID_BAR_MAPPINGFILE = "idbar";
+const char* BAR_ID_MAPPINGFILE = "barid";
+const char STATEFILE[] = "state";
 
 // JSON
 const String UNIQUE_ID = "id";
@@ -88,3 +89,4 @@ const String SAMPLE_PRODUCT_JSON =
     "found\",\"name\":\"Product "
     "found\"},\"status\":\"success\",\"warnings\":[]}";
 #endif
+#endif 
