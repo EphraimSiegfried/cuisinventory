@@ -6,14 +6,10 @@
 const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 
 // Barcode API
-const String BARCODE_ENDPOINT = "world.openfoodfacts.org";
-const String BARCODE_PATH = "/api/v3/product/";
-const String BARCODE_FIELDS =
-    "empty,product_name,generic_name,allergens,conservation_conditions,"
-    "nutriscore_"
-    "grade,ingredients_text,customer_service,product_quantity,brands,image_url,"
-    "categories,empty";  // APi has bug where first and last fields are ignored
-const String USER_AGENT = "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch";
+#define BARCODE_ENDPOINT "world.openfoodfacts.org"
+#define BARCODE_PATH "/api/v3/product/"
+#define BARCODE_FIELDS "empty,product_name,generic_name,allergens,conservation_conditions,nutriscore_grade,ingredients_text,customer_service,product_quantity,brands,image_url,categories,empty"  // APi has bug where first and last fields are ignored
+#define USER_AGENT "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"
 
 // Pythonanywhere server
 const String PYTHONANYWHERE_ENDPOINT = "kev1n27.pythonanywhere.com";
