@@ -44,6 +44,7 @@ bool WiFiServiceClass::get(String barcode,
     }
     LOG("Connected to server");
     // send request
+    LOG("request: "+ BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS);
     httpClient.get(BARCODE_PATH + barcode + "?fields=" + BARCODE_FIELDS);
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);

@@ -238,11 +238,11 @@ bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
 }
 
 bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    LOG(STATEFILE.c_str());
+    LOG(STATEFILE);
     String path = "";
     path = path + STATE_FOLDER + "/state";
     LOG(STATE_FOLDER);
-    LOG(STATEFILE.c_str());
+    LOG(STATEFILE);
     if (!SD.exists(path)) {
         LOG(path + "doesnt exist");
     }

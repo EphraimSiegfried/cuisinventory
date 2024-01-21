@@ -234,8 +234,11 @@ void addProduct() {
 
     uint32_t weight = measureProductWeight();
     if (weight == 0) return;
-
     StaticJsonDocument<JSONSIZE> doc;
+    if(!WiFiService.get(barcode,doc)){
+        printError("FATAL ERROR\nFailed to get product info");
+        return;
+    }
     if (!DB.add(doc, weight, rtc.now().unixtime())) {
         printError("FATAL ERROR\nFailed to save product");
         return;
