@@ -30,13 +30,12 @@ void setup() {
 #endif
     Wire.begin();
     lcd.begin(Wire);
-    // Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
+    Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
     lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
     lcd.setContrast(
         LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
     lcd.clear();
-    delay(5000);
     LOG("start!");
     lcd.print("Initializing station.");
 
@@ -95,7 +94,9 @@ void setup() {
     }
 
     rtc.start();
-
+    if (!DB.initDatabase()) {
+        LOG("failed init database");
+    }
     // *** Scale ***
     if (!initScale()) {
         lcd.print("Failed to initialize the scale");
@@ -113,17 +114,17 @@ void setup() {
             delay(1000);
         }
     }
-    /*
-        // helper lambda to handle wifi-setup errors
-        auto enterOfflineMode = [&](const String& errorMessage) {
-            LOG(errorMessage);
-            lcd.print(errorMessage);
-            lcd.print("\nEntering offline mode");
-            delay(2000);
-            lcd.clear();
-            offlineMode = true;
-        };
 
+    // helper lambda to handle wifi-setup errors
+    auto enterOfflineMode = [&](const String& errorMessage) {
+        LOG(errorMessage);
+        lcd.print(errorMessage);
+        lcd.print("\nEntering offline mode");
+        delay(2000);
+        lcd.clear();
+        offlineMode = true;
+    };
+    /*
         // Retrieve user wifi settings
         File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
         if (!settingsFile) {
@@ -133,7 +134,7 @@ void setup() {
 
         StaticJsonDocument<JSONSIZE> settingsJson;
         DeserializationError error = deserializeJson(settingsJson,
-       settingsFile); settingsFile.close(); if (error) {
+        settingsFile); settingsFile.close(); if (error) {
             enterOfflineMode("Failed to deserialize settings");
             return;
         }
@@ -142,15 +143,17 @@ void setup() {
             !settingsJson.containsKey("Password")) {
             enterOfflineMode("Wi-Fi settings incomplete");
             return;
-        }
+        }/
         // connect to wifi
         if (!WiFiService.connect(String(settingsFile["SSID"]),
-                                 String(settingsFile["Password"]))) {
+                                    String(settingsFile["Password"]))) {
             enterOfflineMode("Failed to connect to Wi-Fi");
             return;
-        }
-        */
-
+        }*/
+    if (!WiFiService.connect("hotspot", "12345678")) {
+        enterOfflineMode("Failed to connect to Wi-Fi");
+        return;
+    }
     LOG("all initialized!");
     lcd.setFastBacklight(0xFFFFFF);
     lcd.clear();
@@ -176,15 +179,20 @@ void printInfo(String infoMessage) {
     lcd.clear();
     lcd.setFastBacklight(0x0000FF);
     lcd.print(infoMessage);
+    // delay(2000);
 }
 
 String scanProductBarcode() {
-    printInfo("Please scan product barcode...");
+    printInfo("Please scan barcode...");
     scanner.startScan();
     String barcode;
     while (!readBar(barcode)) {
-        // scanner.startScan();
-        if (input(RED_BUTTON, LONG_PRESS)) return "";  // cancel
+        scanner.startScan();
+        if (input(RED_BUTTON, LONG_PRESS)) {
+            scanner.stopScan();
+            LOG("abort scan");
+            return "";  // cancel
+        }
         delay(100);
     }
     scanner.stopScan();
@@ -192,8 +200,10 @@ String scanProductBarcode() {
 }
 
 uint32_t measureProductWeight() {
-    printInfo(
-        "Please put the product on the scale,\nPress button 1 to confirm");
+    // printInfo(
+    //     "Please put the product on the scale,\nPress button 1 to confirm");
+    printInfo("now weigh");
+    LOG("weigh");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
@@ -201,6 +211,7 @@ uint32_t measureProductWeight() {
     printInfo("Weighing, please stand by...\n");
     uint32_t weight;
     do {
+        lcd.clear();
         weight = nau.read();
         lcd.print(String(weight * SCALING));
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
@@ -215,6 +226,9 @@ uint32_t measureProductWeight() {
 }
 
 void addProduct() {
+    LOG("please scan barcode to add");
+    // lcd.print("lol");
+    // printInfo("Please scan barcode to add product...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
@@ -232,6 +246,8 @@ void addProduct() {
 }
 
 void updateProduct() {
+    LOG("please scan barcode to update");
+    // printInfo("Please scan barcode to update product weight...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
@@ -253,6 +269,8 @@ void updateProduct() {
 }
 
 void removeProduct() {
+    LOG("please scan barcode to remove");
+    // printInfo("Please scan barcode to remove product...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
