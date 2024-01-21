@@ -39,7 +39,7 @@ const String SETTINGSFILE = "settings.json";
 #define STATEFILE          "state"
 
 // JSON
-const String UNIQUE_ID = "id";
+#define UNIQUE_ID "id"
 
 // Clock
 const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
