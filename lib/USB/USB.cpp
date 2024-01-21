@@ -43,39 +43,36 @@ void setupUSB() {
 // Callback invoked when received READ10 command.
 // Copy disk's data to buffer (up to bufsize) and
 // return number of copied bytes (must be multiple of block size)
-int32_t msc_read_cb (uint32_t lba, void* buffer, uint32_t bufsize)
-{
+int32_t msc_read_cb(uint32_t lba, void* buffer, uint32_t bufsize) {
     bool rc;
 
 #if SD_FAT_VERSION >= 20000
-    rc = card.card()->readSectors(lba, (uint8_t*) buffer, bufsize/512);
+    rc = card.card()->readSectors(lba, (uint8_t*)buffer, bufsize / 512);
 #else
-    rc = card.card()->readBlocks(lba, (uint8_t*) buffer, bufsize/512);
+    rc = card.card()->readBlocks(lba, (uint8_t*)buffer, bufsize / 512);
 #endif
 
     return rc ? bufsize : -1;
 }
 
 // Callback invoked when received WRITE10 command.
-// Process data in buffer to disk's storage and 
+// Process data in buffer to disk's storage and
 // return number of written bytes (must be multiple of block size)
-int32_t msc_write_cb (uint32_t lba, uint8_t* buffer, uint32_t bufsize)
-{
+int32_t msc_write_cb(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
     bool rc;
 
 #if SD_FAT_VERSION >= 20000
-    rc = card.card()->writeSectors(lba, buffer, bufsize/512);
+    rc = card.card()->writeSectors(lba, buffer, bufsize / 512);
 #else
-    rc = card.card()->writeBlocks(lba, buffer, bufsize/512);
+    rc = card.card()->writeBlocks(lba, buffer, bufsize / 512);
 #endif
 
     return rc ? bufsize : -1;
 }
 
-// Callback invoked when WRITE10 command is completed (status received and accepted by host).
-// used to flush any pending cache.
-void msc_flush_cb (void)
-{
+// Callback invoked when WRITE10 command is completed (status received and
+// accepted by host). used to flush any pending cache.
+void msc_flush_cb(void) {
 #if SD_FAT_VERSION >= 20000
     card.card()->syncDevice();
 #else
