@@ -239,8 +239,8 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     String path = String(STATE_FOLDER) + "/" + String(STATEFILE);
     LOG(STATE_FOLDER);
     LOG(STATEFILE);
-    if(!SD.exists(path)){
-        LOG(path+"doesnt exist");
+    if (!SD.exists(path)) {
+        LOG(path + "doesnt exist");
     }
     File stateFile = SD.open(path, FILE_READ);
     if (!stateFile) {
@@ -261,13 +261,13 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     String path = String(STATE_FOLDER) + "/" + String(STATEFILE);
     LOG(STATE_FOLDER);
     LOG(STATEFILE);
-    if(!SD.exists(path)){
-        LOG(path+"doesnt exist");
+    if (!SD.exists(path)) {
+        LOG(path + "doesnt exist");
     }
-    if(!SD.remove(path)){
+    if (!SD.remove(path)) {
         LOG("failed remove");
     }
-    File stateFile = SD.open(path, FILE_WRITE );
+    File stateFile = SD.open(path, FILE_WRITE);
     if (!stateFile) {
         LOG("saveStateMapping(): Failed to open state file");
         return false;
@@ -325,12 +325,14 @@ bool DBClass::initDatabase() {
             return false;
         }
     }
-    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" + String(ID_BAR_MAPPINGFILE))) {
+    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" +
+                          String(ID_BAR_MAPPINGFILE))) {
         if (!initializeIdBarMapping()) {
             return false;
         }
     }
-    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" + String(BAR_ID_MAPPINGFILE))) {
+    if (!checkInitialized(String(INTERNAL_FOLDER) + "/" +
+                          String(BAR_ID_MAPPINGFILE))) {
         if (!initializeBarIdMapping()) {
             return false;
         }
