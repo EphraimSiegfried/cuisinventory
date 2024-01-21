@@ -3,7 +3,7 @@
 
 # Cuisinventory
 
-Cuisinventory serves as an intuitive grocery inventory management tool, simplifying the tracking of food consumption and detailed product specifics. This system is embodied in a station equipped with a barcode scanner and a weight scale for interactive use. By scanning the barcode of grocery items at the station, Cuisinventory promptly retrieves pertinent details such as product name, brand, allergens, and storage guidelines. The integrated weighing feature allows for the measurement of grocery weight, and when combined with the system's data on product quantity, Cuisinventory accurately calculates the remaining food quantity as a percentage. All inventory data is stored in a bespoke database and can be conveniently accessed and managed through a dedicated web application that communicates seamlessly with the station.
+Cuisinventory serves as an grocery inventory management tool, simplifying the tracking of food consumption and detailed product specifics. This system is embodied in a station equipped with a barcode scanner and a weight scale for interactive use. By scanning the barcode of grocery items at the station, Cuisinventory promptly retrieves pertinent details such as product name, brand, allergens, and storage guidelines. The integrated weighing feature allows for the measurement of grocery weight, and when combined with the system's data on product quantity, Cuisinventory accurately calculates the remaining food quantity as a percentage. All inventory data is stored in a bespoke database and can be conveniently accessed and managed through a dedicated web application that communicates seamlessly with the station.
 
 # User Manual
 
