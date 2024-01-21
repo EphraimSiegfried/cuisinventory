@@ -94,7 +94,7 @@ void setup() {
     }
 
     rtc.start();
-    if(!DB.initDatabase()){
+    if (!DB.initDatabase()) {
         LOG("failed init database");
     }
     // *** Scale ***
@@ -114,7 +114,7 @@ void setup() {
             delay(1000);
         }
     }
-    
+
     // helper lambda to handle wifi-setup errors
     auto enterOfflineMode = [&](const String& errorMessage) {
         LOG(errorMessage);
@@ -124,33 +124,33 @@ void setup() {
         lcd.clear();
         offlineMode = true;
     };
-/*
-    // Retrieve user wifi settings
-    File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
-    if (!settingsFile) {
-        enterOfflineMode("Failed to open the user settings file");
-        return;
-    }
+    /*
+        // Retrieve user wifi settings
+        File settingsFile = SD.open(SETTINGSFILE, FILE_READ);
+        if (!settingsFile) {
+            enterOfflineMode("Failed to open the user settings file");
+            return;
+        }
 
-    StaticJsonDocument<JSONSIZE> settingsJson;
-    DeserializationError error = deserializeJson(settingsJson,
-    settingsFile); settingsFile.close(); if (error) {
-        enterOfflineMode("Failed to deserialize settings");
-        return;
-    }
+        StaticJsonDocument<JSONSIZE> settingsJson;
+        DeserializationError error = deserializeJson(settingsJson,
+        settingsFile); settingsFile.close(); if (error) {
+            enterOfflineMode("Failed to deserialize settings");
+            return;
+        }
 
-    if (!settingsJson.containsKey("SSID") ||
-        !settingsJson.containsKey("Password")) {
-        enterOfflineMode("Wi-Fi settings incomplete");
-        return;
-    }/
-    // connect to wifi
-    if (!WiFiService.connect(String(settingsFile["SSID"]),
-                                String(settingsFile["Password"]))) {
-        enterOfflineMode("Failed to connect to Wi-Fi");
-        return;
-    }*/
-    if (!WiFiService.connect("hotspot","12345678")) {
+        if (!settingsJson.containsKey("SSID") ||
+            !settingsJson.containsKey("Password")) {
+            enterOfflineMode("Wi-Fi settings incomplete");
+            return;
+        }/
+        // connect to wifi
+        if (!WiFiService.connect(String(settingsFile["SSID"]),
+                                    String(settingsFile["Password"]))) {
+            enterOfflineMode("Failed to connect to Wi-Fi");
+            return;
+        }*/
+    if (!WiFiService.connect("hotspot", "12345678")) {
         enterOfflineMode("Failed to connect to Wi-Fi");
         return;
     }
@@ -179,7 +179,7 @@ void printInfo(String infoMessage) {
     lcd.clear();
     lcd.setFastBacklight(0x0000FF);
     lcd.print(infoMessage);
-    //delay(2000);
+    // delay(2000);
 }
 
 String scanProductBarcode() {
@@ -188,11 +188,11 @@ String scanProductBarcode() {
     String barcode;
     while (!readBar(barcode)) {
         scanner.startScan();
-        if (input(RED_BUTTON, LONG_PRESS)){
+        if (input(RED_BUTTON, LONG_PRESS)) {
             scanner.stopScan();
             LOG("abort scan");
             return "";  // cancel
-        }   
+        }
         delay(100);
     }
     scanner.stopScan();
@@ -200,8 +200,8 @@ String scanProductBarcode() {
 }
 
 uint32_t measureProductWeight() {
-    //printInfo(
-    //    "Please put the product on the scale,\nPress button 1 to confirm");
+    // printInfo(
+    //     "Please put the product on the scale,\nPress button 1 to confirm");
     printInfo("now weigh");
     LOG("weigh");
     while (!input(GREEN_BUTTON1, SHORT_PRESS)) {
@@ -227,8 +227,8 @@ uint32_t measureProductWeight() {
 
 void addProduct() {
     LOG("please scan barcode to add");
-    //lcd.print("lol");
-    //printInfo("Please scan barcode to add product...");
+    // lcd.print("lol");
+    // printInfo("Please scan barcode to add product...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
@@ -247,7 +247,7 @@ void addProduct() {
 
 void updateProduct() {
     LOG("please scan barcode to update");
-    //printInfo("Please scan barcode to update product weight...");
+    // printInfo("Please scan barcode to update product weight...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
@@ -270,7 +270,7 @@ void updateProduct() {
 
 void removeProduct() {
     LOG("please scan barcode to remove");
-    //printInfo("Please scan barcode to remove product...");
+    // printInfo("Please scan barcode to remove product...");
     String barcode = scanProductBarcode();
     if (barcode.length() == 0) return;
 
