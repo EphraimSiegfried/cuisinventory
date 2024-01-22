@@ -57,7 +57,7 @@ bool WiFiServiceClass::get(String barcode,
     // strcat(finalRequest, "?fields=");
     // LOG(String(finalRequest));
     // strcat(finalRequest, BARCODE_FIELDS);
-    char* request = (char*)malloc(300);
+    char request[300];
     char code[220];
     barcode.toCharArray(code, 220);
     strcpy(request, "/api/v3/product/");

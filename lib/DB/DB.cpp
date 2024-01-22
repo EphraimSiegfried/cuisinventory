@@ -1,5 +1,21 @@
 #include <DB.h>
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+#endif  // __arm__
 
+int freeMemory() {
+  char top;
+#ifdef __arm__
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+  return &top - __brkval;
+#else  // __arm__
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
+}
 DBClass::DBClass() {
     currentID = 0;  // reserved for product not found in get
 }
@@ -51,9 +67,13 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     quantity["packaging"] = weight - productQuantity;
     information["image_url"] = doc["product"]["image_url"];
     information["categories"] = doc["product"]["categories"];
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     if (!saveJson(formattedJson, String(currentID))) {
         return false;
     }
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     if (!addMappings(currentID, barcode)) {
         return false;
     }
@@ -246,7 +266,8 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     /*if (!SD.exists(path)) {
         LOG(path + "doesnt exist");
     }*/
-    LOG("test");
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     File stateFile = SD.open(path, FILE_READ);
     LOG("test2");
     if (!stateFile) {
@@ -320,6 +341,8 @@ bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
 }
 
 bool DBClass::initDatabase() {
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     if (!SD.exists(STATE_FOLDER)) {
         SD.mkdir(STATE_FOLDER);
     }
