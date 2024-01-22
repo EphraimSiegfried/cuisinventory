@@ -298,8 +298,10 @@ With Cuisinventory, a grocery inventory management system, we found such an idea
 Furthermore, we also implemented an external web server and the whole station had a case we designed and built using 3D printing and woodworking.
 To achieve all this, we needed regularly scheduled meetups on which we worked together and set goals for the implementation of components and logic.
 In this project we also set up more efficient collaboration processes, like switching to a more convenient integretion  and implementing automated GitHub actions.
-As we managed to actually implement all of this without cutting corners, we are very happy with the result of the project.
-We created a conveniently usable kitchen station that offers grocery management with a local database and a complementary website.
+As we managed to actually implement all of this without cutting corners, we are happy with the result of the project.
+However we also encountered bugs which were not reproducable with unit tests, for example the microcontroller failing to concatenate strings correctly and constant Strings being overwritten.
+Furthermore some of the QWIIC connector I2C cables in use also showed loose contacts.
+These issues lead to bugs that are difficult to reproduce and would require additional work to completely iron out.
 
 \section{Links}
 
