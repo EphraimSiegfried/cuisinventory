@@ -13,7 +13,7 @@ class WiFiServiceClass {
     WiFiServiceClass();
     bool connect(String ssid, String pw);
     bool put(StaticJsonDocument<JSONSIZE> &doc);
-    bool get(String barcode, StaticJsonDocument<JSONSIZE> &doc);
+    bool get(String barcode, DynamicJsonDocument& doc);
 
    private:
     int wifiStatus;

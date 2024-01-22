@@ -33,7 +33,7 @@ std::vector<uint32_t> DBClass::getAllIDs() {
     return ids;
 }
 
-bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
+bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight,
                   uint32_t time) {
     this->currentID++;
     StaticJsonDocument<JSONSIZE> formattedJson;
@@ -51,6 +51,7 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     quantity["packaging"] = weight - productQuantity;
     information["image_url"] = doc["product"]["image_url"];
     information["categories"] = doc["product"]["categories"];
+    doc.clear();
     if (!saveJson(formattedJson, String(currentID))) {
         return false;
     }
