@@ -27,18 +27,18 @@ uint64_t lastActiveTime = 0;  // millis() of last action
 #ifdef __arm__
 // should use uinstd.h to define sbrk but Due causes a conflict
 extern "C" char* sbrk(int incr);
-#else  // __ARM__
-extern char *__brkval;
+#else   // __ARM__
+extern char* __brkval;
 #endif  // __arm__
 
 int freeMemory2() {
-  char top;
+    char top;
 #ifdef __arm__
-  return &top - reinterpret_cast<char*>(sbrk(0));
+    return &top - reinterpret_cast<char*>(sbrk(0));
 #elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
-  return &top - __brkval;
-#else  // __arm__
-  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+    return &top - __brkval;
+#else   // __arm__
+    return __brkval ? &top - __brkval : &top - __malloc_heap_start;
 #endif  // __arm__
 }
 
@@ -112,9 +112,9 @@ void setup() {
     }
 
     rtc.start();
-    #ifdef DEBUG
+#ifdef DEBUG
     delay(1000);
-    #endif
+#endif
     LOG("free mem:");
     LOG(String(freeMemory2()));
     if (!DB.initDatabase()) {
