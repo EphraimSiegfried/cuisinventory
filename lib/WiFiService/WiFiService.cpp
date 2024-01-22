@@ -57,25 +57,27 @@ bool WiFiServiceClass::get(String barcode,
     // strcat(finalRequest, "?fields=");
     // LOG(String(finalRequest));
     // strcat(finalRequest, BARCODE_FIELDS);
-    char* request = (char*)malloc(300);
+    char *request = (char *)malloc(300);
     char code[220];
     barcode.toCharArray(code, 220);
     strcpy(request, "/api/v3/product/");
-    //request[16] = 'a';
-    //request[17] = '\0';
+    // request[16] = 'a';
+    // request[17] = '\0';
     LOG(strlen(code));
-    //strcat(request, "\0");
-    //strcat((char*)(&code+16), "?fields=empty,product_name,generic_name,allergens,"
-    //   "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-     //  "service,product_quantity,brands,image_url,categories,empty");
-    char fields[] = "?fields=empty,product_name,generic_name,allergens,"
-      "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-      "service,product_quantity,brands,image_url,categories,empty";
+    // strcat(request, "\0");
+    // strcat((char*)(&code+16),
+    // "?fields=empty,product_name,generic_name,allergens,"
+    //    "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
+    //   "service,product_quantity,brands,image_url,categories,empty");
+    char fields[] =
+        "?fields=empty,product_name,generic_name,allergens,"
+        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
+        "service,product_quantity,brands,image_url,categories,empty";
     LOG(code);
     strcat(request, code);
-    for (int i=0; fields[i] != '\0'; i++) {
-        request[15+strlen(code)+i] = fields[i];
-        request[15+strlen(code)+i+1] = '\0';
+    for (int i = 0; fields[i] != '\0'; i++) {
+        request[15 + strlen(code) + i] = fields[i];
+        request[15 + strlen(code) + i + 1] = '\0';
     }
     // request[14+strlen(code)] = '?';
     // request[15+strlen(code)] = 'f';
@@ -100,9 +102,9 @@ bool WiFiServiceClass::get(String barcode,
 
     // request[16+strlen(code)] = 'f';
     // request[17+strlen(code)] = '\0';
-    //strcat(request, fields);
-//        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
- //       "service,product_quantity,brands,image_url,categories,empty");
+    // strcat(request, fields);
+    //        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
+    //       "service,product_quantity,brands,image_url,categories,empty");
     // std::sprintf(request, "/api/v3/product/"
     //     "%s?fields=empty,product_name,generic_name,allergens,"
     //     "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
