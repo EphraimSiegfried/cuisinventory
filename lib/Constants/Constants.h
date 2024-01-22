@@ -27,7 +27,7 @@ const String DEVICE_KEY = "th1s1satestk3y";
 #endif
 
 // SD
-const int JSONSIZE = 1024;
+const int JSONSIZE = 1500;
 const int STATEFILESIZE = 100;
 const int SD_PIN = 10;
 #define INTERNAL_FOLDER "/.intern"

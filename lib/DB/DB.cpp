@@ -16,6 +16,14 @@ int freeMemory() {
   return __brkval ? &top - __brkval : &top - __malloc_heap_start;
 #endif  // __arm__
 }
+
+bool fileExists(String path) {
+    File file;
+    bool exists = SD.open(path, O_RDONLY);
+    if (exists) file.close();
+    return exists;
+}
+
 DBClass::DBClass() {
     currentID = 0;  // reserved for product not found in get
 }
@@ -263,7 +271,7 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     path = path + STATE_FOLDER + "/state";
     LOG(STATE_FOLDER);
     LOG(STATEFILE);
-    /*if (!SD.exists(path)) {
+    /*if (!fileExists(path)) {
         LOG(path + "doesnt exist");
     }*/
     LOG("free mem:");
@@ -289,7 +297,7 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     path = path + STATE_FOLDER + "/state";
     LOG(STATE_FOLDER);
     LOG(STATEFILE);
-    if (!SD.exists(path)) {
+    if (!fileExists(path)) {
         LOG(path + "doesnt exist");
     }
     if (!SD.remove(path)) {
@@ -343,15 +351,21 @@ bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
 bool DBClass::initDatabase() {
     LOG("free mem:");
     LOG(String(freeMemory()));
-    if (!SD.exists(STATE_FOLDER)) {
+    if (!fileExists(STATE_FOLDER)) {
         SD.mkdir(STATE_FOLDER);
     }
-    if (!SD.exists(INTERNAL_FOLDER)) {
+    LOG("free mem:");
+    LOG(String(freeMemory()));
+    if (!fileExists(INTERNAL_FOLDER)) {
         SD.mkdir(INTERNAL_FOLDER);
     }
-    if (!SD.exists(DATA_FOLDER)) {
+    LOG("free mem:");
+    LOG(String(freeMemory()));
+    if (!fileExists(DATA_FOLDER)) {
         SD.mkdir(DATA_FOLDER);
     }
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     String path = "";
     path = path + STATE_FOLDER + "/" + STATEFILE;
     if (!checkInitialized(path)) {

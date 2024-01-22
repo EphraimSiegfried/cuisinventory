@@ -42,75 +42,22 @@ bool WiFiServiceClass::get(String barcode, DynamicJsonDocument &jsonDoc) {
         return false;
     }
     LOG("Connected to server");
-    // send request
-    // String request = "";
-    // LOG("barcode path:" + String(BARCODE_PATH));
-    // request = request + String(BARCODE_PATH);
-    // request = request + barcode;
-    // LOG(request);
-    // char request2[request.length() + 1];  // +1 for the null terminator
-    // request.toCharArray(request2, sizeof(request2));
-    // char finalRequest[300] = "";
-    // strcat(finalRequest, request2);
-    // LOG(String(finalRequest));
-    // strcat(finalRequest, "?fields=");
-    // LOG(String(finalRequest));
-    // strcat(finalRequest, BARCODE_FIELDS);
-    char request[300];
-    char code[220];
-    barcode.toCharArray(code, 220);
-    strcpy(request, "/api/v3/product/");
-    // request[16] = 'a';
-    // request[17] = '\0';
-    LOG(strlen(code));
-    // strcat(request, "\0");
-    // strcat((char*)(&code+16),
-    // "?fields=empty,product_name,generic_name,allergens,"
-    //    "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //   "service,product_quantity,brands,image_url,categories,empty");
-    char fields[] =
-        "?fields=empty,product_name,generic_name,allergens,"
-        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-        "service,product_quantity,brands,image_url,categories,empty";
-    LOG(code);
-    strcat(request, code);
-    for (int i = 0; fields[i] != '\0'; i++) {
-        request[15 + strlen(code) + i] = fields[i];
-        request[15 + strlen(code) + i + 1] = '\0';
+    {
+        char request[300];
+        char code[220];
+        barcode.toCharArray(code, 220);
+        strcpy(request, "/api/v3/product/");
+        LOG(strlen(code));
+        char fields[] = BARCODE_FIELDS;
+        LOG(code);
+        strcat(request, code);
+        for (int i = 0; fields[i] != '\0'; i++) {
+            request[15 + strlen(code) + i] = fields[i];
+            request[15 + strlen(code) + i + 1] = '\0';
+        }
+        LOG(request);
+        httpClient.get(request);
     }
-    // request[14+strlen(code)] = '?';
-    // request[15+strlen(code)] = 'f';
-    // request[16+strlen(code)] = 'i';
-    // request[17+strlen(code)] = 'e';
-    // request[18+strlen(code)] = 'l';
-    // request[19+strlen(code)] = 'd';
-    // request[20+strlen(code)] = '\0';
-    // char request[220];
-    // char code[20];
-    // barcode.toCharArray(code, 20);
-    // LOG("char array:");
-    // LOG(code);
-    // LOG(barcode);
-    // LOG(barcode.toInt());
-    // strcpy(request, "/api/v3/product/");
-    // strcat(request, code);
-    // LOG(request);
-    // char fields[2];
-    // //strcpy(fields, "f");
-    // //strcpy((char *)(&request + 16 + strlen(code)), "faa\0");
-
-    // request[16+strlen(code)] = 'f';
-    // request[17+strlen(code)] = '\0';
-    // strcat(request, fields);
-    //        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //       "service,product_quantity,brands,image_url,categories,empty");
-    // std::sprintf(request, "/api/v3/product/"
-    //     "%s?fields=empty,product_name,generic_name,allergens,"
-    //     "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //     "service,product_quantity,brands,image_url,categories,empty", code);
-    LOG(request);
-    httpClient.get(request);
-    free(request);
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);
     // Check HTTP status
