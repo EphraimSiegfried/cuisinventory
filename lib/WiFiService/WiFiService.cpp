@@ -32,8 +32,7 @@ bool WiFiServiceClass::connect(String ssid, String pw) {
     return true;
 }
 
-bool WiFiServiceClass::get(String barcode,
-                           DynamicJsonDocument& jsonDoc) {
+bool WiFiServiceClass::get(String barcode, DynamicJsonDocument &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, BARCODE_ENDPOINT, port);

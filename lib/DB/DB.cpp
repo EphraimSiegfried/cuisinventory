@@ -33,8 +33,7 @@ std::vector<uint32_t> DBClass::getAllIDs() {
     return ids;
 }
 
-bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight,
-                  uint32_t time) {
+bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
     this->currentID++;
     StaticJsonDocument<JSONSIZE> formattedJson;
     JsonObject information = formattedJson.to<JsonObject>();
