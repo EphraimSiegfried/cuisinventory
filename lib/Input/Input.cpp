@@ -11,9 +11,11 @@ bool input(Button btn, Press press) {
         btns[btn]->clearEventBits();
         return true;
     }
-    // while (!btns[btn]->isClickedQueueEmpty() && !btns[btn]->isPressedQueueEmpty()) {
-    //     uint32_t start = btns[btn]->popPressedQueue();  // ms since button down
-    //     uint32_t end = btns[btn]->popClickedQueue();    // ms since button up
+    // while (!btns[btn]->isClickedQueueEmpty() &&
+    // !btns[btn]->isPressedQueueEmpty()) {
+    //     uint32_t start = btns[btn]->popPressedQueue();  // ms since button
+    //     down uint32_t end = btns[btn]->popClickedQueue();    // ms since
+    //     button up
     //     // if (start >= PRESS_AGE_THRESHOLD)
     //     //     continue;  // disregard too old presses
     //     if (press == LONG_PRESS) return (start - end >= LONG_PRESS_DURATION);

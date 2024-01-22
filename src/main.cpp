@@ -237,7 +237,7 @@ void addProduct() {
 
     LOG("barcode: ");
     LOG(barcode);
-    StaticJsonDocument<JSONSIZE> doc;
+    DynamicJsonDocument doc(JSONSIZE);
     if (!WiFiService.get(barcode, doc)) {
         printError("FATAL ERROR\nFailed to get product info");
         return;

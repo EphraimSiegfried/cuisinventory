@@ -8,9 +8,9 @@ const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 // Barcode API
 #define BARCODE_ENDPOINT "world.openfoodfacts.org"
 #define BARCODE_PATH     "/api/v3/product/"
-#define BARCODE_FIELDS                                                     \
-    "empty,product_name,generic_name,allergens,conservation_conditions,"   \
-    "nutriscore_grade,ingredients_text,customer_service,product_quantity," \
+#define BARCODE_FIELDS                 \
+    "empty,product_name,generic_name," \
+    "product_quantity,"                \
     "brands,image_url,categories,empty"  // APi has bug where first and last
                                          // fields are ignored
 #define USER_AGENT "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"
@@ -27,8 +27,8 @@ const String DEVICE_KEY = "th1s1satestk3y";
 #endif
 
 // SD
-const int JSONSIZE = 1536;
-const int STATEFILESIZE = 500;
+const int JSONSIZE = 1024;
+const int STATEFILESIZE = 100;
 const int SD_PIN = 10;
 #define INTERNAL_FOLDER "/.intern"
 #define STATE_FOLDER    "/.state"
@@ -46,7 +46,7 @@ const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
 
 // Scale
 const uint32_t STABILITY_THRESHOLD = 1;  // TODO: Change constant
-const uint32_t SCALING = 400;              // TODO: Change constant
+const uint32_t SCALING = 400;            // TODO: Change constant
 const uint32_t SAMPLE_AMOUNT = 10;       // TODO: Change constant
 
 // Buttons

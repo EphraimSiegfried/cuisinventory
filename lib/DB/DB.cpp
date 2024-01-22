@@ -49,8 +49,7 @@ std::vector<uint32_t> DBClass::getAllIDs() {
     return ids;
 }
 
-bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
-                  uint32_t time) {
+bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
     this->currentID++;
     StaticJsonDocument<JSONSIZE> formattedJson;
     JsonObject information = formattedJson.to<JsonObject>();
@@ -69,6 +68,7 @@ bool DBClass::add(StaticJsonDocument<JSONSIZE>& doc, uint32_t weight,
     information["categories"] = doc["product"]["categories"];
     LOG("free mem:");
     LOG(String(freeMemory()));
+    doc.clear();
     if (!saveJson(formattedJson, String(currentID))) {
         return false;
     }
