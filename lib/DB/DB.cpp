@@ -243,10 +243,12 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     path = path + STATE_FOLDER + "/state";
     LOG(STATE_FOLDER);
     LOG(STATEFILE);
-    if (!SD.exists(path)) {
+    /*if (!SD.exists(path)) {
         LOG(path + "doesnt exist");
-    }
+    }*/
+    LOG("test");
     File stateFile = SD.open(path, FILE_READ);
+    LOG("test2");
     if (!stateFile) {
         LOG("loadStateMapping(): Failed to open state file");
         return false;

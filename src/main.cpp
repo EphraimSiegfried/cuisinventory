@@ -150,7 +150,7 @@ void setup() {
             enterOfflineMode("Failed to connect to Wi-Fi");
             return;
         }*/
-    if (!WiFiService.connect("hotspot", "12345678")) {
+    if (!WiFiService.connect("iPhone", "12345678")) {
         enterOfflineMode("Failed to connect to Wi-Fi");
         return;
     }
@@ -213,7 +213,7 @@ uint32_t measureProductWeight() {
     do {
         lcd.clear();
         weight = nau.read();
-        lcd.print(String(weight * SCALING));
+        lcd.print(String(weight / SCALING));
         if (input(RED_BUTTON, LONG_PRESS)) return 0;  // cancel
         delay(100);
     } while (!(abs(nau.read() - weight) <= STABILITY_THRESHOLD));
@@ -221,7 +221,7 @@ uint32_t measureProductWeight() {
     for (uint8_t i; i < SAMPLE_AMOUNT; i++) {
         weight += nau.read();
     }
-    weight = (weight / (SAMPLE_AMOUNT - 1)) * SCALING;
+    weight = (weight / (SAMPLE_AMOUNT - 1)) / SCALING;
     return weight;
 }
 
@@ -242,11 +242,14 @@ void addProduct() {
         printError("FATAL ERROR\nFailed to get product info");
         return;
     }
+    LOG("WiFi get done");
 
     if (!DB.add(doc, weight, rtc.now().unixtime())) {
         printError("FATAL ERROR\nFailed to save product");
         return;
     }
+    LOG("DB add done");
+
     pendingSync = true;
     printSuccess("Product added successfully!");
     return;
