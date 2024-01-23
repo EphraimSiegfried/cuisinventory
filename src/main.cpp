@@ -51,7 +51,8 @@ void setup() {
     Wire.setClock(400000);  // set I2C SCL to High Speed Mode of 400kHz
 
     lcd.setFastBacklight(0xFFFFFF);  // set backlight to bright white
-    lcd.setContrast(LCD_CONTRAST);   // Set contrast. Lower to 0 for higher contrast.
+    lcd.setContrast(
+        LCD_CONTRAST);  // Set contrast. Lower to 0 for higher contrast.
     lcd.clear();
     LOG(F("start!"));
 
@@ -312,7 +313,8 @@ void printProducts() {
         char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
         String name = doc["name"].as<String>();
         String current = String(i) + "/" + String(ids.size());
-        printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") + date);
+        printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") +
+                  date);
     };
 
     size_t i = ids.size() - 1;
