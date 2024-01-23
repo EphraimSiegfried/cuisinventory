@@ -116,6 +116,7 @@ void setup() {
 #endif
     LOG("free mem:");
     LOG(String(freeMemory2()));
+    DB.clear();
     if (!DB.initDatabase()) {
         LOG(F("failed init database"));
     }
@@ -149,7 +150,7 @@ void setup() {
         offlineMode = true;
     };
 
-    if (!WiFiService.connect(F("iPhone"), F("12345678"))) {
+    if (!WiFiService.connect(F("hotspot"), F("12345678"))) {
         enterOfflineMode(F("Failed to connect to Wi-Fi"));
         return;
     }
@@ -252,7 +253,7 @@ void addProduct() {
     LOG(F("DB add done"));
 
     pendingSync = true;
-    printSuccess(F("Product added successfully!"));
+    printSuccess(F("Product added!"));
     return;
 }
 
@@ -309,16 +310,19 @@ void printProducts() {
     char dateformat[] = "DD.MM.YY: hh:mm";
 
     auto printProd = [&](size_t i, JsonDocument& doc) {
+        LOG("print prod id: " + String(ids[i]) );
         DB.getJsonFromID(ids[i], doc);
         char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
         String name = doc["name"].as<String>();
         String current = String(i) + "/" + String(ids.size());
-        printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") +
-                  date);
+        //printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") +
+        //          date);
+        printInfo(name);
     };
 
-    size_t i = ids.size() - 1;
-    printProd(ids[i], productJson);
+    size_t i = 0;
+    LOG("size:" + String(ids.size()));
+    printProd(i, productJson);
 
     while (1) {
         if (input(GREEN_BUTTON1, SHORT_PRESS)) {  // forwards
@@ -350,7 +354,8 @@ void loop() {
     }
     if (input(GREEN_BUTTON2, SHORT_PRESS)) {
         LOG(F("green 2 short"));
-        updateProduct();
+        //updateProduct();
+        printProducts();
         reset();
     }
     if (input(RED_BUTTON, SHORT_PRESS)) {

@@ -29,7 +29,7 @@ DBClass::DBClass() {
 }
 
 bool DBClass::getJsonFromID(uint32_t id, JsonDocument& doc) {
-    return loadJson(doc,INTERNAL_FOLDER, String(id).c_str());
+    return loadJson(doc,DATA_FOLDER, String(id).c_str());
 }
 
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
@@ -38,9 +38,11 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
         return false;
     }
     // read out field and add to vector
-    JsonArray productIds = barIdMapJson[barcode];
+    LOG("barcode to check" + barcode);
+    JsonArray productIds = barIdMapJson[barcode].to<JsonArray>();
     for (JsonVariant id : productIds) {
         ids.push_back(id.as<uint32_t>());
+        LOG("id" + String(id.as<uint32_t>()));
     }
     barIdMapJson.clear();
     return true;
@@ -55,7 +57,9 @@ std::vector<uint32_t> DBClass::getAllIDs() {
     JsonObject obj = idBarMapJson.as<JsonObject>();
     for (JsonPair kv : obj) {
         const char* keyStr = kv.key().c_str();
+        LOG("internal keystr: " + String(keyStr));
         uint32_t id = static_cast<uint32_t>(atol(keyStr));
+        LOG("internal keystr edit: " + String(keyStr));
         ids.push_back(id);
     }
     idBarMapJson.clear();
@@ -83,6 +87,7 @@ bool DBClass::add(JsonDocument& doc, uint32_t weight, uint32_t time) {
     LOG("free mem:");
     LOG(String(freeMemory()));
     doc.clear();
+    LOG(String(currentID).c_str());
     if (!saveJson(formattedJson, DATA_FOLDER,String(currentID).c_str())) {
         return false;
     }
@@ -146,11 +151,13 @@ uint32_t DBClass::getLeastWeightID(String barcode) {
     int leastWeight = 999999;
     getIDs(barcode, ids);
     for (uint32_t id : ids) {
+        LOG("GetIDLW: " + String(id));
         JsonDocument doc;
         loadJson(doc, DATA_FOLDER, String(id).c_str());
         int weight = doc["quantity"]["remaining"];
         if (weight < leastWeight) {
             leastWeight = weight;
+            LOG("least weight =" + String(id));
             leastWeightId = id;
         }
     }
