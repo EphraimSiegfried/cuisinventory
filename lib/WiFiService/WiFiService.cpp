@@ -44,6 +44,19 @@ bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
     LOG(F("Connected to server"));
     char request[200];
     snprintf(request,200,"%s%s%s%s",BARCODE_PATH,barcode,"?fields=",BARCODE_FIELDS);
+    /*char request[200];
+    char code[30];
+    barcode.toCharArray(code, 30);
+    strcpy(request, "/api/v3/product/");
+    LOG(strlen(code));
+    char fields[] = BARCODE_FIELDS;
+    LOG(code);
+    strcat(request, code);
+    for (int i = 0; fields[i] != '\0'; i++) {
+        request[15 + strlen(code) + i] = fields[i];
+        request[15 + strlen(code) + i + 1] = '\0';
+    }*/
+    LOG(request);
     httpClient.get(request);
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);
