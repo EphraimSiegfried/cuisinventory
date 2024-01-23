@@ -189,6 +189,7 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
     if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
         return false;
     }
+    barIdMapJson.clear();
     // update id bar mapping
     DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
     if (idBarJson.capacity() <= 0) {
@@ -215,11 +216,13 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
     for (JsonArray::iterator it = ids.begin(); it != ids.end(); ++it) {
         if ((*it).as<uint32_t>() == id) {
             ids.remove(it);
+            LOG("Removed id: " + String(id));
         }
     }
     if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
         return false;
     }
+    barIdMapJson.clear();
     // update id bar mapping
     DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
     if (idBarJson.capacity() <= 0) {
