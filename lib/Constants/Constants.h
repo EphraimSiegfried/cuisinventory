@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 // Main
-const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
+const uint64_t IDLE_WAIT_BEFORE_SYNC = 60000;  // ms
 
 // Barcode API
 extern const char BARCODE_ENDPOINT[];
@@ -41,7 +41,7 @@ const char UNIQUE_ID[] = "id";
 const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds
 
 // Scale
-const uint32_t STABILITY_THRESHOLD = 1;  // TODO: Change constant
+const uint32_t STABILITY_THRESHOLD = 5;  // TODO: Change constant
 const uint32_t SCALING = 400;            // TODO: Change constant
 const uint32_t SAMPLE_AMOUNT = 10;       // TODO: Change constant
 
