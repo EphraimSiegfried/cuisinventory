@@ -7,9 +7,9 @@ const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 
 // Barcode API
 extern const char BARCODE_ENDPOINT[];
-extern const char BARCODE_PATH [];
+extern const char BARCODE_PATH[];
 extern const char BARCODE_FIELDS[];
-extern const char USER_AGENT [];
+extern const char USER_AGENT[];
 
 // Pythonanywhere server
 extern const char PYTHONANYWHERE_ENDPOINT[];
@@ -28,7 +28,7 @@ const int STATEFILESIZE = 100;
 const int SD_PIN = 10;
 extern const char INTERNAL_FOLDER[];
 extern const char STATE_FOLDER[];
-extern const char DATA_FOLDER [];
+extern const char DATA_FOLDER[];
 extern const char SETTINGSFILE[];
 extern const char ID_BAR_MAPPINGFILE[];
 extern const char BAR_ID_MAPPINGFILE[];

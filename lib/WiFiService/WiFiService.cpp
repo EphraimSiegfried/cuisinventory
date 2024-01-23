@@ -43,7 +43,8 @@ bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
     }
     LOG(F("Connected to server"));
     char request[200];
-    snprintf(request,200,"%s%s%s%s",BARCODE_PATH,barcode,"?fields=",BARCODE_FIELDS);
+    snprintf(request, 200, "%s%s%s%s", BARCODE_PATH, barcode,
+             "?fields=", BARCODE_FIELDS);
     /*char request[200];
     char code[30];
     barcode.toCharArray(code, 30);
@@ -83,19 +84,22 @@ bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
     return true;
 }
 
-bool WiFiServiceClass::get2(const char barcode[], DynamicJsonDocument &jsonDoc) {
+bool WiFiServiceClass::get2(const char barcode[],
+                            DynamicJsonDocument &jsonDoc) {
     if (!this->wifiClient.connect(BARCODE_ENDPOINT, 443)) {
-    Serial.println(F("Connection to server failed"));
-    return false;
-  }
+        Serial.println(F("Connection to server failed"));
+        return false;
+    }
     LOG(F("Connected to server"));
     char request[200];
-    snprintf(request,200,"%s%s%s%s%s%s","GET ",BARCODE_PATH,barcode,"?fields=",BARCODE_FIELDS," HTTP/1.1");
-    wifiClient.println("Host: "+ String(BARCODE_ENDPOINT));
-    wifiClient.println(F("User-Agent: Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"));
+    snprintf(request, 200, "%s%s%s%s%s%s", "GET ", BARCODE_PATH, barcode,
+             "?fields=", BARCODE_FIELDS, " HTTP/1.1");
+    wifiClient.println("Host: " + String(BARCODE_ENDPOINT));
+    wifiClient.println(
+        F("User-Agent: Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"));
     wifiClient.println("Connection: close");
     wifiClient.println();
-     // Check HTTP status
+    // Check HTTP status
     char status[32] = {0};
     wifiClient.readBytesUntil('\r', status, sizeof(status));
     if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
@@ -108,8 +112,8 @@ bool WiFiServiceClass::get2(const char barcode[], DynamicJsonDocument &jsonDoc) 
     char doubleLine[] = "\r\n\r\n";
     // Skip headers
     wifiClient.find(doubleLine, 4);
-    //skip first line
-    wifiClient.find(singelLine,1);
+    // skip first line
+    wifiClient.find(singelLine, 1);
 
     auto error = deserializeJson(jsonDoc, wifiClient);
     if (error) {
