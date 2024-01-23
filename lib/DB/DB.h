@@ -29,8 +29,10 @@ class DBClass {
     bool getCurrentID();
     bool addMappings(uint32_t currentID, String barcode);
     bool removeMappings(uint32_t currentID, String barcode);
-    bool loadJson(JsonDocument& jsonDoc, const char folder[], const char name[]);
-    bool saveJson(JsonDocument& jsonDoc, const char folder[], const char name[]);
+    bool loadJson(JsonDocument& jsonDoc, const char folder[],
+                  const char name[]);
+    bool saveJson(JsonDocument& jsonDoc, const char folder[],
+                  const char name[]);
     bool initializeStateFile();
     bool initializeIdBarMapping();
     bool initializeBarIdMapping();

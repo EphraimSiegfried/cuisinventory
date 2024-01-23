@@ -85,9 +85,9 @@ bool WiFiServiceClass::get(const char barcode[], JsonDocument &jsonDoc) {
     LOG(jsonDoc["product"]["product_name"].as<const char *>());
     return true;
 }
-//this get2 method is more memory efficient as it passes the stream with server response directly to deserialize json without copy
-bool WiFiServiceClass::get2(const char barcode[],
-                            JsonDocument &jsonDoc) {
+// this get2 method is more memory efficient as it passes the stream with server
+// response directly to deserialize json without copy
+bool WiFiServiceClass::get2(const char barcode[], JsonDocument &jsonDoc) {
     if (!this->wifiClient.connect(BARCODE_ENDPOINT, 443)) {
         Serial.println(F("Connection to server failed"));
         return false;

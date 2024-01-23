@@ -29,12 +29,12 @@ DBClass::DBClass() {
 }
 
 bool DBClass::getJsonFromID(uint32_t id, JsonDocument& doc) {
-    return loadJson(doc,DATA_FOLDER, String(id).c_str());
+    return loadJson(doc, DATA_FOLDER, String(id).c_str());
 }
 
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
     JsonDocument barIdMapJson;
-    if(!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)){
+    if (!loadJson(barIdMapJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     // read out field and add to vector
@@ -51,7 +51,7 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
 std::vector<uint32_t> DBClass::getAllIDs() {
     std::vector<uint32_t> ids;
     JsonDocument idBarMapJson;
-    if(!loadJson(idBarMapJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)){
+    if (!loadJson(idBarMapJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return ids;
     }
     JsonObject obj = idBarMapJson.as<JsonObject>();
@@ -76,7 +76,7 @@ bool DBClass::add(JsonDocument& doc, uint32_t weight, uint32_t time) {
     information["date"] = time;
     information["name"] = doc["product"]["product_name"];
     information["brand"] = doc["product"]["brands"];
-    //JsonObject quantity = information.createNestedObject("quantity");
+    // JsonObject quantity = information.createNestedObject("quantity");
     JsonObject quantity = information["quantity"].to<JsonObject>();
     quantity["initial"] = weight;
     quantity["remaining"] = weight;
@@ -88,7 +88,7 @@ bool DBClass::add(JsonDocument& doc, uint32_t weight, uint32_t time) {
     LOG(String(freeMemory()));
     doc.clear();
     LOG(String(currentID).c_str());
-    if (!saveJson(formattedJson, DATA_FOLDER,String(currentID).c_str())) {
+    if (!saveJson(formattedJson, DATA_FOLDER, String(currentID).c_str())) {
         return false;
     }
     LOG(F("free mem:"));
@@ -138,7 +138,7 @@ bool DBClass::remove(uint32_t id, String barcode) {
 
 bool DBClass::getCurrentID() {
     JsonDocument stateJson;
-    if (!loadJson(stateJson,STATE_FOLDER,STATEFILE)){
+    if (!loadJson(stateJson, STATE_FOLDER, STATEFILE)) {
         return false;
     }
     this->currentID = stateJson[UNIQUE_ID].as<const uint32_t>();
@@ -169,7 +169,7 @@ bool DBClass::syncDB() {
     startEnd["sync"] = "BEGIN";
     WiFiService.put(startEnd);
     JsonDocument idBarJson;
-    if(!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)){
+    if (!loadJson(idBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     for (JsonPair keyValue : idBarJson.as<JsonObject>()) {
@@ -185,35 +185,35 @@ bool DBClass::syncDB() {
 bool DBClass::addMappings(uint32_t id, String barcode) {
     // update statefile
     JsonDocument stateJson;
-    if (!loadJson(stateJson,STATE_FOLDER,STATEFILE)) {
+    if (!loadJson(stateJson, STATE_FOLDER, STATEFILE)) {
         return false;
     }
     stateJson[UNIQUE_ID] = String(id);
-    if (!saveJson(stateJson,STATE_FOLDER,STATEFILE)) {
+    if (!saveJson(stateJson, STATE_FOLDER, STATEFILE)) {
         return false;
     }
     // update bar id mapping
     JsonDocument barIdMapJson;
-    if (!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
+    if (!loadJson(barIdMapJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     if (!barIdMapJson.containsKey(barcode)) {
-        //barIdMapJson.createNestedArray(barcode);
+        // barIdMapJson.createNestedArray(barcode);
         barIdMapJson[barcode].to<JsonArray>();
     }
     JsonArray ids = barIdMapJson[barcode];
     ids.add(id);
-    if (!saveJson(barIdMapJson,INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
+    if (!saveJson(barIdMapJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     barIdMapJson.clear();
     // update id bar mapping
     JsonDocument idBarJson;
-    if (!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)) {
+    if (!loadJson(idBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     idBarJson[String(id)] = barcode;
-    if (!saveJson(idBarJson,INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
+    if (!saveJson(idBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
@@ -222,7 +222,7 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
 bool DBClass::removeMappings(uint32_t id, String barcode) {
     // update bar id mapping
     JsonDocument barIdMapJson;
-    if (!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
+    if (!loadJson(barIdMapJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     if (!barIdMapJson.containsKey(barcode)) {
@@ -236,13 +236,13 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
             LOG("Removed id: " + String(id));
         }
     }
-    if (!saveJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
+    if (!saveJson(barIdMapJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     barIdMapJson.clear();
     // update id bar mapping
     JsonDocument idBarJson;
-    if (!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)) {
+    if (!loadJson(idBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     idBarJson.remove(String(id));
@@ -252,10 +252,11 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
     return true;
 }
 
-bool DBClass::loadJson(JsonDocument& jsonDoc, const char folder[], const char name[]) {
-    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder,"/", name);
+bool DBClass::loadJson(JsonDocument& jsonDoc, const char folder[],
+                       const char name[]) {
+    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder, "/", name);
     char path[totalLength + 1];  // +1 for the null terminator
-    snprintf(path, sizeof(path), "%s%s%s", folder,"/", name);
+    snprintf(path, sizeof(path), "%s%s%s", folder, "/", name);
     LOG(path);
     LOG("free mem:");
     LOG(String(freeMemory()));
@@ -275,10 +276,11 @@ bool DBClass::loadJson(JsonDocument& jsonDoc, const char folder[], const char na
     return true;
 }
 
-bool DBClass::saveJson(JsonDocument& jsonDoc, const char folder[], const char name[]) {
-    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder,"/", name);
+bool DBClass::saveJson(JsonDocument& jsonDoc, const char folder[],
+                       const char name[]) {
+    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder, "/", name);
     char path[totalLength + 1];  // +1 for the null terminator
-    snprintf(path, sizeof(path), "%s%s%s", folder,"/", name);
+    snprintf(path, sizeof(path), "%s%s%s", folder, "/", name);
     LOG(path);
     SD.remove(path);
     File jsonFile = SD.open(path, FILE_WRITE);
@@ -353,7 +355,7 @@ bool DBClass::checkInitialized(String filename) {
 bool DBClass::initializeStateFile() {
     JsonDocument stateJson;
     stateJson[UNIQUE_ID] = 0;
-    if (!saveJson(stateJson,STATE_FOLDER,STATEFILE)) {
+    if (!saveJson(stateJson, STATE_FOLDER, STATEFILE)) {
         LOG(F("Initialize state mapping failed"));
         return false;
     }
@@ -364,7 +366,7 @@ bool DBClass::initializeIdBarMapping() {
     JsonDocument IdBarJson;
     // create empty json
     IdBarJson.to<JsonObject>();
-    if (!saveJson(IdBarJson,INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
+    if (!saveJson(IdBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         LOG(F("Initialize id bar mapping failed"));
         return false;
     }

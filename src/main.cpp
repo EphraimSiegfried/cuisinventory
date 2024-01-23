@@ -310,13 +310,13 @@ void printProducts() {
     char dateformat[] = "DD.MM.YY: hh:mm";
 
     auto printProd = [&](size_t i, JsonDocument& doc) {
-        LOG("print prod id: " + String(ids[i]) );
+        LOG("print prod id: " + String(ids[i]));
         DB.getJsonFromID(ids[i], doc);
         char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
         String name = doc["name"].as<String>();
         String current = String(i) + "/" + String(ids.size());
-        //printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") +
-        //          date);
+        // printInfo(current + F("\n") + name + F("\n") + F("Enter date: ") +
+        //           date);
         printInfo(name);
     };
 
@@ -354,7 +354,7 @@ void loop() {
     }
     if (input(GREEN_BUTTON2, SHORT_PRESS)) {
         LOG(F("green 2 short"));
-        //updateProduct();
+        // updateProduct();
         printProducts();
         reset();
     }
