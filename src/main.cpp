@@ -238,7 +238,7 @@ void addProduct() {
 
     LOG(F("barcode: "));
     LOG(barcode);
-    DynamicJsonDocument doc(JSONSIZE);
+    JsonDocument doc;
     if (!WiFiService.get(barcode.c_str(), doc)) {
         printError(F("FATAL ERROR\nFailed to get product info"));
         return;
@@ -305,10 +305,10 @@ void printProducts() {
         return;
     }
 
-    StaticJsonDocument<JSONSIZE> productJson;
+    JsonDocument productJson;
     char dateformat[] = "DD.MM.YY: hh:mm";
 
-    auto printProd = [&](size_t i, StaticJsonDocument<JSONSIZE>& doc) {
+    auto printProd = [&](size_t i, JsonDocument& doc) {
         DB.getJsonFromID(ids[i], doc);
         char* date = DateTime(doc["date"].as<uint32_t>()).toString(dateformat);
         String name = doc["name"].as<String>();

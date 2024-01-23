@@ -32,7 +32,7 @@ bool WiFiServiceClass::connect(String ssid, String pw) {
     return true;
 }
 
-bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
+bool WiFiServiceClass::get(const char barcode[], JsonDocument &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, BARCODE_ENDPOINT, port);
@@ -85,7 +85,7 @@ bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
 }
 
 bool WiFiServiceClass::get2(const char barcode[],
-                            DynamicJsonDocument &jsonDoc) {
+                            JsonDocument &jsonDoc) {
     if (!this->wifiClient.connect(BARCODE_ENDPOINT, 443)) {
         Serial.println(F("Connection to server failed"));
         return false;
@@ -130,7 +130,7 @@ bool WiFiServiceClass::get2(const char barcode[],
     return true;
 }
 
-bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
+bool WiFiServiceClass::put(JsonDocument &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT, port);

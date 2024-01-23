@@ -28,13 +28,15 @@ DBClass::DBClass() {
     currentID = 0;  // reserved for product not found in get
 }
 
-bool DBClass::getJsonFromID(uint32_t id, StaticJsonDocument<JSONSIZE>& doc) {
-    return loadJson(doc, String(id));
+bool DBClass::getJsonFromID(uint32_t id, JsonDocument& doc) {
+    return loadJson(doc,INTERNAL_FOLDER, String(id).c_str());
 }
 
 bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
-    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
-    if (barIdMapJson.capacity() <= 0) return false;
+    JsonDocument barIdMapJson;
+    if(!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)){
+        return false;
+    }
     // read out field and add to vector
     JsonArray productIds = barIdMapJson[barcode];
     for (JsonVariant id : productIds) {
@@ -46,7 +48,10 @@ bool DBClass::getIDs(String barcode, std::vector<uint32_t>& ids) {
 
 std::vector<uint32_t> DBClass::getAllIDs() {
     std::vector<uint32_t> ids;
-    DynamicJsonDocument idBarMapJson = loadMapping(ID_BAR_MAPPINGFILE);
+    JsonDocument idBarMapJson;
+    if(!loadJson(idBarMapJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)){
+        return ids;
+    }
     JsonObject obj = idBarMapJson.as<JsonObject>();
     for (JsonPair kv : obj) {
         const char* keyStr = kv.key().c_str();
@@ -57,9 +62,9 @@ std::vector<uint32_t> DBClass::getAllIDs() {
     return ids;
 }
 
-bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
+bool DBClass::add(JsonDocument& doc, uint32_t weight, uint32_t time) {
     this->currentID++;
-    StaticJsonDocument<JSONSIZE> formattedJson;
+    JsonDocument formattedJson;
     JsonObject information = formattedJson.to<JsonObject>();
     information[UNIQUE_ID] = currentID;
     String barcode = doc["code"];
@@ -67,7 +72,8 @@ bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
     information["date"] = time;
     information["name"] = doc["product"]["product_name"];
     information["brand"] = doc["product"]["brands"];
-    JsonObject quantity = information.createNestedObject("quantity");
+    //JsonObject quantity = information.createNestedObject("quantity");
+    JsonObject quantity = information["quantity"].to<JsonObject>();
     quantity["initial"] = weight;
     quantity["remaining"] = weight;
     int productQuantity = doc["product"]["product_quantity"];
@@ -77,7 +83,7 @@ bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
     LOG("free mem:");
     LOG(String(freeMemory()));
     doc.clear();
-    if (!saveJson(formattedJson, String(currentID))) {
+    if (!saveJson(formattedJson, DATA_FOLDER,String(currentID).c_str())) {
         return false;
     }
     LOG(F("free mem:"));
@@ -89,24 +95,24 @@ bool DBClass::add(DynamicJsonDocument& doc, uint32_t weight, uint32_t time) {
 }
 
 bool DBClass::set(uint32_t id, String key, String value) {
-    StaticJsonDocument<JSONSIZE> jsonDoc;
-    if (!loadJson(jsonDoc, String(id))) {
+    JsonDocument jsonDoc;
+    if (!loadJson(jsonDoc, DATA_FOLDER, String(id).c_str())) {
         return false;
     }
     jsonDoc[key] = value;
-    if (!saveJson(jsonDoc, String(id))) {
+    if (!saveJson(jsonDoc, DATA_FOLDER, String(id).c_str())) {
         return false;
     }
     return true;
 }
 
 bool DBClass::setWeight(uint32_t id, uint32_t value) {
-    StaticJsonDocument<JSONSIZE> jsonDoc;
-    if (!loadJson(jsonDoc, String(id))) {
+    JsonDocument jsonDoc;
+    if (!loadJson(jsonDoc, DATA_FOLDER, String(id).c_str())) {
         return false;
     }
     jsonDoc["quantity"]["remaining"] = String(value);
-    if (!saveJson(jsonDoc, String(id))) {
+    if (!saveJson(jsonDoc, DATA_FOLDER, String(id).c_str())) {
         return false;
     }
     return true;
@@ -126,9 +132,11 @@ bool DBClass::remove(uint32_t id, String barcode) {
 }
 
 bool DBClass::getCurrentID() {
-    StaticJsonDocument<STATEFILESIZE> stateJson;
-    if (loadStateMapping(stateJson))
-        this->currentID = stateJson[UNIQUE_ID].as<const uint32_t>();
+    JsonDocument stateJson;
+    if (!loadJson(stateJson,STATE_FOLDER,STATEFILE)){
+        return false;
+    }
+    this->currentID = stateJson[UNIQUE_ID].as<const uint32_t>();
     return true;
 }
 
@@ -138,8 +146,8 @@ uint32_t DBClass::getLeastWeightID(String barcode) {
     int leastWeight = 999999;
     getIDs(barcode, ids);
     for (uint32_t id : ids) {
-        StaticJsonDocument<JSONSIZE> doc;
-        loadJson(doc, String(id));
+        JsonDocument doc;
+        loadJson(doc, DATA_FOLDER, String(id).c_str());
         int weight = doc["quantity"]["remaining"];
         if (weight < leastWeight) {
             leastWeight = weight;
@@ -150,13 +158,16 @@ uint32_t DBClass::getLeastWeightID(String barcode) {
 }
 
 bool DBClass::syncDB() {
-    StaticJsonDocument<JSONSIZE> startEnd;
+    JsonDocument startEnd;
     startEnd["sync"] = "BEGIN";
     WiFiService.put(startEnd);
-    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
+    JsonDocument idBarJson;
+    if(!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)){
+        return false;
+    }
     for (JsonPair keyValue : idBarJson.as<JsonObject>()) {
-        StaticJsonDocument<JSONSIZE> jsonSend;
-        loadJson(jsonSend, String(keyValue.key().c_str()));
+        JsonDocument jsonSend;
+        loadJson(jsonSend, DATA_FOLDER, keyValue.key().c_str());
         WiFiService.put(jsonSend);
     }
     startEnd["sync"] = "END";
@@ -166,37 +177,36 @@ bool DBClass::syncDB() {
 
 bool DBClass::addMappings(uint32_t id, String barcode) {
     // update statefile
-    StaticJsonDocument<STATEFILESIZE> stateJson;
-    if (!loadStateMapping(stateJson)) {
+    JsonDocument stateJson;
+    if (!loadJson(stateJson,STATE_FOLDER,STATEFILE)) {
         return false;
     }
     stateJson[UNIQUE_ID] = String(id);
-    if (!saveStateMapping(stateJson)) {
+    if (!saveJson(stateJson,STATE_FOLDER,STATEFILE)) {
         return false;
     }
     // update bar id mapping
-    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
-    if (barIdMapJson.capacity() <= 0) {
+    JsonDocument barIdMapJson;
+    if (!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
         return false;
     }
     if (!barIdMapJson.containsKey(barcode)) {
-        /*StaticJsonDocument<1> doc;
-        JsonArray array = doc.to<JsonArray>();*/
-        barIdMapJson.createNestedArray(barcode);
+        //barIdMapJson.createNestedArray(barcode);
+        barIdMapJson[barcode].to<JsonArray>();
     }
     JsonArray ids = barIdMapJson[barcode];
     ids.add(id);
-    if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
+    if (!saveJson(barIdMapJson,INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         return false;
     }
     barIdMapJson.clear();
     // update id bar mapping
-    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
-    if (idBarJson.capacity() <= 0) {
+    JsonDocument idBarJson;
+    if (!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)) {
         return false;
     }
     idBarJson[String(id)] = barcode;
-    if (!saveMapping(idBarJson, ID_BAR_MAPPINGFILE)) {
+    if (!saveJson(idBarJson,INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
@@ -204,8 +214,8 @@ bool DBClass::addMappings(uint32_t id, String barcode) {
 
 bool DBClass::removeMappings(uint32_t id, String barcode) {
     // update bar id mapping
-    DynamicJsonDocument barIdMapJson = loadMapping(BAR_ID_MAPPINGFILE);
-    if (barIdMapJson.capacity() <= 0) {
+    JsonDocument barIdMapJson;
+    if (!loadJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
         return false;
     }
     if (!barIdMapJson.containsKey(barcode)) {
@@ -219,28 +229,33 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
             LOG("Removed id: " + String(id));
         }
     }
-    if (!saveMapping(barIdMapJson, BAR_ID_MAPPINGFILE)) {
+    if (!saveJson(barIdMapJson,INTERNAL_FOLDER,BAR_ID_MAPPINGFILE)) {
         return false;
     }
     barIdMapJson.clear();
     // update id bar mapping
-    DynamicJsonDocument idBarJson = loadMapping(ID_BAR_MAPPINGFILE);
-    if (idBarJson.capacity() <= 0) {
+    JsonDocument idBarJson;
+    if (!loadJson(idBarJson,INTERNAL_FOLDER,ID_BAR_MAPPINGFILE)) {
         return false;
     }
     idBarJson.remove(String(id));
-    if (!saveMapping(idBarJson, ID_BAR_MAPPINGFILE)) {
+    if (!saveJson(idBarJson, INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         return false;
     }
     return true;
 }
 
-bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    String path = "";
-    path = path + DATA_FOLDER + "/" + name;
+bool DBClass::loadJson(JsonDocument& jsonDoc, const char folder[], const char name[]) {
+    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder,"/", name);
+    char path[totalLength + 1];  // +1 for the null terminator
+    snprintf(path, sizeof(path), "%s%s%s", folder,"/", name);
+    LOG(path);
+    LOG("free mem:");
+    LOG(String(freeMemory()));
     File jsonFile = SD.open(path, FILE_READ);
     if (!jsonFile) {
-        LOG(F("loadJson(): Failed to open json file"));
+        LOG(F("loadJson(): Failed to open json file with path:"));
+        LOG(path);
         return false;
     }
     auto error = deserializeJson(jsonDoc, jsonFile);
@@ -253,101 +268,20 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     return true;
 }
 
-bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
-    String path = "";
-    path = path + DATA_FOLDER + "/" + name;
+bool DBClass::saveJson(JsonDocument& jsonDoc, const char folder[], const char name[]) {
+    size_t totalLength = snprintf(NULL, 0, "%s%s%s", folder,"/", name);
+    char path[totalLength + 1];  // +1 for the null terminator
+    snprintf(path, sizeof(path), "%s%s%s", folder,"/", name);
     LOG(path);
     SD.remove(path);
     File jsonFile = SD.open(path, FILE_WRITE);
     if (!jsonFile) {
-        LOG(F("saveJson(): Failed to open json file"));
+        LOG(F("saveJson(): Failed to open json file with path:"));
+        LOG(path);
         return false;
     }
     serializeJson(jsonDoc, jsonFile);
     jsonFile.close();
-    return true;
-}
-
-bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    LOG(STATEFILE);
-    String path = "";
-    path = path + STATE_FOLDER + "/state";
-    LOG(STATE_FOLDER);
-    LOG(STATEFILE);
-    /*if (!fileExists(path)) {
-        LOG(path + "doesnt exist");
-    }*/
-    LOG("free mem:");
-    LOG(String(freeMemory()));
-    File stateFile = SD.open(path, FILE_READ);
-    LOG(F("test2"));
-    if (!stateFile) {
-        LOG(F("loadStateMapping(): Failed to open state file"));
-        return false;
-    }
-    auto error = deserializeJson(stateJson, stateFile);
-    if (error) {
-        LOG(F("loadStateMapping(): deserializeJson() failed with code "));
-        LOG(error.c_str());
-        return false;
-    }
-    stateFile.close();
-    return true;
-}
-
-bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
-    String path = "";
-    path = path + STATE_FOLDER + "/state";
-    LOG(STATE_FOLDER);
-    LOG(STATEFILE);
-    if (!fileExists(path)) {
-        LOG(path + "doesnt exist");
-    }
-    if (!SD.remove(path)) {
-        LOG(F("failed remove"));
-    }
-    File stateFile = SD.open(path, FILE_WRITE);
-    if (!stateFile) {
-        LOG(F("saveStateMapping(): Failed to open state file"));
-        return false;
-    }
-    serializeJson(stateJson, stateFile);
-    stateFile.close();
-    return true;
-}
-
-DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
-    String path = "";
-    path = path + INTERNAL_FOLDER + "/" + mappingfile;
-    File mappingFile = SD.open(path, FILE_READ);
-    if (!mappingFile) {
-        LOG(F("loadMapping(): Failed to open mapping file"));
-        return DynamicJsonDocument(0);
-    }
-    // estimate required filesize
-    uint64_t estimateMembers = mappingFile.size() / 12;
-    DynamicJsonDocument mapJson(100 + JSON_OBJECT_SIZE(1 + estimateMembers));
-    auto error = deserializeJson(mapJson, mappingFile);
-    if (error) {
-        LOG(F("loadMapping(): deserializeJson() failed with code "));
-        LOG(error.c_str());
-        return DynamicJsonDocument(0);
-    }
-    mappingFile.close();
-    return mapJson;
-}
-
-bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
-    String path = "";
-    path = path + INTERNAL_FOLDER + "/" + mappingName;
-    SD.remove(path);
-    File mappingFile = SD.open(path, FILE_WRITE);
-    if (!mappingFile) {
-        LOG(F("saveMapping(): Failed to open mapping file"));
-        return false;
-    }
-    serializeJson(doc, mappingFile);
-    mappingFile.close();
     return true;
 }
 
@@ -410,9 +344,9 @@ bool DBClass::checkInitialized(String filename) {
 }
 
 bool DBClass::initializeStateFile() {
-    StaticJsonDocument<STATEFILESIZE> stateJson;
+    JsonDocument stateJson;
     stateJson[UNIQUE_ID] = 0;
-    if (!saveStateMapping(stateJson)) {
+    if (!saveJson(stateJson,STATE_FOLDER,STATEFILE)) {
         LOG(F("Initialize state mapping failed"));
         return false;
     }
@@ -420,10 +354,10 @@ bool DBClass::initializeStateFile() {
 }
 
 bool DBClass::initializeIdBarMapping() {
-    DynamicJsonDocument IdBarJson(100);
+    JsonDocument IdBarJson;
     // create empty json
     IdBarJson.to<JsonObject>();
-    if (!saveMapping(IdBarJson, ID_BAR_MAPPINGFILE)) {
+    if (!saveJson(IdBarJson,INTERNAL_FOLDER, ID_BAR_MAPPINGFILE)) {
         LOG(F("Initialize id bar mapping failed"));
         return false;
     }
@@ -431,10 +365,10 @@ bool DBClass::initializeIdBarMapping() {
 }
 
 bool DBClass::initializeBarIdMapping() {
-    DynamicJsonDocument barIdJson(100);
+    JsonDocument barIdJson;
     // create empty json
     barIdJson.to<JsonObject>();
-    if (!saveMapping(barIdJson, BAR_ID_MAPPINGFILE)) {
+    if (!saveJson(barIdJson, INTERNAL_FOLDER, BAR_ID_MAPPINGFILE)) {
         LOG(F("Initialize bar id mapping failed"));
         return false;
     }
