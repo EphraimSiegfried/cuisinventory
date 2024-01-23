@@ -1,14 +1,17 @@
 #include <Scale.h>
 
 Adafruit_NAU7802 nau;
+
 bool initScale() {
     if (!nau.begin()) {
-        LOG("Failed to find NAU7802");
+        LOG(F("Failed to find NAU7802"));
         return false;
     }
+
     nau.setLDO(NAU7802_3V9);
     nau.setGain(NAU7802_GAIN_128);
     nau.setRate(NAU7802_RATE_10SPS);
+
     for (uint8_t i = 0; i < 10; i++) {
         while (!nau.available()) delay(1);
         nau.read();
@@ -21,8 +24,9 @@ bool initScale() {
             calibrated = true;
         }
     }
+
     if (!calibrated) {
-        LOG("Failed to calibrate internal offset");
+        LOG(F("Failed to calibrate internal offset"));
         return false;
     }
 
@@ -33,10 +37,12 @@ bool initScale() {
             calibrated = true;
         }
     }
+
     if (!calibrated) {
-        LOG("Failed to calibrate system offset");
+        LOG(F("Failed to calibrate system offset"));
         return false;
     }
-    LOG("Calibrated system offset");
+
+    LOG(F("Calibrated system offset"));
     return true;
 }

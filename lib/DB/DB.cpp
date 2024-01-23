@@ -180,7 +180,7 @@ bool DBClass::removeMappings(uint32_t id, String barcode) {
         return false;
     }
     if (!barIdMapJson.containsKey(barcode)) {
-        LOG("Barcode doesn't exist");
+        LOG(F("Barcode doesn't exist"));
         return false;
     }
     JsonArray ids = barIdMapJson[barcode];
@@ -209,7 +209,7 @@ bool DBClass::loadJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     path = path + DATA_FOLDER + "/" + name;
     File jsonFile = SD.open(path, FILE_READ);
     if (!jsonFile) {
-        LOG("loadJson(): Failed to open json file");
+        LOG(F("loadJson(): Failed to open json file"));
         return false;
     }
     auto error = deserializeJson(jsonDoc, jsonFile);
@@ -229,7 +229,7 @@ bool DBClass::saveJson(StaticJsonDocument<JSONSIZE>& jsonDoc, String name) {
     SD.remove(path);
     File jsonFile = SD.open(path, FILE_WRITE);
     if (!jsonFile) {
-        LOG("saveJson(): Failed to open json file");
+        LOG(F("saveJson(): Failed to open json file"));
         return false;
     }
     serializeJson(jsonDoc, jsonFile);
@@ -246,11 +246,11 @@ bool DBClass::loadStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
     /*if (!SD.exists(path)) {
         LOG(path + "doesnt exist");
     }*/
-    LOG("test");
+    LOG(F("test"));
     File stateFile = SD.open(path, FILE_READ);
-    LOG("test2");
+    LOG(F("test2"));
     if (!stateFile) {
-        LOG("loadStateMapping(): Failed to open state file");
+        LOG(F("loadStateMapping(): Failed to open state file"));
         return false;
     }
     auto error = deserializeJson(stateJson, stateFile);
@@ -272,11 +272,11 @@ bool DBClass::saveStateMapping(StaticJsonDocument<STATEFILESIZE>& stateJson) {
         LOG(path + "doesnt exist");
     }
     if (!SD.remove(path)) {
-        LOG("failed remove");
+        LOG(F("failed remove"));
     }
     File stateFile = SD.open(path, FILE_WRITE);
     if (!stateFile) {
-        LOG("saveStateMapping(): Failed to open state file");
+        LOG(F("saveStateMapping(): Failed to open state file"));
         return false;
     }
     serializeJson(stateJson, stateFile);
@@ -289,12 +289,12 @@ DynamicJsonDocument DBClass::loadMapping(String mappingfile) {
     path = path + INTERNAL_FOLDER + "/" + mappingfile;
     File mappingFile = SD.open(path, FILE_READ);
     if (!mappingFile) {
-        LOG("loadMapping(): Failed to open mapping file");
+        LOG(F("loadMapping(): Failed to open mapping file"));
         return DynamicJsonDocument(0);
     }
     // estimate required filesize
     uint64_t estimateMembers = mappingFile.size() / 12;
-    DynamicJsonDocument mapJson(200 + JSON_OBJECT_SIZE(1 + estimateMembers));
+    DynamicJsonDocument mapJson(100 + JSON_OBJECT_SIZE(1 + estimateMembers));
     auto error = deserializeJson(mapJson, mappingFile);
     if (error) {
         LOG(F("loadMapping(): deserializeJson() failed with code "));
@@ -311,7 +311,7 @@ bool DBClass::saveMapping(DynamicJsonDocument doc, String mappingName) {
     SD.remove(path);
     File mappingFile = SD.open(path, FILE_WRITE);
     if (!mappingFile) {
-        LOG("saveMapping(): Failed to open mapping file");
+        LOG(F("saveMapping(): Failed to open mapping file"));
         return false;
     }
     serializeJson(doc, mappingFile);
@@ -373,7 +373,7 @@ bool DBClass::initializeStateFile() {
     StaticJsonDocument<STATEFILESIZE> stateJson;
     stateJson[UNIQUE_ID] = 0;
     if (!saveStateMapping(stateJson)) {
-        LOG("Initialize state mapping failed");
+        LOG(F("Initialize state mapping failed"));
         return false;
     }
     return true;
@@ -384,7 +384,7 @@ bool DBClass::initializeIdBarMapping() {
     // create empty json
     IdBarJson.to<JsonObject>();
     if (!saveMapping(IdBarJson, ID_BAR_MAPPINGFILE)) {
-        LOG("Initialize id bar mapping failed");
+        LOG(F("Initialize id bar mapping failed"));
         return false;
     }
     return true;
@@ -395,7 +395,7 @@ bool DBClass::initializeBarIdMapping() {
     // create empty json
     barIdJson.to<JsonObject>();
     if (!saveMapping(barIdJson, BAR_ID_MAPPINGFILE)) {
-        LOG("Initialize bar id mapping failed");
+        LOG(F("Initialize bar id mapping failed"));
         return false;
     }
     return true;

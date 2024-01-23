@@ -6,18 +6,14 @@
 const uint64_t IDLE_WAIT_BEFORE_SYNC = 300000;  // ms
 
 // Barcode API
-#define BARCODE_ENDPOINT "world.openfoodfacts.org"
-#define BARCODE_PATH     "/api/v3/product/"
-#define BARCODE_FIELDS                 \
-    "empty,product_name,generic_name," \
-    "product_quantity,"                \
-    "brands,image_url,categories,empty"  // APi has bug where first and last
-                                         // fields are ignored
-#define USER_AGENT "Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"
+extern const char BARCODE_ENDPOINT[];
+extern const char BARCODE_PATH [];
+extern const char BARCODE_FIELDS[];
+extern const char USER_AGENT [];
 
 // Pythonanywhere server
-const String PYTHONANYWHERE_ENDPOINT = "kev1n27.pythonanywhere.com";
-const String PYTHONANYWHERE_PATH = "/cuisinventory";
+extern const char PYTHONANYWHERE_ENDPOINT[];
+extern const char PYTHONANYWHERE_PATH[];
 
 // Device constants
 #ifndef PIO_UNIT_TESTING
@@ -30,16 +26,16 @@ const String DEVICE_KEY = "th1s1satestk3y";
 const int JSONSIZE = 1024;
 const int STATEFILESIZE = 100;
 const int SD_PIN = 10;
-#define INTERNAL_FOLDER "/.intern"
-#define STATE_FOLDER    "/.state"
-#define DATA_FOLDER     "/.data"
-const String SETTINGSFILE = "settings.json";
-#define ID_BAR_MAPPINGFILE "idbar"
-#define BAR_ID_MAPPINGFILE "barid"
-#define STATEFILE          "state"
+extern const char INTERNAL_FOLDER[];
+extern const char STATE_FOLDER[];
+extern const char DATA_FOLDER [];
+extern const char SETTINGSFILE[];
+extern const char ID_BAR_MAPPINGFILE[];
+extern const char BAR_ID_MAPPINGFILE[];
+extern const char STATEFILE[];
 
 // JSON
-#define UNIQUE_ID "id"
+const char UNIQUE_ID[] = "id";
 
 // Clock
 const uint32_t CLOCK_OFFSET = -17;  // offset of RTC in seconds

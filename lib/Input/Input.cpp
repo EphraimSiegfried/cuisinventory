@@ -11,7 +11,7 @@ bool input(Button btn, Press press) {
         btns[btn]->clearEventBits();
         return true;
     }
-    // while (!btns[btn]->isClickedQueueEmpty() &&
+   // while (!btns[btn]->isClickedQueueEmpty() &&
     // !btns[btn]->isPressedQueueEmpty()) {
     //     uint32_t start = btns[btn]->popPressedQueue();  // ms since button
     //     down uint32_t end = btns[btn]->popClickedQueue();    // ms since

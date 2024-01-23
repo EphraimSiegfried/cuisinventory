@@ -196,7 +196,6 @@ Our project involves numerous hardware components, and it was crucial to ensure 
 	\centering
 	\includegraphics[angle=90,width=0.3\textwidth]{controller.jpeg}
 	\caption{Stacking Wifi and SD Card}
-	\label{fig:mesh1}
 \end{figure}
 
 The remaining components include the strain load cell, the ADC chip for weight measurement, an LCD, three buttons, and a barcode scanner. All of these, except the barcode scanner, communicate via the I2C protocol, which is beneficial since it allows multiple devices to share the same bus.
@@ -207,6 +206,17 @@ The final component, the Barcode Scanner, employs UART for communication and was
 
 \subsubsection{Building the case}
 We wanted to build a case that houses all required hardware components and offers convenient interaction with them in the scope of a kitchen station inventory management system.
+We designed the entire case in a CAD software called Fusion360. The middle part was designed to be 3D printed and contains holes for the buttons and the LCD display.
+The dimensions of our hardware components was researched over the internet.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{case2.jpg}
+	\caption{Designing the case}
+	\label{fig:mesh1}
+\end{figure}
+The bottom and the top of the case are made using woodplates as 3D printing simple flat surfaces wasn't worth the material cost and time.
+The strain gauge cell is placed on a chunk of wood and the top woodplate is placed on the strain gauge with a spacer in between them.
+This way we can use the strain gauge to measure weight by putting products on the top of the case.
 \subsection{Software}
 The Cuisinventory station fundamentally has five functions that are offered to the user. The first three are managing the inventory: Adding a product, updating the weight of a product and removing a product.
 The last two are displaying the inventory on the local LCD and putting the main controller in USB mode, such that the user can make changes to the configuration files on the local SD card.

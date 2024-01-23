@@ -14,10 +14,10 @@ WiFiServiceClass::WiFiServiceClass() {
 bool WiFiServiceClass::connect(String ssid, String pw) {
     // check for the WiFi module:
     if (WiFi.status() == WL_NO_MODULE) {
-        LOG("Communication with WiFi module failed!");
+        LOG(F("Communication with WiFi module failed!"));
         return false;
     }
-    LOG("Attempting to connect to WPA SSID: \r\n");
+    LOG(F("Attempting to connect to WPA SSID: \r\n"));
     LOG(ssid);
     // Connect to WPA/WPA2 network:
     int amountOfTries = 0;
@@ -32,105 +32,81 @@ bool WiFiServiceClass::connect(String ssid, String pw) {
     return true;
 }
 
-bool WiFiServiceClass::get(String barcode, DynamicJsonDocument &jsonDoc) {
+bool WiFiServiceClass::get(const char barcode[], DynamicJsonDocument &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
         HttpClient(this->wifiClient, BARCODE_ENDPOINT, port);
     // if you get a connection, report back via serial:
     if (!this->wifiClient.connect(BARCODE_ENDPOINT, port)) {
-        LOG("Connection to server failed");
+        LOG(F("Connection to server failed"));
         return false;
     }
-    LOG("Connected to server");
-    // send request
-    // String request = "";
-    // LOG("barcode path:" + String(BARCODE_PATH));
-    // request = request + String(BARCODE_PATH);
-    // request = request + barcode;
-    // LOG(request);
-    // char request2[request.length() + 1];  // +1 for the null terminator
-    // request.toCharArray(request2, sizeof(request2));
-    // char finalRequest[300] = "";
-    // strcat(finalRequest, request2);
-    // LOG(String(finalRequest));
-    // strcat(finalRequest, "?fields=");
-    // LOG(String(finalRequest));
-    // strcat(finalRequest, BARCODE_FIELDS);
-    char *request = (char *)malloc(300);
-    char code[220];
-    barcode.toCharArray(code, 220);
-    strcpy(request, "/api/v3/product/");
-    // request[16] = 'a';
-    // request[17] = '\0';
-    LOG(strlen(code));
-    // strcat(request, "\0");
-    // strcat((char*)(&code+16),
-    // "?fields=empty,product_name,generic_name,allergens,"
-    //    "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //   "service,product_quantity,brands,image_url,categories,empty");
-    char fields[] =
-        "?fields=empty,product_name,generic_name,allergens,"
-        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-        "service,product_quantity,brands,image_url,categories,empty";
-    LOG(code);
-    strcat(request, code);
-    for (int i = 0; fields[i] != '\0'; i++) {
-        request[15 + strlen(code) + i] = fields[i];
-        request[15 + strlen(code) + i + 1] = '\0';
-    }
-    // request[14+strlen(code)] = '?';
-    // request[15+strlen(code)] = 'f';
-    // request[16+strlen(code)] = 'i';
-    // request[17+strlen(code)] = 'e';
-    // request[18+strlen(code)] = 'l';
-    // request[19+strlen(code)] = 'd';
-    // request[20+strlen(code)] = '\0';
-    // char request[220];
-    // char code[20];
-    // barcode.toCharArray(code, 20);
-    // LOG("char array:");
-    // LOG(code);
-    // LOG(barcode);
-    // LOG(barcode.toInt());
-    // strcpy(request, "/api/v3/product/");
-    // strcat(request, code);
-    // LOG(request);
-    // char fields[2];
-    // //strcpy(fields, "f");
-    // //strcpy((char *)(&request + 16 + strlen(code)), "faa\0");
-
-    // request[16+strlen(code)] = 'f';
-    // request[17+strlen(code)] = '\0';
-    // strcat(request, fields);
-    //        "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //       "service,product_quantity,brands,image_url,categories,empty");
-    // std::sprintf(request, "/api/v3/product/"
-    //     "%s?fields=empty,product_name,generic_name,allergens,"
-    //     "conservation_conditions,nutriscore_grade,ingredients_text,customer_"
-    //     "service,product_quantity,brands,image_url,categories,empty", code);
-    LOG(request);
+    LOG(F("Connected to server"));
+    char request[200];
+    snprintf(request,200,"%s%s%s%s",BARCODE_PATH,barcode,"?fields=",BARCODE_FIELDS);
     httpClient.get(request);
-    free(request);
     //               " HTTP/1.1\r\n" + "Host: " + BARCODE_ENDPOINT + "\r\n" +
     //               "User-Agent: " + USER_AGENT);
     // Check HTTP status
     int statusCode = httpClient.responseStatusCode();
     LOG(statusCode);
     if (statusCode != 200) {
-        LOG("Unexpected response:");
+        LOG(F("Unexpected response:"));
         LOG(statusCode);
         return false;
     }
     // Get response
-    String response = httpClient.responseBody();
-    auto error = deserializeJson(jsonDoc, response);
+    auto error = deserializeJson(jsonDoc, httpClient.responseBody());
     if (error) {
-        LOG("deserializeJson() failed with code:");
+        LOG(F("deserializeJson() failed with code:"));
         LOG(error.c_str());
         return false;
     }
     if (strcmp(jsonDoc["status"].as<const char *>(), "success") != 0) {
-        LOG("Couldn't find product");
+        LOG(F("Couldn't find product"));
+        return false;
+    }
+    LOG(jsonDoc["product"]["product_name"].as<const char *>());
+    return true;
+}
+
+bool WiFiServiceClass::get2(const char barcode[], DynamicJsonDocument &jsonDoc) {
+    if (!this->wifiClient.connect(BARCODE_ENDPOINT, 443)) {
+    Serial.println(F("Connection to server failed"));
+    return false;
+  }
+    LOG(F("Connected to server"));
+    char request[200];
+    snprintf(request,200,"%s%s%s%s%s%s","GET ",BARCODE_PATH,barcode,"?fields=",BARCODE_FIELDS," HTTP/1.1");
+    wifiClient.println("Host: "+ String(BARCODE_ENDPOINT));
+    wifiClient.println(F("User-Agent: Cuisinventory/1.0 alexander.lutsch@stud.unibas.ch"));
+    wifiClient.println("Connection: close");
+    wifiClient.println();
+     // Check HTTP status
+    char status[32] = {0};
+    wifiClient.readBytesUntil('\r', status, sizeof(status));
+    if (strcmp(status, "HTTP/1.1 200 OK") != 0) {
+        Serial.print(F("Unexpected response: "));
+        Serial.println(status);
+        return false;
+    }
+
+    char singelLine[] = "\n";
+    char doubleLine[] = "\r\n\r\n";
+    // Skip headers
+    wifiClient.find(doubleLine, 4);
+    //skip first line
+    wifiClient.find(singelLine,1);
+
+    auto error = deserializeJson(jsonDoc, wifiClient);
+    if (error) {
+        LOG(F("deserializeJson() failed with code:"));
+        LOG(error.c_str());
+        return false;
+    }
+    wifiClient.stop();
+    if (strcmp(jsonDoc["status"].as<const char *>(), "success") != 0) {
+        LOG(F("Couldn't find product"));
         return false;
     }
     LOG(jsonDoc["product"]["product_name"].as<const char *>());
@@ -140,13 +116,13 @@ bool WiFiServiceClass::get(String barcode, DynamicJsonDocument &jsonDoc) {
 bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     int port = 443;
     HttpClient httpClient =
-        HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT.c_str(), port);
+        HttpClient(this->wifiClient, PYTHONANYWHERE_ENDPOINT, port);
     // if you get a connection, report back via serial:
-    if (!this->wifiClient.connect(PYTHONANYWHERE_ENDPOINT.c_str(), port)) {
-        LOG("Connection to server failed");
+    if (!this->wifiClient.connect(PYTHONANYWHERE_ENDPOINT, port)) {
+        LOG(F("Connection to server failed"));
         return false;
     }
-    LOG("Connected to server");
+    LOG(F("Connected to server"));
     // send request
     char serializedJson[JSONSIZE];
     serializeJson(jsonDoc, serializedJson);
@@ -159,7 +135,7 @@ bool WiFiServiceClass::put(StaticJsonDocument<JSONSIZE> &jsonDoc) {
     // Check HTTP status
     int statusCode = httpClient.responseStatusCode();
     if (statusCode != 200) {
-        LOG("Unexpected response:");
+        LOG(F("Unexpected response:"));
         LOG(statusCode);
         return false;
     }
